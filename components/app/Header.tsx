@@ -6,6 +6,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
 import { useChatActions, useIsChatOpen } from "@/lib/store/chat-store-provider";
+import { CurrencyConverter } from "@/components/app/CurrencyConverter";
 
 export function Header() {
   const { openCart } = useCartActions();
@@ -45,6 +46,9 @@ export function Header() {
               <span className="text-sm font-medium">Ask AI</span>
             </Button>
           )}
+
+          {/* Currency Converter */}
+          <CurrencyConverter />
 
           {/* Cart Button */}
           <Button
