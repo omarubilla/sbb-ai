@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { CurrencyProvider } from "@/lib/context/CurrencyContext";
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
 
 const SanityAppProvider = dynamic(
@@ -14,5 +15,9 @@ const SanityAppProvider = dynamic(
 );
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <SanityAppProvider>{children}</SanityAppProvider>;
+  return (
+    <CurrencyProvider>
+      <SanityAppProvider>{children}</SanityAppProvider>
+    </CurrencyProvider>
+  );
 }

@@ -1,8 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { AddToCartButton } from "@/components/app/AddToCartButton";
 import { AskAISimilarButton } from "@/components/app/AskAISimilarButton";
 import { StockBadge } from "@/components/app/StockBadge";
-import { formatPrice } from "@/lib/utils";
+import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import type { PRODUCT_BY_SLUG_QUERYResult } from "@/sanity.types";
 
 interface ProductInfoProps {
@@ -10,6 +12,7 @@ interface ProductInfoProps {
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
+  const formatPrice = useFormattedPrice();
   const imageUrl = product.images?.[0]?.asset?.url;
 
   return (

@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn, formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import type { FEATURED_PRODUCTS_QUERYResult } from "@/sanity.types";
 
 type FeaturedProduct = FEATURED_PRODUCTS_QUERYResult[number];
@@ -28,6 +29,7 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+  const formatPrice = useFormattedPrice();
 
   useEffect(() => {
     if (!api) return;
@@ -71,7 +73,7 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
         <CarouselContent className="-ml-0">
           {products.map((product) => (
             <CarouselItem key={product._id} className="pl-0">
-              <FeaturedSlide product={product} />
+              <FeaturedSlide product={product} formatPrice={formatPrice} />
             </CarouselItem>
           ))}
         </CarouselContent>
@@ -106,9 +108,10 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
 
 interface FeaturedSlideProps {
   product: FeaturedProduct;
+  formatPrice: (amount: number | null | undefined) => string;
 }
 
-function FeaturedSlide({ product }: FeaturedSlideProps) {
+function FeaturedSlide({ product, formatPrice }: FeaturedSlideProps) {
   const mainImage = product.images?.[0]?.asset?.url;
 
   return (

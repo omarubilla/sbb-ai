@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useCartActions } from "@/lib/store/cart-store-provider";
 import { AddToCartButton } from "@/components/app/AddToCartButton";
 import { StockBadge } from "@/components/app/StockBadge";
-import { cn, formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import type { CartItem as CartItemType } from "@/lib/store/cart-store";
 import type { StockInfo } from "@/lib/hooks/useCartStock";
 
@@ -18,6 +19,7 @@ interface CartItemProps {
 
 export function CartItem({ item, stockInfo }: CartItemProps) {
   const { removeItem } = useCartActions();
+  const formatPrice = useFormattedPrice();
 
   const isOutOfStock = stockInfo?.isOutOfStock ?? false;
   const exceedsStock = stockInfo?.exceedsStock ?? false;

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
+import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import {
   useTotalPrice,
   useTotalItems,
@@ -17,6 +17,7 @@ export function CartSummary({ hasStockIssues = false }: CartSummaryProps) {
   const totalPrice = useTotalPrice();
   const totalItems = useTotalItems();
   const { closeCart } = useCartActions();
+  const formatPrice = useFormattedPrice();
 
   if (totalItems === 0) return null;
 
