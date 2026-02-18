@@ -41,3 +41,49 @@ export const categoryType = defineType({
     },
   },
 });
+
+export const subcategoryType = defineType({
+  name: "subcategory",
+  title: "Subcategory",
+  type: "document",
+  icon: TagIcon,
+  fields: [
+    defineField({
+      name: "name",
+      type: "string",
+      validation: (rule) => [
+        rule.required().error("Subcategory name is required"),
+      ],
+    }),
+    defineField({
+      name: "slug",
+      type: "slug",
+      options: {
+        source: "name",
+        maxLength: 96,
+      },
+      validation: (rule) => [
+        rule.required().error("Slug is required"),
+      ],
+    }),
+    defineField({
+      name: "parentCategory",
+      type: "reference",
+      to: [{ type: "category" }],
+      validation: (rule) => [
+        rule.required().error("Parent category is required"),
+      ],
+    }),
+    defineField({
+      name: "description",
+      type: "text",
+      rows: 2,
+    }),
+  ],
+  preview: {
+    select: {
+      title: "name",
+      subtitle: "description",
+    },
+  },
+});

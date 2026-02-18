@@ -6,9 +6,9 @@ interface WelcomeScreenProps {
 }
 
 const productSuggestions = [
-  "Show me oak tables",
-  "Leather sofas under £1000",
-  "What chairs do you have?",
+  "trending products",
+  "20S Proteasome under £1000",
+  "What chains do you have?",
 ];
 
 const orderSuggestions = [

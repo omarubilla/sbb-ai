@@ -17,7 +17,7 @@ export function CategoryTiles({
   return (
     <div className="relative">
       {/* Horizontal scrolling container - full width with edge padding */}
-      <div className="flex gap-4 overflow-x-auto  py-4 pl-8 pr-4 sm:pl-12 sm:pr-6 lg:pl-10 lg:pr-8 scrollbar-hide">
+      <div className="flex gap-4 overflow-x-auto py-4 pl-8 pr-4 sm:pl-12 sm:pr-6 lg:pl-10 lg:pr-8 scrollbar-hide">
         {/* All Products tile */}
         <Link
           href="/"
@@ -52,6 +52,7 @@ export function CategoryTiles({
         {categories.map((category) => {
           const isActive = activeCategory === category.slug;
           const imageUrl = category.image?.asset?.url;
+          const subcategories = category.subcategories || [];
 
           return (
             <Link
@@ -77,13 +78,33 @@ export function CategoryTiles({
                 )}
 
                 {/* Dark overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent transition-opacity duration-300 group-hover:from-black/95" />
 
-                {/* Category name */}
-                <div className="absolute inset-x-0 bottom-0 p-4">
-                  <span className="text-base font-semibold text-white drop-shadow-md">
+                {/* Content container */}
+                <div className="absolute inset-0 flex flex-col justify-end p-4">
+                  {/* Category name - main title */}
+                  <h3 className="text-lg font-bold text-white drop-shadow-md sm:text-xl">
                     {category.title}
-                  </span>
+                  </h3>
+
+                  {/* Subcategories list */}
+                  {subcategories.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {subcategories.slice(0, 4).map((sub) => (
+                        <span
+                          key={sub._id}
+                          className="rounded bg-white/20 px-2 py-0.5 text-xs text-white/90 backdrop-blur-sm"
+                        >
+                          {sub.name}
+                        </span>
+                      ))}
+                      {subcategories.length > 4 && (
+                        <span className="rounded bg-white/20 px-2 py-0.5 text-xs text-white/90 backdrop-blur-sm">
+                          +{subcategories.length - 4}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Active indicator */}

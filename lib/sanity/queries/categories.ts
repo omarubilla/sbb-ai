@@ -1,7 +1,7 @@
 import { defineQuery } from "next-sanity";
 
 /**
- * Get all categories
+ * Get all categories with their subcategories
  * Used for navigation and filters
  */
 export const ALL_CATEGORIES_QUERY = defineQuery(`*[
@@ -16,6 +16,12 @@ export const ALL_CATEGORIES_QUERY = defineQuery(`*[
       url
     },
     hotspot
+  },
+  "subcategories": *[_type == "subcategory" && references(^._id)] | order(name asc) {
+    _id,
+    name,
+    "slug": slug.current,
+    description
   }
 }`);
 
