@@ -2,20 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
 import { ChevronDown, Package, ShoppingBag, Sparkles, User } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
 import { useChatActions, useIsChatOpen } from "@/lib/store/chat-store-provider";
 import { CurrencyConverter } from "@/components/app/CurrencyConverter";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 import sbbLogo from "@/app/SBB_Logo_full.png";
 
@@ -24,33 +16,10 @@ interface HeaderProps {
 }
 
 export function Header({ categories }: HeaderProps) {
-  const searchParams = useSearchParams();
   const { openCart } = useCartActions();
   const { openChat } = useChatActions();
   const isChatOpen = useIsChatOpen();
   const totalItems = useTotalItems();
-  const activeCategory = searchParams.get("category") || "";
-  const activeSubcategory = searchParams.get("subcategory") || "";
-  const [openCategoryId, setOpenCategoryId] = useState<string | null>(null);
-  const [dropdownHoverCategoryId, setDropdownHoverCategoryId] =
-    useState<string | null>(null);
-  const closeTimeoutRef = useRef<number | null>(null);
-
-  const cancelScheduledClose = () => {
-    if (closeTimeoutRef.current !== null) {
-      window.clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-  };
-
-  const scheduleClose = () => {
-    cancelScheduledClose();
-    closeTimeoutRef.current = window.setTimeout(() => {
-      setOpenCategoryId(null);
-      setDropdownHoverCategoryId(null);
-      closeTimeoutRef.current = null;
-    }, 120);
-  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/80">
@@ -138,16 +107,9 @@ export function Header({ categories }: HeaderProps) {
       </div>
 
       <div className="border-t border-zinc-200 dark:border-zinc-800">
-        <nav
-          className="mx-auto flex h-11 max-w-7xl items-center gap-1 overflow-x-auto px-4 sm:px-6 lg:px-8"
-          onMouseEnter={cancelScheduledClose}
-          onMouseLeave={scheduleClose}
-        >
+        <nav className="mx-auto flex h-11 max-w-7xl items-center gap-1 px-4 sm:px-6 lg:px-8">
           {categories.map((category) => {
             const subcategories = category.subcategories || [];
-            const isCategoryActive = activeCategory === category.slug;
-            const isMenuOpen = openCategoryId === category._id;
-            const isHoveringDropdown = dropdownHoverCategoryId === category._id;
 
             if (subcategories.length === 0) {
               return (
@@ -155,101 +117,31 @@ export function Header({ categories }: HeaderProps) {
                   key={category._id}
                   variant="ghost"
                   asChild
-                  className={`h-8 px-3 text-sm transition-all hover:ring-2 hover:ring-teal-500 hover:ring-offset-2 hover:ring-offset-white dark:hover:ring-offset-zinc-950 ${
-                    isCategoryActive
-                      ? "relative pr-6 ring-2 ring-teal-500 ring-offset-2 ring-offset-white hover:bg-zinc-100/60 dark:ring-offset-zinc-950 dark:hover:bg-zinc-900/60"
-                      : "hover:bg-zinc-100/60 dark:hover:bg-zinc-900/60"
-                  }`}
+                  className="h-8 px-3 text-sm"
                 >
-                  <Link href={`/?category=${category.slug}`} className="relative">
-                    {category.title}
-                  </Link>
+                  <Link href={`/?category=${category.slug}`}>{category.title}</Link>
                 </Button>
               );
             }
 
             return (
-              <DropdownMenu
-                key={category._id}
-                open={isMenuOpen}
-                onOpenChange={(open) => {
-                  if (open) {
-                    cancelScheduledClose();
-                    if (
-                      dropdownHoverCategoryId !== null &&
-                      dropdownHoverCategoryId !== category._id
-                    ) {
-                      setDropdownHoverCategoryId(null);
-                    }
-                    setOpenCategoryId(category._id);
-                  } else if (openCategoryId === category._id) {
-                    scheduleClose();
-                  }
-                }}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    onMouseEnter={() => {
-                      cancelScheduledClose();
-                      if (
-                        dropdownHoverCategoryId !== null &&
-                        dropdownHoverCategoryId !== category._id
-                      ) {
-                        setDropdownHoverCategoryId(null);
-                      }
-                      setOpenCategoryId(category._id);
-                    }}
-                    onMouseLeave={() => {
-                      if (!isHoveringDropdown) {
-                        scheduleClose();
-                      }
-                    }}
-                    onFocus={() => setOpenCategoryId(category._id)}
-                    className={`relative h-8 px-3 text-sm transition-all hover:ring-2 hover:ring-teal-500 hover:ring-offset-2 hover:ring-offset-white dark:hover:ring-offset-zinc-950 ${
-                      isCategoryActive
-                        ? "pr-6 hover:bg-zinc-100/60 dark:hover:bg-zinc-900/60"
-                        : "hover:bg-zinc-100/60 dark:hover:bg-zinc-900/60"
-                    } ${
-                      isMenuOpen
-                        ? "ring-2 ring-teal-500 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950"
-                        : ""
-                    }`}
-                  >
-                    {category.title}
-                    <ChevronDown className="ml-1 h-4 w-4" />
-                    {isHoveringDropdown && (
-                      <span className="pointer-events-none absolute right-1 top-1 flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-teal-500" />
-                      </span>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  className="min-w-56"
-                  onMouseEnter={() => {
-                    cancelScheduledClose();
-                    setOpenCategoryId(category._id);
-                    setDropdownHoverCategoryId(category._id);
-                  }}
-                  onMouseLeave={() => {
-                    setDropdownHoverCategoryId(null);
-                    scheduleClose();
-                  }}
-                >
+              <div key={category._id} className="group relative">
+                <Button variant="ghost" className="h-8 px-3 text-sm">
+                  {category.title}
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+                <div className="bg-popover text-popover-foreground absolute left-0 top-full z-50 hidden min-w-56 overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md group-hover:block">
                   {subcategories.map((subcategory) => (
-                    <DropdownMenuItem key={subcategory._id} asChild>
-                      <Link
-                        href={`/?category=${category.slug}&subcategory=${subcategory.slug}`}
-                      >
-                        {subcategory.name}
-                      </Link>
-                    </DropdownMenuItem>
+                    <Link
+                      key={subcategory._id}
+                      href={`/?category=${category.slug}&subcategory=${subcategory.slug}`}
+                      className="focus:bg-accent focus:text-accent-foreground relative flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none"
+                    >
+                      {subcategory.name}
+                    </Link>
                   ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </div>
+              </div>
             );
           })}
         </nav>
