@@ -6,9 +6,9 @@ import { defineQuery } from "next-sanity";
  */
 export const ALL_CATEGORIES_QUERY = defineQuery(`*[
   _type == "category"
-] | order(title asc) {
+] | order(coalesce(title, name) asc) {
   _id,
-  title,
+  "title": coalesce(title, name),
   "slug": slug.current,
   "image": image{
     asset->{
@@ -33,7 +33,7 @@ export const CATEGORY_BY_SLUG_QUERY = defineQuery(`*[
   && slug.current == $slug
 ][0] {
   _id,
-  title,
+  "title": coalesce(title, name),
   "slug": slug.current,
   "image": image{
     asset->{

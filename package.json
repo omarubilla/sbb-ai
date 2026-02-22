@@ -9,7 +9,8 @@
     "lint": "biome check",
     "format": "biome format --write",
     "typecheck": "tsc --noEmit",
-    "typegen": "sanity schema extract && sanity typegen generate --enforce-required-fields"
+    "typegen": "sanity schema extract && sanity typegen generate --enforce-required-fields",
+    "sync:sbb-specs": "node scrape-south-bay-bio-specs.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.44",

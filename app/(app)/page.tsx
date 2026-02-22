@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
   FEATURED_PRODUCTS_QUERY,
@@ -12,11 +13,13 @@ import { ProductSection } from "@/components/app/ProductSection";
 import { CategoryTiles } from "@/components/app/CategoryTiles";
 import { FeaturedCarousel } from "@/components/app/FeaturedCarousel";
 import { FeaturedCarouselSkeleton } from "@/components/app/FeaturedCarouselSkeleton";
+import { Button } from "@/components/ui/button";
 
 interface PageProps {
   searchParams: Promise<{
     q?: string;
     category?: string;
+    subcategory?: string;
     color?: string;
     material?: string;
     minPrice?: string;
@@ -31,6 +34,7 @@ export default async function HomePage({ searchParams }: PageProps) {
 
   const searchQuery = params.q ?? "";
   const categorySlug = params.category ?? "";
+  const subcategorySlug = params.subcategory ?? "";
   const color = params.color ?? "";
   const material = params.material ?? "";
   const minPrice = Number(params.minPrice) || 0;
@@ -63,6 +67,7 @@ export default async function HomePage({ searchParams }: PageProps) {
     params: {
       searchQuery,
       categorySlug,
+      subcategorySlug,
       color,
       material,
       minPrice,
@@ -90,12 +95,38 @@ export default async function HomePage({ searchParams }: PageProps) {
         </Suspense>
       )}
 
+      <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+                  Services
+                </p>
+                <h2 className="mt-2 text-xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+                  Discover our research support services
+                </h2>
+                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                  Explore assay development, custom requests, and scientific support.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Button asChild className="bg-blue-600 text-white hover:bg-blue-700">
+                  <Link href="/services">Services</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Page Banner */}
       <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg:zinc-950">
         <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             {categorySlug 
-              ? `Shop by Category: ${categories.find((c) => c.slug === categorySlug)?.title?.toUpperCase() || categorySlug.toUpperCase()}`
+              ? `Shop by Category: ${categories.find((c: { slug?: string | null; title?: string | null }) => c.slug === categorySlug)?.title?.toUpperCase() || categorySlug.toUpperCase()}`
               : "Shop All Products"
             }
           </h1>
@@ -120,6 +151,22 @@ export default async function HomePage({ searchParams }: PageProps) {
           searchQuery={searchQuery}
         />
       </div>
+
+      <section className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900/50">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+              News
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+              News
+            </h2>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Latest updates, announcements, and research highlights coming soon.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

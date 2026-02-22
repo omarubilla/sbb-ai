@@ -21,11 +21,7 @@ export function CategoryTiles({
         {/* All Products tile */}
         <Link
           href="/"
-          className={`group relative flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300 ${
-            !activeCategory
-              ? "ring-2 ring-teal-500 ring-offset-2 dark:ring-offset-zinc-900"
-              : "hover:ring-2 hover:ring-zinc-300 hover:ring-offset-2 dark:hover:ring-zinc-600 dark:hover:ring-offset-zinc-900"
-          }`}
+          className="group relative flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300 hover:ring-2 hover:ring-zinc-300 hover:ring-offset-2 dark:hover:ring-zinc-600 dark:hover:ring-offset-zinc-900"
         >
           <div className="relative h-32 w-56 sm:h-56 sm:w-80">
             {/* Gradient background */}

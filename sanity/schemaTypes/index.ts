@@ -5,6 +5,14 @@ import { customerType } from './customerType'
 import { orderType } from './orderType'
 import { productType } from './productType'
 
+export const schemaTypes: SchemaTypeDefinition[] = [
+  categoryType,
+  subcategoryType,
+  customerType,
+  productType,
+  orderType,
+]
+
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [categoryType, subcategoryType, customerType, productType, orderType],
+  types: schemaTypes,
 }

@@ -221,7 +221,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
       </div>
 
       {/* Color */}
-      <div>
+      {/* <div>
         <FilterLabel isActive={isColorActive} filterKey="color">
           Color
         </FilterLabel>
@@ -249,10 +249,10 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       {/* Material */}
-      <div>
+      {/* <div>
         <FilterLabel isActive={isMaterialActive} filterKey="material">
           Material
         </FilterLabel>
@@ -280,10 +280,10 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       {/* Price Range */}
-      <div>
+      {/* <div>
         <FilterLabel isActive={isPriceActive} filterKey="price">
           Price Range: £{priceRange[0]} - £{priceRange[1]}
         </FilterLabel>
@@ -301,7 +301,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
           }
           className={`mt-4 ${isPriceActive ? "[&_[role=slider]]:border-teal-500 [&_[role=slider]]:ring-teal-500" : ""}`}
         />
-      </div>
+      </div> */}
 
       {/* In Stock Only */}
       <div>

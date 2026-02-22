@@ -40,7 +40,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div
           className={cn(
             "relative overflow-hidden bg-linear-to-br from-zinc-100 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900",
-            hasMultipleImages ? "aspect-square" : "aspect-4/5",
+            hasMultipleImages ? "aspect-[4/3]" : "aspect-[4/3]",
           )}
         >
           {displayedImageUrl ? (
@@ -89,13 +89,13 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Thumbnail strip - only show if multiple images */}
       {hasMultipleImages && (
-        <div className="flex gap-2 border-t border-zinc-100 bg-zinc-50/50 p-3 dark:border-zinc-800 dark:bg-zinc-800/50">
+        <div className="flex gap-2 border-t border-zinc-100 bg-zinc-50/50 p-2 dark:border-zinc-800 dark:bg-zinc-800/50">
           {images.map((image, index) => (
             <button
               key={image._key ?? index}
               type="button"
               className={cn(
-                "relative h-14 flex-1 overflow-hidden rounded-lg transition-all duration-200",
+                "relative h-10 flex-1 overflow-hidden rounded-lg transition-all duration-200",
                 hoveredImageIndex === index
                   ? "ring-2 ring-zinc-900 ring-offset-2 dark:ring-white dark:ring-offset-zinc-900"
                   : "opacity-50 hover:opacity-100",
@@ -117,21 +117,21 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       )}
 
-      <CardContent className="flex grow flex-col justify-between gap-2 p-5">
+      <CardContent className="flex grow flex-col justify-between gap-2 p-4">
         <Link href={`/products/${product.slug}`} className="block">
-          <h3 className="line-clamp-2 text-base font-semibold leading-tight text-zinc-900 transition-colors group-hover:text-zinc-600 dark:text-zinc-100 dark:group-hover:text-zinc-300">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-zinc-900 transition-colors group-hover:text-zinc-600 dark:text-zinc-100 dark:group-hover:text-zinc-300">
             {product.name}
           </h3>
         </Link>
         <div className="flex items-baseline justify-between gap-2">
-          <p className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
+          <p className="text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
             {formatPrice(product.price)}
           </p>
           <StockBadge productId={product._id} stock={stock} />
         </div>
       </CardContent>
 
-      <CardFooter className="mt-auto p-5 pt-0">
+      <CardFooter className="mt-auto p-4 pt-0">
         <AddToCartButton
           productId={product._id}
           name={product.name ?? "Unknown Product"}

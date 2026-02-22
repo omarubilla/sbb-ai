@@ -1,6 +1,5 @@
 import { PackageIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
-import { MATERIALS_SANITY_LIST, COLORS_SANITY_LIST } from "@/lib/constants/filters";
 
 export const productType = defineType({
   name: "product",
@@ -39,6 +38,56 @@ export const productType = defineType({
       description: "Product description",
     }),
     defineField({
+      name: "imageUrl",
+      type: "url",
+      group: "details",
+      description: "External product image URL",
+      validation: (rule) => [
+        rule.uri({ scheme: ["http", "https"] }).error("Use a valid URL"),
+      ],
+    }),
+    defineField({
+      name: "quantity",
+      type: "string",
+      group: "details",
+      description: 'e.g., "250 µg"',
+    }),
+    defineField({
+      name: "molecularWeight",
+      type: "string",
+      group: "details",
+      description: 'e.g., "1187.3 Da"',
+    }),
+    defineField({
+      name: "purity",
+      type: "string",
+      group: "details",
+      description: 'e.g., ">99% by HPLC"',
+    }),
+    defineField({
+      name: "storageBuffer",
+      type: "text",
+      group: "details",
+      rows: 3,
+      description: "Storage buffer composition",
+    }),
+    defineField({
+      name: "storage",
+      type: "text",
+      group: "details",
+      rows: 4,
+      description: "Storage instructions",
+    }),
+    defineField({
+      name: "certificateOfAnalysisUrl",
+      type: "url",
+      group: "details",
+      description: "Link to Certificate of Analysis PDF",
+      validation: (rule) => [
+        rule.uri({ scheme: ["http", "https"] }).error("Use a valid URL"),
+      ],
+    }),
+    defineField({
       name: "price",
       type: "number",
       group: "details",
@@ -56,28 +105,19 @@ export const productType = defineType({
       validation: (rule) => [rule.required().error("Category is required")],
     }),
     defineField({
-      name: "material",
-      type: "string",
+      name: "subcategory",
+      type: "reference",
+      to: [{ type: "subcategory" }],
       group: "details",
-      options: {
-        list: MATERIALS_SANITY_LIST,
-        layout: "radio",
-      },
     }),
     defineField({
-      name: "color",
-      type: "string",
-      group: "details",
+      name: "image",
+      type: "image",
+      group: "media",
       options: {
-        list: COLORS_SANITY_LIST,
-        layout: "radio",
+        hotspot: true,
       },
-    }),
-    defineField({
-      name: "dimensions",
-      type: "string",
-      group: "details",
-      description: 'e.g., "120cm x 80cm x 75cm"',
+      description: "Primary product image",
     }),
     defineField({
       name: "images",

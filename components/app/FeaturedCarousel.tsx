@@ -21,6 +21,30 @@ import type { FEATURED_PRODUCTS_QUERYResult } from "@/sanity.types";
 
 type FeaturedProduct = FEATURED_PRODUCTS_QUERYResult[number];
 
+const LEFT_BANNERS = [
+  {
+    imageSrc: "/TR-FRET-Ubi-AssaysSlide.jpeg",
+    badge: "Research Grade",
+    title: "Precision Tools for Protein Science",
+    description:
+      "Curated reagents and assays for high-confidence discovery workflows.",
+  },
+  {
+    imageSrc: "/C-TerminalDerivatives.jpeg",
+    badge: "Fast Shipping",
+    title: "Built for Reproducible Results",
+    description:
+      "High-quality bioproducts with validated performance across workflows.",
+  },
+  {
+    imageSrc: "/Proteasomes&Substrates.jpeg",
+    badge: "Expert Support",
+    title: "Powering Next-Generation Discovery",
+    description:
+      "From screening to validation, find the right tools for your pipeline.",
+  },
+];
+
 interface FeaturedCarouselProps {
   products: FEATURED_PRODUCTS_QUERYResult;
 }
@@ -53,55 +77,86 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
     return null;
   }
 
+  const activeBanner = LEFT_BANNERS[current % LEFT_BANNERS.length];
+
   return (
-    <div className="relative w-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
-      <Carousel
-        setApi={setApi}
-        opts={{
-          loop: true,
-          align: "start",
-        }}
-        plugins={[
-          Autoplay({
-            delay: 5000,
-            stopOnInteraction: false,
-            stopOnMouseEnter: true,
-          }),
-        ]}
-        className="w-full"
-      >
-        <CarouselContent className="-ml-0">
-          {products.map((product) => (
-            <CarouselItem key={product._id} className="pl-0">
-              <FeaturedSlide product={product} formatPrice={formatPrice} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
+    <div className="w-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
+      <div className="flex min-h-[340px] flex-col md:min-h-[390px] md:flex-row lg:min-h-[430px]">
+        <div className="relative h-56 w-full overflow-hidden md:h-auto md:w-3/5">
+          <Image
+            src={activeBanner.imageSrc}
+            alt={activeBanner.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 60vw"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-zinc-900/80 via-zinc-900/40 to-transparent" />
 
-        {/* Navigation arrows - positioned inside */}
-        <CarouselPrevious className="left-4 border-zinc-700 bg-zinc-800/80 text-white hover:bg-zinc-700 hover:text-white sm:left-8" />
-        <CarouselNext className="right-4 border-zinc-700 bg-zinc-800/80 text-white hover:bg-zinc-700 hover:text-white sm:right-8" />
-      </Carousel>
-
-      {/* Dot indicators */}
-      {count > 1 && (
-        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 sm:bottom-6">
-          {Array.from({ length: count }).map((_, index) => (
-            <button
-              key={`dot-${index}`}
-              type="button"
-              onClick={() => scrollTo(index)}
-              className={cn(
-                "h-2 w-2 rounded-full transition-all duration-300",
-                current === index
-                  ? "w-6 bg-teal-500"
-                  : "bg-white/40 hover:bg-white/60",
-              )}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+          <div className="relative z-10 flex h-full flex-col justify-end px-6 py-8 sm:px-8 md:px-10 lg:px-12">
+            <Badge
+              variant="secondary"
+              className="mb-4 w-fit bg-white/20 text-white hover:bg-white/30"
+            >
+              {activeBanner.badge}
+            </Badge>
+            <h2 className="max-w-2xl text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
+              {activeBanner.title}
+            </h2>
+            <p className="mt-3 max-w-xl text-sm text-zinc-200 sm:text-base">
+              {activeBanner.description}
+            </p>
+          </div>
         </div>
-      )}
+
+        <div className="relative w-full md:w-2/5">
+          <Carousel
+            setApi={setApi}
+            opts={{
+              loop: true,
+              align: "start",
+            }}
+            plugins={[
+              Autoplay({
+                delay: 5000,
+                stopOnInteraction: false,
+                stopOnMouseEnter: true,
+              }),
+            ]}
+            className="h-full w-full"
+          >
+            <CarouselContent className="-ml-0 h-full">
+              {products.map((product) => (
+                <CarouselItem key={product._id} className="pl-0">
+                  <FeaturedSlide product={product} formatPrice={formatPrice} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            <CarouselPrevious className="left-4 border-zinc-700 bg-zinc-800/80 text-white hover:bg-zinc-700 hover:text-white" />
+            <CarouselNext className="right-4 border-zinc-700 bg-zinc-800/80 text-white hover:bg-zinc-700 hover:text-white" />
+          </Carousel>
+
+          {count > 1 && (
+            <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:bottom-6">
+              {Array.from({ length: count }).map((_, index) => (
+                <button
+                  key={`dot-${index}`}
+                  type="button"
+                  onClick={() => scrollTo(index)}
+                  className={cn(
+                    "h-2 w-2 rounded-full transition-all duration-300",
+                    current === index
+                      ? "w-6 bg-teal-500"
+                      : "bg-white/40 hover:bg-white/60",
+                  )}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -112,34 +167,12 @@ interface FeaturedSlideProps {
 }
 
 function FeaturedSlide({ product, formatPrice }: FeaturedSlideProps) {
-  const mainImage = product.images?.[0]?.asset?.url;
-
   return (
-    <div className="flex min-h-[400px] flex-col md:min-h-[450px] md:flex-row lg:min-h-[500px]">
-      {/* Image Section - Left side (60% on desktop) */}
-      <div className="relative h-64 w-full md:h-auto md:w-3/5">
-        {mainImage ? (
-          <Image
-            src={mainImage}
-            alt={product.name ?? "Featured product"}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 60vw"
-            priority
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center bg-zinc-800">
-            <span className="text-zinc-500">No image</span>
-          </div>
-        )}
+    <div className="flex h-full min-h-[340px] w-full flex-col justify-center px-6 py-8 md:min-h-[390px] md:px-10 lg:min-h-[430px] lg:px-12">
+      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
+        Featured Products
+      </p>
 
-        {/* Gradient overlay for image edge blending */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-zinc-900/90 dark:to-zinc-950/90 hidden md:block" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 via-transparent to-transparent md:hidden" />
-      </div>
-
-      {/* Content Section - Right side (40% on desktop) */}
-      <div className="flex w-full flex-col justify-center px-6 py-8 md:w-2/5 md:px-10 lg:px-16">
         {product.category && (
           <Badge
             variant="secondary"
@@ -175,7 +208,6 @@ function FeaturedSlide({ product, formatPrice }: FeaturedSlideProps) {
             </Link>
           </Button>
         </div>
-      </div>
     </div>
   );
 }

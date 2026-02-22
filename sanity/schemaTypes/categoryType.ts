@@ -8,6 +8,14 @@ export const categoryType = defineType({
   icon: TagIcon,
   fields: [
     defineField({
+      name: "name",
+      title: "Legacy Name",
+      type: "string",
+      hidden: true,
+      readOnly: true,
+      description: "Legacy field kept for backward compatibility",
+    }),
+    defineField({
       name: "title",
       type: "string",
       validation: (rule) => [
@@ -18,12 +26,20 @@ export const categoryType = defineType({
       name: "slug",
       type: "slug",
       options: {
-        source: "title",
+        source: (doc) =>
+          (doc as { title?: string; name?: string }).title ||
+          (doc as { title?: string; name?: string }).name ||
+          "",
         maxLength: 96,
       },
       validation: (rule) => [
         rule.required().error("Slug is required for URL generation"),
       ],
+    }),
+    defineField({
+      name: "description",
+      type: "text",
+      rows: 2,
     }),
     defineField({
       name: "image",
@@ -37,7 +53,18 @@ export const categoryType = defineType({
   preview: {
     select: {
       title: "title",
+      legacyName: "name",
       media: "image",
+    },
+    prepare({
+      title,
+      legacyName,
+      media,
+    }) {
+      return {
+        title: title || legacyName || "Untitled Category",
+        media: media as any,
+      };
     },
   },
 });

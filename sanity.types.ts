@@ -62,6 +62,13 @@ export type Product = {
   name?: string;
   slug?: Slug;
   description?: string;
+  imageUrl?: string;
+  quantity?: string;
+  molecularWeight?: string;
+  purity?: string;
+  storageBuffer?: string;
+  storage?: string;
+  certificateOfAnalysisUrl?: string;
   price?: number;
   category?: {
     _ref: string;
@@ -69,9 +76,24 @@ export type Product = {
     _weak?: boolean;
     [internalGroqTypeReferenceTo]?: "category";
   };
-  material?: "wood" | "metal" | "fabric" | "leather" | "glass";
-  color?: "black" | "white" | "oak" | "walnut" | "grey" | "natural";
-  dimensions?: string;
+  subcategory?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "subcategory";
+  };
+  image?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
   images?: Array<{
     asset?: {
       _ref: string;
@@ -407,9 +429,9 @@ export type ALL_PRODUCTS_QUERYResult = Array<{
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
-  dimensions: string | null;
+  material: null;
+  color: null;
+  dimensions: null;
   stock: number | null;
   featured: boolean | null;
   assemblyRequired: boolean | null;
@@ -456,17 +478,23 @@ export type PRODUCTS_BY_CATEGORY_QUERYResult = Array<{
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
+  material: null;
+  color: null;
   stock: number | null;
 }>;
 // Variable: PRODUCT_BY_SLUG_QUERY
-// Query: *[  _type == "product"  && slug.current == $slug][0] {  _id,  name,  "slug": slug.current,  description,  price,  "images": images[]{    _key,    asset->{      _id,      url    },    hotspot  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  dimensions,  stock,  featured,  assemblyRequired}
+// Query: *[  _type == "product"  && slug.current == $slug][0] {  _id,  name,  "slug": slug.current,  description,  quantity,  molecularWeight,  purity,  storageBuffer,  storage,  certificateOfAnalysisUrl,  price,  "images": images[]{    _key,    asset->{      _id,      url    },    hotspot  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  dimensions,  stock,  featured,  assemblyRequired}
 export type PRODUCT_BY_SLUG_QUERYResult = {
   _id: string;
   name: string | null;
   slug: string | null;
   description: string | null;
+  quantity: string | null;
+  molecularWeight: string | null;
+  purity: string | null;
+  storageBuffer: string | null;
+  storage: string | null;
+  certificateOfAnalysisUrl: string | null;
   price: number | null;
   images: Array<{
     _key: string;
@@ -481,9 +509,9 @@ export type PRODUCT_BY_SLUG_QUERYResult = {
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
-  dimensions: string | null;
+  material: null;
+  color: null;
+  dimensions: null;
   stock: number | null;
   featured: boolean | null;
   assemblyRequired: boolean | null;
@@ -508,8 +536,8 @@ export type SEARCH_PRODUCTS_QUERYResult = Array<{
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
+  material: null;
+  color: null;
   stock: number | null;
 }>;
 // Variable: FILTER_PRODUCTS_BY_NAME_QUERY
@@ -531,8 +559,8 @@ export type FILTER_PRODUCTS_BY_NAME_QUERYResult = Array<{
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
+  material: null;
+  color: null;
   stock: number | null;
 }>;
 // Variable: FILTER_PRODUCTS_BY_PRICE_ASC_QUERY
@@ -554,8 +582,8 @@ export type FILTER_PRODUCTS_BY_PRICE_ASC_QUERYResult = Array<{
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
+  material: null;
+  color: null;
   stock: number | null;
 }>;
 // Variable: FILTER_PRODUCTS_BY_PRICE_DESC_QUERY
@@ -577,8 +605,8 @@ export type FILTER_PRODUCTS_BY_PRICE_DESC_QUERYResult = Array<{
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
+  material: null;
+  color: null;
   stock: number | null;
 }>;
 // Variable: FILTER_PRODUCTS_BY_RELEVANCE_QUERY
@@ -600,8 +628,8 @@ export type FILTER_PRODUCTS_BY_RELEVANCE_QUERYResult = Array<{
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
+  material: null;
+  color: null;
   stock: number | null;
 }>;
 // Variable: PRODUCTS_BY_IDS_QUERY
@@ -666,9 +694,9 @@ export type AI_SEARCH_PRODUCTS_QUERYResult = Array<{
     title: string | null;
     slug: string | null;
   } | null;
-  material: "fabric" | "glass" | "leather" | "metal" | "wood" | null;
-  color: "black" | "grey" | "natural" | "oak" | "walnut" | "white" | null;
-  dimensions: string | null;
+  material: null;
+  color: null;
+  dimensions: null;
   stock: number | null;
   featured: boolean | null;
   assemblyRequired: boolean | null;
@@ -759,7 +787,7 @@ declare module "@sanity/client" {
     "*[\n  _type == \"product\"\n] | order(name asc) {\n  _id,\n  name,\n  \"slug\": slug.current,\n  description,\n  price,\n  \"images\": images[]{\n    _key,\n    asset->{\n      _id,\n      url\n    },\n    hotspot\n  },\n  category->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  material,\n  color,\n  dimensions,\n  stock,\n  featured,\n  assemblyRequired\n}": ALL_PRODUCTS_QUERYResult;
     "*[\n  _type == \"product\"\n  && featured == true\n  && stock > 0\n] | order(name asc) [0...6] {\n  _id,\n  name,\n  \"slug\": slug.current,\n  description,\n  price,\n  \"images\": images[]{\n    _key,\n    asset->{\n      _id,\n      url\n    },\n    hotspot\n  },\n  category->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  stock\n}": FEATURED_PRODUCTS_QUERYResult;
     "*[\n  _type == \"product\"\n  && category->slug.current == $categorySlug\n] | order(name asc) {\n  _id,\n  name,\n  \"slug\": slug.current,\n  price,\n  \"image\": images[0]{\n    asset->{\n      _id,\n      url\n    },\n    hotspot\n  },\n  category->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  material,\n  color,\n  stock\n}": PRODUCTS_BY_CATEGORY_QUERYResult;
-    "*[\n  _type == \"product\"\n  && slug.current == $slug\n][0] {\n  _id,\n  name,\n  \"slug\": slug.current,\n  description,\n  price,\n  \"images\": images[]{\n    _key,\n    asset->{\n      _id,\n      url\n    },\n    hotspot\n  },\n  category->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  material,\n  color,\n  dimensions,\n  stock,\n  featured,\n  assemblyRequired\n}": PRODUCT_BY_SLUG_QUERYResult;
+    "*[\n  _type == \"product\"\n  && slug.current == $slug\n][0] {\n  _id,\n  name,\n  \"slug\": slug.current,\n  description,\n  quantity,\n  molecularWeight,\n  purity,\n  storageBuffer,\n  storage,\n  certificateOfAnalysisUrl,\n  price,\n  \"images\": images[]{\n    _key,\n    asset->{\n      _id,\n      url\n    },\n    hotspot\n  },\n  category->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  material,\n  color,\n  dimensions,\n  stock,\n  featured,\n  assemblyRequired\n}": PRODUCT_BY_SLUG_QUERYResult;
     "*[\n  _type == \"product\"\n  && (\n    name match $searchQuery + \"*\"\n    || description match $searchQuery + \"*\"\n  )\n] | score(\n  boost(name match $searchQuery + \"*\", 3),\n  boost(description match $searchQuery + \"*\", 1)\n) | order(_score desc) {\n  _id,\n  _score,\n  name,\n  \"slug\": slug.current,\n  price,\n  \"image\": images[0]{\n    asset->{\n      _id,\n      url\n    },\n    hotspot\n  },\n  category->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  material,\n  color,\n  stock\n}": SEARCH_PRODUCTS_QUERYResult;
     "*[\n  _type == \"product\"\n  && ($categorySlug == \"\" || category->slug.current == $categorySlug)\n  && ($color == \"\" || color == $color)\n  && ($material == \"\" || material == $material)\n  && ($minPrice == 0 || price >= $minPrice)\n  && ($maxPrice == 0 || price <= $maxPrice)\n  && ($searchQuery == \"\" || name match $searchQuery + \"*\" || description match $searchQuery + \"*\")\n  && ($inStock == false || stock > 0)\n] | order(name asc) {\n  _id,\n  name,\n  \"slug\": slug.current,\n  price,\n  \"images\": images[0...4]{\n    _key,\n    asset->{\n      _id,\n      url\n    }\n  },\n  category->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  material,\n  color,\n  stock\n}": FILTER_PRODUCTS_BY_NAME_QUERYResult;
     "*[\n  _type == \"product\"\n  && ($categorySlug == \"\" || category->slug.current == $categorySlug)\n  && ($color == \"\" || color == $color)\n  && ($material == \"\" || material == $material)\n  && ($minPrice == 0 || price >= $minPrice)\n  && ($maxPrice == 0 || price <= $maxPrice)\n  && ($searchQuery == \"\" || name match $searchQuery + \"*\" || description match $searchQuery + \"*\")\n  && ($inStock == false || stock > 0)\n] | order(price asc) {\n  _id,\n  name,\n  \"slug\": slug.current,\n  price,\n  \"images\": images[0...4]{\n    _key,\n    asset->{\n      _id,\n      url\n    }\n  },\n  category->{\n    _id,\n    title,\n    \"slug\": slug.current\n  },\n  material,\n  color,\n  stock\n}": FILTER_PRODUCTS_BY_PRICE_ASC_QUERYResult;

@@ -9,6 +9,7 @@ import { LOW_STOCK_THRESHOLD } from "@/lib/constants/stock";
 const PRODUCT_FILTER_CONDITIONS = `
   _type == "product"
   && ($categorySlug == "" || category->slug.current == $categorySlug)
+  && ($subcategorySlug == "" || subcategory->slug.current == $subcategorySlug)
   && ($color == "" || color == $color)
   && ($material == "" || material == $material)
   && ($minPrice == 0 || price >= $minPrice)
@@ -152,6 +153,12 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   name,
   "slug": slug.current,
   description,
+  quantity,
+  molecularWeight,
+  purity,
+  storageBuffer,
+  storage,
+  certificateOfAnalysisUrl,
   price,
   "images": images[]{
     _key,

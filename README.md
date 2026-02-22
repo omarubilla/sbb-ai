@@ -252,6 +252,37 @@ cd ai-ecommerce-sanity-clerk
 
 ```bash
 pnpm install
+
+### Sync South Bay Bio Product Specs
+
+Use this script to scrape and sync these fields from South Bay Bio product pages:
+
+- `quantity`
+- `molecularWeight`
+- `purity`
+- `storageBuffer`
+- `storage`
+
+```bash
+# Dry run from products.json URLs (no writes)
+npm run sync:sbb-specs -- --target sanity --source products-json --dry-run --limit 20
+
+# Write to Sanity
+npm run sync:sbb-specs -- --target sanity --source products-json
+
+# Write to MongoDB only
+npm run sync:sbb-specs -- --target mongodb --source products-json --mongo-db test --mongo-collection products
+
+# Write to both Sanity and MongoDB, crawling sitemap URLs
+npm run sync:sbb-specs -- --target both --source sitemap --delay-ms 400
+```
+
+Required env vars:
+
+- `NEXT_PUBLIC_SANITY_PROJECT_ID`
+- `NEXT_PUBLIC_SANITY_DATASET`
+- `SANITY_API_WRITE_TOKEN` (for Sanity writes)
+- `MONGODB_URI` (for MongoDB writes)
 ```
 
 #### 3. Set Up Environment Variables

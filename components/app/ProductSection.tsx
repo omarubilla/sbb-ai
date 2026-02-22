@@ -63,18 +63,20 @@ export function ProductSection({
       </div>
 
       {/* Main content area */}
-      <div className="flex flex-col gap-8 lg:flex-row">
+      <div className="flex flex-col gap-8 lg:h-[760px] lg:flex-row">
         {/* Sidebar Filters - completely hidden when collapsed on desktop */}
         <aside
           className={`shrink-0 transition-all duration-300 ease-in-out ${
             filtersOpen ? "w-full lg:w-72 lg:opacity-100" : "hidden lg:hidden"
           }`}
         >
-          <ProductFilters categories={categories} />
+          <div className="lg:h-full lg:overflow-y-auto">
+            <ProductFilters categories={categories} />
+          </div>
         </aside>
 
         {/* Product Grid - expands to full width when filters hidden */}
-        <main className="flex-1 transition-all duration-300">
+        <main className="flex-1 transition-all duration-300 lg:h-full lg:overflow-y-auto">
           <ProductGrid products={products} />
         </main>
       </div>

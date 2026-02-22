@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "E-Commerce AI App",
-  description: "E-Commerce AI App",
+  title: "South Bay Bio",
+  description: "Biotech Products for Research and Development",
 };
 
 export default function RootLayout({
