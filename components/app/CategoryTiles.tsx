@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Grid2x2 } from "lucide-react";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
+import { getCategoryPageSlug } from "@/lib/constants/category-pages";
 
 interface CategoryTilesProps {
   categories: ALL_CATEGORIES_QUERYResult;
@@ -46,14 +47,19 @@ export function CategoryTiles({
 
         {/* Category tiles */}
         {categories.map((category) => {
-          const isActive = activeCategory === category.slug;
+          const categorySlug = getCategoryPageSlug(category.title, category.slug);
+          const isActive = activeCategory === categorySlug;
           const imageUrl = category.image?.asset?.url;
           const subcategories = category.subcategories || [];
+
+          if (!categorySlug) {
+            return null;
+          }
 
           return (
             <Link
               key={category._id}
-              href={`/?category=${category.slug}`}
+              href={`/category/${categorySlug}`}
               className={`group relative flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300 ${
                 isActive
                   ? "ring-2 ring-teal-500 ring-offset-2 dark:ring-offset-zinc-900"

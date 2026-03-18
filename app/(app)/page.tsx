@@ -14,7 +14,7 @@ import { ProductSection } from "@/components/app/ProductSection";
 import { CategoryTiles } from "@/components/app/CategoryTiles";
 import { FeaturedCarousel } from "@/components/app/FeaturedCarousel";
 import { FeaturedCarouselSkeleton } from "@/components/app/FeaturedCarouselSkeleton";
-import { NewsCarousel } from "@/components/news/NewsCarousel";
+import { NewsInlineCarousel } from "@/components/news/NewsInlineCarousel";
 import { newsItems } from "@/data/news";
 
 interface PageProps {
@@ -99,9 +99,9 @@ export default async function HomePage({ searchParams }: PageProps) {
 
       <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
+          <div className="grid items-start gap-8 xl:grid-cols-3 xl:gap-8">
             <div className="py-2 sm:py-4">
-              <h2 className="text-4xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100 sm:text-5xl lg:text-6xl">
+              <h2 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100 sm:text-2xl lg:text-4xl">
                 <span className="block">We Provide You</span>
                 <span className="mt-2 block text-blue-600 dark:text-blue-400">
                   Custom Biochemical
@@ -109,12 +109,12 @@ export default async function HomePage({ searchParams }: PageProps) {
                 <span className="mt-2 block">Solutions</span>
               </h2>
 
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-300 sm:text-2xl">
+              <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-300 sm:text-lg">
                 Assay development, protein labeling and antibody conjugation,
                 expression, and purification.
               </p>
 
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-300 sm:text-2xl">
+              <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-300 sm:text-lg">
                 Providing you with unmatched quality, innovation, and a touch of
                 genius.
               </p>
@@ -157,45 +157,56 @@ export default async function HomePage({ searchParams }: PageProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <article className="flex flex-col items-center rounded-3xl bg-zinc-50 p-4 text-center shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900/50 dark:ring-zinc-800">
-                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-blue-600 text-white shadow-md">
+              <div className="grid grid-cols-1 gap-3">
+                <article className="flex items-start gap-4 rounded-3xl bg-zinc-50 p-4 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900/50 dark:ring-zinc-800">
+                  <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-blue-600 text-white shadow-md">
                     <Truck className="h-5 w-5" />
                   </div>
-                  <h3 className="whitespace-nowrap text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
-                    Fast shipping
-                  </h3>
-                  <p className="mt-2 h-12 overflow-hidden text-base leading-6 text-zinc-600 dark:text-zinc-300">
-                    Enjoy seamless shopping with our worldwide shipping service.
-                  </p>
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+                      Fast shipping
+                    </h3>
+                    <p className="mt-2 text-base leading-6 text-zinc-600 dark:text-zinc-300">
+                      Enjoy seamless shopping with our worldwide shipping
+                      service.
+                    </p>
+                  </div>
                 </article>
 
-                <article className="flex flex-col items-center rounded-3xl bg-zinc-50 p-4 text-center shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900/50 dark:ring-zinc-800">
-                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-blue-600 text-white shadow-md">
+                <article className="flex items-start gap-4 rounded-3xl bg-zinc-50 p-4 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900/50 dark:ring-zinc-800">
+                  <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-blue-600 text-white shadow-md">
                     <ShieldCheck className="h-5 w-5" />
                   </div>
-                  <h3 className="whitespace-nowrap text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
-                    Secure Payment
-                  </h3>
-                  <p className="mt-2 h-12 overflow-hidden text-base leading-6 text-zinc-600 dark:text-zinc-300">
-                    Experience worry-free transactions with our secure payment
-                    options.
-                  </p>
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+                      Secure Payment
+                    </h3>
+                    <p className="mt-2 text-base leading-6 text-zinc-600 dark:text-zinc-300">
+                      Experience worry-free transactions with our secure payment
+                      options.
+                    </p>
+                  </div>
                 </article>
 
-                <article className="flex flex-col items-center rounded-3xl bg-zinc-50 p-4 text-center shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900/50 dark:ring-zinc-800">
-                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-blue-600 text-white shadow-md">
+                <article className="flex items-start gap-4 rounded-3xl bg-zinc-50 p-4 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900/50 dark:ring-zinc-800">
+                  <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-blue-600 text-white shadow-md">
                     <HandHeart className="h-5 w-5" />
                   </div>
-                  <h3 className="whitespace-nowrap text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
-                    Love to help you
-                  </h3>
-                  <p className="mt-2 h-12 overflow-hidden text-base leading-6 text-zinc-600 dark:text-zinc-300">
-                    Our dedicated team is here to assist you every step of the
-                    way.
-                  </p>
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+                      Love to help you
+                    </h3>
+                    <p className="mt-2 text-base leading-6 text-zinc-600 dark:text-zinc-300">
+                      Our dedicated team is here to assist you every step of
+                      the way.
+                    </p>
+                  </div>
                 </article>
               </div>
+            </div>
+
+            <div className="py-2 sm:py-4">
+              <NewsInlineCarousel items={newsItems} />
             </div>
           </div>
         </div>
@@ -232,7 +243,139 @@ export default async function HomePage({ searchParams }: PageProps) {
         />
       </div>
 
-      <NewsCarousel items={newsItems} />
+      <section className="border-t border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div>
+              <h2 className="text-4xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100 sm:text-5xl">
+                Sign Up for <span className="text-blue-600">Updates</span>
+                <br />
+                &amp; Newsletter
+              </h2>
+            </div>
+
+            <form className="w-full" action="#" method="post">
+              <div className="flex w-full flex-col gap-3 rounded-full border border-zinc-300 bg-white p-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:flex-row sm:items-center">
+                <label htmlFor="newsletter-email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="newsletter-email"
+                  type="email"
+                  name="email"
+                  placeholder="subscribe@south-bay-bio.com"
+                  className="h-12 w-full rounded-full bg-zinc-100 px-5 text-base text-zinc-800 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-400"
+                />
+                <button
+                  type="submit"
+                  className="h-12 shrink-0 rounded-full bg-blue-600 px-8 text-lg font-medium text-white transition-colors hover:bg-blue-700"
+                >
+                  Sign Up
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-[#03122D] text-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+            <div>
+              <h3 className="text-lg font-semibold tracking-tight sm:text-xl">South Bay Bio</h3>
+              <p className="mt-3 text-sm leading-relaxed text-zinc-100/90">
+                We offer a variety of custom biochemistry services with an
+                emphasis on assay development and custom protein labeling.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-zinc-100/90">
+                Our goal is to advance into lead identification and provide you
+                with the tools and knowledge to succeed.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold tracking-tight sm:text-xl">
+                Custom Biochemistry
+              </h3>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-zinc-100/90">
+                <li>
+                  Assay design &amp; development: TR-FRET, ELISA, Fluorescence
+                  Polarization
+                </li>
+                <li>
+                  Protein &amp; antibody labeling: Maleimide, NHS, Hydrazide
+                  coupling &amp; more
+                </li>
+                <li>
+                  Expression &amp; purification: E. coli, Yeast, Insect,
+                  Mammalian
+                </li>
+                <li>
+                  Protein characterization, enzyme kinetics, IC50 &amp; Ki
+                  determination
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold tracking-tight sm:text-xl">Contact Us</h3>
+              <div className="mt-3 space-y-2 text-sm leading-relaxed text-zinc-100/90">
+                <p>
+                  <span className="font-semibold">CALL:</span> (415) 935-3226
+                </p>
+                <p>
+                  <span className="font-semibold">General Help:</span>{" "}
+                  <a
+                    href="mailto:support@south-bay-bio.com"
+                    className="text-blue-300 transition-colors hover:text-blue-200"
+                  >
+                    support@south-bay-bio.com
+                  </a>
+                </p>
+                <p>
+                  <span className="font-semibold">Orders and Shipping:</span>{" "}
+                  <a
+                    href="mailto:orders@south-bay-bio.com"
+                    className="text-blue-300 transition-colors hover:text-blue-200"
+                  >
+                    orders@south-bay-bio.com
+                  </a>
+                </p>
+                <p>
+                  5941 Optical Court, Suite 229
+                  <br />
+                  San Jose, CA 95138
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 border-t border-white/15 pt-5">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-300 sm:text-sm">
+              <Link
+                href="/privacy-policy"
+                className="transition-colors hover:text-white"
+              >
+                Privacy and Cookie Policy
+              </Link>
+              <a href="#" className="transition-colors hover:text-white">
+                Orders and Returns
+              </a>
+              <Link href="/sitemap" className="transition-colors hover:text-white">
+                Sitemap
+              </Link>
+              <Link href="/terms-of-sale" className="transition-colors hover:text-white">
+                Terms of Sale
+              </Link>
+            </div>
+
+            <p className="mt-4 text-center text-xs text-zinc-400 sm:text-sm">
+              &copy; 2026 by South Bay Bio LLC
+            </p>
+          </div>
+        </div>
+      </footer>
+
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
 import { useChatActions, useIsChatOpen } from "@/lib/store/chat-store-provider";
 import { CurrencyConverter } from "@/components/app/CurrencyConverter";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
+import { getCategoryPageSlug } from "@/lib/constants/category-pages";
 import sbbLogo from "@/app/SBB_Logo_full.png";
 
 interface HeaderProps {
@@ -110,6 +111,15 @@ export function Header({ categories }: HeaderProps) {
         <nav className="mx-auto flex h-11 max-w-7xl items-center gap-1 px-4 sm:px-6 lg:px-8">
           {categories.map((category) => {
             const subcategories = category.subcategories || [];
+            const categorySlug = getCategoryPageSlug(category.title, category.slug);
+            const isProteasome = categorySlug === "proteasome";
+            const categoryHref = isProteasome
+              ? "/proteasome"
+              : `/category/${categorySlug}`;
+
+            if (!categorySlug) {
+              return null;
+            }
 
             if (subcategories.length === 0) {
               return (
@@ -119,25 +129,37 @@ export function Header({ categories }: HeaderProps) {
                   asChild
                   className="h-8 bg-sky-600 px-3 text-sm text-white hover:bg-sky-700 hover:text-white"
                 >
-                  <Link href={`/?category=${category.slug}`}>{category.title}</Link>
+                  <Link href={categoryHref}>
+                    {category.title}
+                  </Link>
                 </Button>
               );
             }
 
             return (
               <div key={category._id} className="group relative">
-                <Button
-                  variant="ghost"
-                  className="h-8 bg-sky-600 px-3 text-sm text-white hover:bg-sky-700 hover:text-white"
+                <Link
+                  href={categoryHref}
+                  className="inline-flex h-8 items-center rounded-md bg-sky-600 px-3 text-sm text-white transition-colors hover:bg-sky-700 hover:text-white"
                 >
                   {category.title}
                   <ChevronDown className="ml-1 h-4 w-4" />
-                </Button>
+                </Link>
                 <div className="bg-popover text-popover-foreground absolute left-0 top-full z-50 hidden min-w-56 overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md group-hover:block">
+                  <Link
+                    href={categoryHref}
+                    className="focus:bg-accent focus:text-accent-foreground relative mb-1 flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm font-medium outline-hidden select-none"
+                  >
+                    View all {category.title}
+                  </Link>
                   {subcategories.map((subcategory) => (
                     <Link
                       key={subcategory._id}
-                      href={`/?category=${category.slug}&subcategory=${subcategory.slug}`}
+                      href={
+                        isProteasome
+                          ? `/proteasome#${subcategory.slug}`
+                          : `/category/${categorySlug}?category=${categorySlug}&subcategory=${subcategory.slug}`
+                      }
                       className="focus:bg-accent focus:text-accent-foreground relative flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none"
                     >
                       {subcategory.name}
