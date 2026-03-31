@@ -19,14 +19,24 @@ import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 
 interface ProductFiltersProps {
   categories: ALL_CATEGORIES_QUERYResult;
+  basePath?: string;
+  hideCategorySelect?: boolean;
+  lockedCategorySlug?: string;
 }
 
-export function ProductFilters({ categories }: ProductFiltersProps) {
+export function ProductFilters({
+  categories,
+  basePath = "/",
+  hideCategorySelect = false,
+  lockedCategorySlug,
+}: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [selectsReady, setSelectsReady] = useState(false);
 
   const currentSearch = searchParams.get("q") ?? "";
   const currentCategory = searchParams.get("category") ?? "";
+  const currentSubcategory = searchParams.get("subcategory") ?? "";
   const currentColor = searchParams.get("color") ?? "";
   const currentMaterial = searchParams.get("material") ?? "";
   const currentSort = searchParams.get("sort") ?? "name";
@@ -45,9 +55,14 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
     setPriceRange([urlMinPrice, urlMaxPrice]);
   }, [urlMinPrice, urlMaxPrice]);
 
+  useEffect(() => {
+    setSelectsReady(true);
+  }, []);
+
   // Check which filters are active
   const isSearchActive = !!currentSearch;
   const isCategoryActive = !!currentCategory;
+  const isSubcategoryActive = !!currentSubcategory;
   const isColorActive = !!currentColor;
   const isMaterialActive = !!currentMaterial;
   const isPriceActive = urlMinPrice > 0 || urlMaxPrice < 5000;
@@ -56,6 +71,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   const hasActiveFilters =
     isSearchActive ||
     isCategoryActive ||
+    isSubcategoryActive ||
     isColorActive ||
     isMaterialActive ||
     isPriceActive ||
@@ -64,7 +80,8 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   // Count active filters
   const activeFilterCount = [
     isSearchActive,
-    isCategoryActive,
+    !hideCategorySelect && isCategoryActive,
+    isSubcategoryActive,
     isColorActive,
     isMaterialActive,
     isPriceActive,
@@ -83,9 +100,12 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
         }
       });
 
-      router.push(`?${params.toString()}`, { scroll: false });
+      const nextQuery = params.toString();
+      router.push(nextQuery ? `${basePath}?${nextQuery}` : basePath, {
+        scroll: false,
+      });
     },
-    [router, searchParams],
+    [basePath, router, searchParams],
   );
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -96,7 +116,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   };
 
   const handleClearFilters = () => {
-    router.push("/", { scroll: false });
+    router.push(basePath, { scroll: false });
   };
 
   const clearSingleFilter = (key: string) => {
@@ -107,15 +127,79 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
     }
   };
 
+  const shopByCategories = hideCategorySelect
+    ? categories.filter((category) => category.slug === lockedCategorySlug)
+    : categories;
+
+  const navigateToCategoryPage = (categorySlug?: string | null) => {
+    if (!categorySlug) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("category");
+    params.delete("subcategory");
+
+    const nextQuery = params.toString();
+    router.push(
+      nextQuery
+        ? `/category/${categorySlug}?${nextQuery}`
+        : `/category/${categorySlug}`,
+      {
+        scroll: false,
+      },
+    );
+  };
+
+  const handleSubcategoryFilter = (
+    categorySlug: string | null | undefined,
+    subcategorySlug: string | null | undefined,
+  ) => {
+    if (!subcategorySlug) return;
+
+    if (currentSubcategory === subcategorySlug) {
+      updateParams({ subcategory: null });
+      return;
+    }
+
+    if (hideCategorySelect) {
+      updateParams({ subcategory: subcategorySlug });
+      return;
+    }
+
+    updateParams({
+      category: categorySlug ?? null,
+      subcategory: subcategorySlug,
+    });
+  };
+
+  const getCurrentCategoryLabel = () => {
+    if (!currentCategory) {
+      return "All Categories";
+    }
+
+    return (
+      categories.find((category) => category.slug === currentCategory)?.title ??
+      "All Categories"
+    );
+  };
+
+  const getCurrentSortLabel = () => {
+    return (
+      SORT_OPTIONS.find((option) => option.value === currentSort)?.label ??
+      "Sort By"
+    );
+  };
+
   // Helper for filter label with active indicator
   const FilterLabel = ({
     children,
     isActive,
     filterKey,
+    onClear,
   }: {
     children: React.ReactNode;
     isActive: boolean;
-    filterKey: string;
+    filterKey?: string;
+    onClear?: () => void;
   }) => (
     <div className="mb-2 flex items-center justify-between">
       <span
@@ -132,12 +216,12 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
           </Badge>
         )}
       </span>
-      {isActive && (
+      {isActive && (onClear || filterKey) && (
         <button
           type="button"
-          onClick={() => clearSingleFilter(filterKey)}
+          onClick={() => (onClear ? onClear() : clearSingleFilter(filterKey ?? ""))}
           className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-          aria-label={`Clear ${filterKey} filter`}
+          aria-label="Clear filter"
         >
           <X className="h-4 w-4" />
         </button>
@@ -189,36 +273,110 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
         </form>
       </div>
 
-      {/* Category */}
+      {/* Shop By */}
       <div>
-        <FilterLabel isActive={isCategoryActive} filterKey="category">
-          Category
-        </FilterLabel>
-        <Select
-          value={currentCategory || "all"}
-          onValueChange={(value) =>
-            updateParams({ category: value === "all" ? null : value })
-          }
+        <FilterLabel
+          isActive={isCategoryActive || isSubcategoryActive}
+          onClear={() => updateParams({ category: null, subcategory: null })}
         >
-          <SelectTrigger
-            className={
-              isCategoryActive
-                ? "border-teal-500 ring-1 ring-teal-500 dark:border-teal-400 dark:ring-teal-400"
-                : ""
-            }
-          >
-            <SelectValue placeholder="All Categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {categories.map((category) => (
-              <SelectItem key={category._id} value={category.slug ?? ""}>
-                {category.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          Shop By
+        </FilterLabel>
+        <div className="space-y-3">
+          {shopByCategories.map((category) => {
+            const categoryIsCurrentPage = category.slug === lockedCategorySlug;
+
+            return (
+              <div key={category._id} className="space-y-1.5">
+                <button
+                  type="button"
+                  onClick={() => navigateToCategoryPage(category.slug)}
+                  className={`w-full rounded-md px-2 py-1 text-left text-sm font-semibold transition-colors ${
+                    categoryIsCurrentPage
+                      ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
+                      : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                  }`}
+                >
+                  {category.title}
+                </button>
+
+                {category.subcategories && category.subcategories.length > 0 && (
+                  <div className="space-y-1 pl-3">
+                    {category.subcategories.map((subcategory) => {
+                      const subcategoryIsActive =
+                        currentSubcategory === subcategory.slug;
+
+                      return (
+                        <button
+                          key={subcategory._id}
+                          type="button"
+                          onClick={() =>
+                            handleSubcategoryFilter(
+                              category.slug,
+                              subcategory.slug,
+                            )
+                          }
+                          className={`w-full rounded-md px-2 py-1 text-left text-sm transition-colors ${
+                            subcategoryIsActive
+                              ? "bg-teal-100 text-teal-900 dark:bg-teal-900/40 dark:text-teal-100"
+                              : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                          }`}
+                        >
+                          {subcategory.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
+
+      {/* Category */}
+      {!hideCategorySelect && (
+        <div>
+          <FilterLabel isActive={isCategoryActive} filterKey="category">
+            Category
+          </FilterLabel>
+          {selectsReady ? (
+            <Select
+              value={currentCategory || "all"}
+              onValueChange={(value) =>
+                updateParams({ category: value === "all" ? null : value })
+              }
+            >
+              <SelectTrigger
+                className={
+                  isCategoryActive
+                    ? "border-teal-500 ring-1 ring-teal-500 dark:border-teal-400 dark:ring-teal-400"
+                    : ""
+                }
+              >
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category._id} value={category.slug ?? ""}>
+                    {category.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <div
+              className={`flex h-9 w-full items-center rounded-md border bg-transparent px-3 text-sm text-zinc-700 shadow-xs dark:bg-input/30 dark:text-zinc-300 ${
+                isCategoryActive
+                  ? "border-teal-500 ring-1 ring-teal-500 dark:border-teal-400 dark:ring-teal-400"
+                  : "border-input"
+              }`}
+            >
+              {getCurrentCategoryLabel()}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Color */}
       {/* <div>
@@ -336,21 +494,27 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
         <span className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
           Sort By
         </span>
-        <Select
-          value={currentSort}
-          onValueChange={(value) => updateParams({ sort: value })}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SORT_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {selectsReady ? (
+          <Select
+            value={currentSort}
+            onValueChange={(value) => updateParams({ sort: value })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SORT_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <div className="border-input flex h-9 w-full items-center rounded-md border bg-transparent px-3 text-sm text-zinc-700 shadow-xs dark:bg-input/30 dark:text-zinc-300">
+            {getCurrentSortLabel()}
+          </div>
+        )}
       </div>
     </div>
   );

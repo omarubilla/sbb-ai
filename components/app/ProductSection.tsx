@@ -5,6 +5,7 @@ import { PanelLeftClose, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductFilters } from "./ProductFilters";
 import { ProductGrid } from "./ProductGrid";
+import { CategoryProductList } from "./CategoryProductList";
 import type {
   ALL_CATEGORIES_QUERYResult,
   FILTER_PRODUCTS_BY_NAME_QUERYResult,
@@ -14,14 +15,21 @@ interface ProductSectionProps {
   categories: ALL_CATEGORIES_QUERYResult;
   products: FILTER_PRODUCTS_BY_NAME_QUERYResult;
   searchQuery: string;
+  variant?: "grid" | "category-list";
+  basePath?: string;
+  lockedCategorySlug?: string;
 }
 
 export function ProductSection({
   categories,
   products,
   searchQuery,
+  variant = "grid",
+  basePath = "/",
+  lockedCategorySlug,
 }: ProductSectionProps) {
   const [filtersOpen, setFiltersOpen] = useState(true);
+  const isCategoryList = variant === "category-list";
 
   return (
     <div className="flex flex-col gap-6">
@@ -63,21 +71,38 @@ export function ProductSection({
       </div>
 
       {/* Main content area */}
-      <div className="flex flex-col gap-8 lg:h-[760px] lg:flex-row">
+      <div
+        className={`flex flex-col gap-8 lg:flex-row ${
+          isCategoryList ? "lg:items-start" : "lg:h-[760px]"
+        }`}
+      >
         {/* Sidebar Filters - completely hidden when collapsed on desktop */}
         <aside
           className={`shrink-0 transition-all duration-300 ease-in-out ${
             filtersOpen ? "w-full lg:w-72 lg:opacity-100" : "hidden lg:hidden"
           }`}
         >
-          <div className="lg:h-full lg:overflow-y-auto">
-            <ProductFilters categories={categories} />
+          <div className={isCategoryList ? "lg:sticky lg:top-24" : "lg:h-full lg:overflow-y-auto"}>
+            <ProductFilters
+              categories={categories}
+              basePath={basePath}
+              hideCategorySelect={Boolean(lockedCategorySlug)}
+              lockedCategorySlug={lockedCategorySlug}
+            />
           </div>
         </aside>
 
         {/* Product Grid - expands to full width when filters hidden */}
-        <main className="flex-1 transition-all duration-300 lg:h-full lg:overflow-y-auto">
-          <ProductGrid products={products} />
+        <main
+          className={`flex-1 transition-all duration-300 ${
+            isCategoryList ? "min-w-0" : "lg:h-full lg:overflow-y-auto"
+          }`}
+        >
+          {isCategoryList ? (
+            <CategoryProductList products={products} />
+          ) : (
+            <ProductGrid products={products} />
+          )}
         </main>
       </div>
     </div>

@@ -23,6 +23,8 @@ const FILTERED_PRODUCT_PROJECTION = `{
   _id,
   name,
   "slug": slug.current,
+  description,
+  quantity,
   price,
   "images": images[0...4]{
     _key,

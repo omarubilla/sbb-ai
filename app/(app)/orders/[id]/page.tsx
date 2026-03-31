@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,9 +10,13 @@ import { ORDER_BY_ID_QUERY } from "@/lib/sanity/queries/orders";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
 import { formatPrice, formatDate } from "@/lib/utils";
 
-export const metadata = {
-  title: "Order Details | Furniture Shop",
-  description: "View your order details",
+export const metadata: Metadata = {
+  title: "Order Details | South Bay Bio",
+  description: "View details for a South Bay Bio order.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 interface OrderPageProps {

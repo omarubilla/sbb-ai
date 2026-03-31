@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { HandHeart, ShieldCheck, Truck } from "lucide-react";
@@ -16,6 +17,18 @@ import { FeaturedCarousel } from "@/components/app/FeaturedCarousel";
 import { FeaturedCarouselSkeleton } from "@/components/app/FeaturedCarouselSkeleton";
 import { NewsInlineCarousel } from "@/components/news/NewsInlineCarousel";
 import { newsItems } from "@/data/news";
+import {
+  DEFAULT_SITE_DESCRIPTION,
+  getRobotsValue,
+  isProteasomeSeoExperiment,
+  SITE_NAME,
+} from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: SITE_NAME,
+  description: DEFAULT_SITE_DESCRIPTION,
+  robots: getRobotsValue(!isProteasomeSeoExperiment()),
+};
 
 interface PageProps {
   searchParams: Promise<{
@@ -164,11 +177,10 @@ export default async function HomePage({ searchParams }: PageProps) {
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
-                      Fast shipping
+                      Direct Shipping to Europe
                     </h3>
                     <p className="mt-2 text-base leading-6 text-zinc-600 dark:text-zinc-300">
-                      Enjoy seamless shopping with our worldwide shipping
-                      service.
+                      For oders over $1,000, 50% off overseas shipments.
                     </p>
                   </div>
                 </article>
@@ -361,7 +373,7 @@ export default async function HomePage({ searchParams }: PageProps) {
               <a href="#" className="transition-colors hover:text-white">
                 Orders and Returns
               </a>
-              <Link href="/sitemap" className="transition-colors hover:text-white">
+              <Link href="/sitemap-links" className="transition-colors hover:text-white">
                 Sitemap
               </Link>
               <Link href="/terms-of-sale" className="transition-colors hover:text-white">

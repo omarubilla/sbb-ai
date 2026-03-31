@@ -11,7 +11,6 @@ import {
   CATEGORY_BY_SLUG_QUERY,
 } from "@/lib/sanity/queries/categories";
 import { ProductSection } from "@/components/app/ProductSection";
-import { CategoryTiles } from "@/components/app/CategoryTiles";
 
 export interface CategorySearchParams {
   q?: string;
@@ -106,10 +105,6 @@ export async function CategoryPageTemplate({
             main shop page.
           </p>
         </div>
-
-        <div className="mt-6">
-          <CategoryTiles categories={categories} activeCategory={slug} />
-        </div>
       </section>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -117,6 +112,9 @@ export async function CategoryPageTemplate({
           categories={categories}
           products={products}
           searchQuery={searchQuery}
+          variant="category-list"
+          basePath={`/category/${slug}`}
+          lockedCategorySlug={slug}
         />
       </div>
     </div>

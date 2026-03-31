@@ -8,7 +8,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={`min-h-screen transition-all duration-300 ease-in-out ${
-        isChatOpen ? "xl:mr-[448px] max-xl:overflow-hidden max-xl:h-screen" : ""
+        isChatOpen ? "max-xl:overflow-hidden max-xl:h-screen" : ""
       }`}
     >
       {children}

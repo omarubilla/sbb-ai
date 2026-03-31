@@ -146,12 +146,6 @@ export function Header({ categories }: HeaderProps) {
                   <ChevronDown className="ml-1 h-4 w-4" />
                 </Link>
                 <div className="bg-popover text-popover-foreground absolute left-0 top-full z-50 hidden min-w-56 overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md group-hover:block">
-                  <Link
-                    href={categoryHref}
-                    className="focus:bg-accent focus:text-accent-foreground relative mb-1 flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm font-medium outline-hidden select-none"
-                  >
-                    View all {category.title}
-                  </Link>
                   {subcategories.map((subcategory) => (
                     <Link
                       key={subcategory._id}

@@ -541,11 +541,13 @@ export type SEARCH_PRODUCTS_QUERYResult = Array<{
   stock: number | null;
 }>;
 // Variable: FILTER_PRODUCTS_BY_NAME_QUERY
-// Query: *[  _type == "product"  && ($categorySlug == "" || category->slug.current == $categorySlug)  && ($color == "" || color == $color)  && ($material == "" || material == $material)  && ($minPrice == 0 || price >= $minPrice)  && ($maxPrice == 0 || price <= $maxPrice)  && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")  && ($inStock == false || stock > 0)] | order(name asc) {  _id,  name,  "slug": slug.current,  price,  "images": images[0...4]{    _key,    asset->{      _id,      url    }  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  stock}
+// Query: *[  _type == "product"  && ($categorySlug == "" || category->slug.current == $categorySlug)  && ($color == "" || color == $color)  && ($material == "" || material == $material)  && ($minPrice == 0 || price >= $minPrice)  && ($maxPrice == 0 || price <= $maxPrice)  && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")  && ($inStock == false || stock > 0)] | order(name asc) {  _id,  name,  "slug": slug.current,  description,  quantity,  price,  "images": images[0...4]{    _key,    asset->{      _id,      url    }  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  stock}
 export type FILTER_PRODUCTS_BY_NAME_QUERYResult = Array<{
   _id: string;
   name: string | null;
   slug: string | null;
+  description: string | null;
+  quantity: string | null;
   price: number | null;
   images: Array<{
     _key: string;
@@ -564,11 +566,13 @@ export type FILTER_PRODUCTS_BY_NAME_QUERYResult = Array<{
   stock: number | null;
 }>;
 // Variable: FILTER_PRODUCTS_BY_PRICE_ASC_QUERY
-// Query: *[  _type == "product"  && ($categorySlug == "" || category->slug.current == $categorySlug)  && ($color == "" || color == $color)  && ($material == "" || material == $material)  && ($minPrice == 0 || price >= $minPrice)  && ($maxPrice == 0 || price <= $maxPrice)  && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")  && ($inStock == false || stock > 0)] | order(price asc) {  _id,  name,  "slug": slug.current,  price,  "images": images[0...4]{    _key,    asset->{      _id,      url    }  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  stock}
+// Query: *[  _type == "product"  && ($categorySlug == "" || category->slug.current == $categorySlug)  && ($color == "" || color == $color)  && ($material == "" || material == $material)  && ($minPrice == 0 || price >= $minPrice)  && ($maxPrice == 0 || price <= $maxPrice)  && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")  && ($inStock == false || stock > 0)] | order(price asc) {  _id,  name,  "slug": slug.current,  description,  quantity,  price,  "images": images[0...4]{    _key,    asset->{      _id,      url    }  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  stock}
 export type FILTER_PRODUCTS_BY_PRICE_ASC_QUERYResult = Array<{
   _id: string;
   name: string | null;
   slug: string | null;
+  description: string | null;
+  quantity: string | null;
   price: number | null;
   images: Array<{
     _key: string;
@@ -587,11 +591,13 @@ export type FILTER_PRODUCTS_BY_PRICE_ASC_QUERYResult = Array<{
   stock: number | null;
 }>;
 // Variable: FILTER_PRODUCTS_BY_PRICE_DESC_QUERY
-// Query: *[  _type == "product"  && ($categorySlug == "" || category->slug.current == $categorySlug)  && ($color == "" || color == $color)  && ($material == "" || material == $material)  && ($minPrice == 0 || price >= $minPrice)  && ($maxPrice == 0 || price <= $maxPrice)  && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")  && ($inStock == false || stock > 0)] | order(price desc) {  _id,  name,  "slug": slug.current,  price,  "images": images[0...4]{    _key,    asset->{      _id,      url    }  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  stock}
+// Query: *[  _type == "product"  && ($categorySlug == "" || category->slug.current == $categorySlug)  && ($color == "" || color == $color)  && ($material == "" || material == $material)  && ($minPrice == 0 || price >= $minPrice)  && ($maxPrice == 0 || price <= $maxPrice)  && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")  && ($inStock == false || stock > 0)] | order(price desc) {  _id,  name,  "slug": slug.current,  description,  quantity,  price,  "images": images[0...4]{    _key,    asset->{      _id,      url    }  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  stock}
 export type FILTER_PRODUCTS_BY_PRICE_DESC_QUERYResult = Array<{
   _id: string;
   name: string | null;
   slug: string | null;
+  description: string | null;
+  quantity: string | null;
   price: number | null;
   images: Array<{
     _key: string;
@@ -610,11 +616,13 @@ export type FILTER_PRODUCTS_BY_PRICE_DESC_QUERYResult = Array<{
   stock: number | null;
 }>;
 // Variable: FILTER_PRODUCTS_BY_RELEVANCE_QUERY
-// Query: *[  _type == "product"  && ($categorySlug == "" || category->slug.current == $categorySlug)  && ($color == "" || color == $color)  && ($material == "" || material == $material)  && ($minPrice == 0 || price >= $minPrice)  && ($maxPrice == 0 || price <= $maxPrice)  && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")  && ($inStock == false || stock > 0)] | score(  boost(name match $searchQuery + "*", 3),  boost(description match $searchQuery + "*", 1)) | order(_score desc, name asc) {  _id,  name,  "slug": slug.current,  price,  "images": images[0...4]{    _key,    asset->{      _id,      url    }  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  stock}
+// Query: *[  _type == "product"  && ($categorySlug == "" || category->slug.current == $categorySlug)  && ($color == "" || color == $color)  && ($material == "" || material == $material)  && ($minPrice == 0 || price >= $minPrice)  && ($maxPrice == 0 || price <= $maxPrice)  && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")  && ($inStock == false || stock > 0)] | score(  boost(name match $searchQuery + "*", 3),  boost(description match $searchQuery + "*", 1)) | order(_score desc, name asc) {  _id,  name,  "slug": slug.current,  description,  quantity,  price,  "images": images[0...4]{    _key,    asset->{      _id,      url    }  },  category->{    _id,    title,    "slug": slug.current  },  material,  color,  stock}
 export type FILTER_PRODUCTS_BY_RELEVANCE_QUERYResult = Array<{
   _id: string;
   name: string | null;
   slug: string | null;
+  description: string | null;
+  quantity: string | null;
   price: number | null;
   images: Array<{
     _key: string;

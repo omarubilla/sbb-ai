@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { Package, ArrowRight } from "lucide-react";
@@ -9,9 +10,13 @@ import { getOrderStatus } from "@/lib/constants/orderStatus";
 import { formatPrice, formatDate, formatOrderNumber } from "@/lib/utils";
 import { StackedProductImages } from "@/components/app/StackedProductImages";
 
-export const metadata = {
-  title: "Your Orders | Furniture Shop",
-  description: "View your order history",
+export const metadata: Metadata = {
+  title: "Your Orders | South Bay Bio",
+  description: "View your South Bay Bio order history.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function OrdersPage() {
