@@ -20,6 +20,10 @@ interface ProductPageProps {
 }
 
 type Product = NonNullable<PRODUCT_BY_SLUG_QUERYResult>;
+type ProductWithExternalImageUrls = Product & {
+  imageUrl?: string | null;
+  imageUrls?: string[] | null;
+};
 
 const getProduct = cache(async (slug: string): Promise<Product | null> => {
   const { data: product } = await sanityFetch({
@@ -49,11 +53,16 @@ function getProductDescription(product: Product) {
   return `${product.name ?? "Product"} from ${SITE_NAME} for research and development use.`;
 }
 
-function getProductImageUrls(product: Product) {
-  return (
+function getProductImageUrls(product: ProductWithExternalImageUrls) {
+  const uploadedImageUrls =
     product.images
-      ?.flatMap((image) => (image.asset?.url ? [image.asset.url] : [])) ?? []
-  );
+      ?.flatMap((image) => (image.asset?.url ? [image.asset.url] : [])) ?? [];
+
+  const externalImageUrls = (product.imageUrls ?? []).filter(Boolean);
+  const legacyImageUrl = product.imageUrl ? [product.imageUrl] : [];
+
+  // Keep order stable while removing duplicates.
+  return [...new Set([...uploadedImageUrls, ...externalImageUrls, ...legacyImageUrl])];
 }
 
 function getProductUrl(slug: string) {
@@ -78,7 +87,7 @@ export async function generateMetadata({
 
   const productName = product.name ?? "Product";
   const description = getProductDescription(product);
-  const imageUrls = getProductImageUrls(product);
+  const imageUrls = getProductImageUrls(product as ProductWithExternalImageUrls);
   const shouldIndex =
     !isProteasomeSeoExperiment() || product.category?.slug === "proteasome";
 
@@ -120,7 +129,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const productName = product.name ?? "Product";
   const description = getProductDescription(product);
   const productUrl = getProductUrl(product.slug ?? slug);
-  const imageUrls = getProductImageUrls(product);
+  const imageUrls = getProductImageUrls(product as ProductWithExternalImageUrls);
   const shouldIndex =
     !isProteasomeSeoExperiment() || product.category?.slug === "proteasome";
   const additionalProperty = [
@@ -194,7 +203,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Image Gallery */}
-          <ProductGallery images={product.images} productName={product.name} />
+          <ProductGallery imageUrls={imageUrls} productName={product.name} />
 
           {/* Product Info */}
           <ProductInfo product={product} />

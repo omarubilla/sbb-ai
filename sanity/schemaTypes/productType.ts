@@ -1,5 +1,5 @@
 import { PackageIcon } from "@sanity/icons";
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
 export const productType = defineType({
   name: "product",
@@ -39,12 +39,34 @@ export const productType = defineType({
     }),
     defineField({
       name: "imageUrl",
+      title: "Primary Image URL",
       type: "url",
       group: "details",
-      description: "External product image URL",
+      description: "Primary external product image URL",
       validation: (rule) => [
         rule.uri({ scheme: ["http", "https"] }).error("Use a valid URL"),
       ],
+    }),
+    defineField({
+      name: "imageUrls",
+      title: "Additional Image URLs",
+      type: "array",
+      group: "details",
+      of: [
+        defineArrayMember({
+          type: "url",
+          validation: (rule) =>
+            rule
+              .required()
+              .uri({ scheme: ["http", "https"] })
+              .error("Use a valid http/https URL"),
+        }),
+      ],
+      options: {
+        sortable: true,
+      },
+      description:
+        "Click Add item to paste more image URLs for this product.",
     }),
     defineField({
       name: "quantity",

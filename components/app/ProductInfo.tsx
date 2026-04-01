@@ -22,6 +22,9 @@ interface ProductInfoProps {
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
+  const BULK_MIN_QUANTITY = 10;
+  const BULK_DISCOUNT_RATE = 0.15;
+
   const formatPrice = useFormattedPrice();
   const { addItem } = useCartActions();
   const stock = product.stock ?? 0;
@@ -36,7 +39,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const { meta: descriptionMeta, summary: descriptionSummary } =
     splitProductDescription(product.description, product.quantity);
   const unitPrice = product.price ?? 0;
-  const calculatedTotal = unitPrice * selectedQuantity;
+  const isBulkDiscountActive = selectedQuantity >= BULK_MIN_QUANTITY;
+  const discountedUnitPrice = isBulkDiscountActive
+    ? unitPrice * (1 - BULK_DISCOUNT_RATE)
+    : unitPrice;
+  const calculatedTotal = discountedUnitPrice * selectedQuantity;
+  const savingsAmount = (unitPrice - discountedUnitPrice) * selectedQuantity;
 
   const handleDecreaseQuantity = () => {
     setSelectedQuantity((prev) => Math.max(1, prev - 1));
@@ -55,7 +63,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {
         productId: product._id,
         name: product.name ?? "Unknown Product",
-        price: unitPrice,
+        price: discountedUnitPrice,
         image: imageUrl ?? undefined,
       },
       selectedQuantity,
@@ -106,28 +114,36 @@ export function ProductInfo({ product }: ProductInfoProps) {
               <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                 Quantity
               </p>
-              <div className="mt-1 flex h-11 w-36 items-center rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-full w-11 rounded-r-none"
-                  onClick={handleDecreaseQuantity}
-                  disabled={selectedQuantity <= 1 || stock <= 0}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="flex-1 text-center text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
-                  {selectedQuantity}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-full w-11 rounded-l-none"
-                  onClick={handleIncreaseQuantity}
-                  disabled={selectedQuantity >= stock || stock <= 0}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+              <div className="mt-1 flex items-center gap-2">
+                <div className="flex h-11 w-36 items-center rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-full w-11 rounded-r-none"
+                    onClick={handleDecreaseQuantity}
+                    disabled={selectedQuantity <= 1 || stock <= 0}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className="flex-1 text-center text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
+                    {selectedQuantity}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-full w-11 rounded-l-none"
+                    onClick={handleIncreaseQuantity}
+                    disabled={selectedQuantity >= stock || stock <= 0}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {isBulkDiscountActive && (
+                  <span className="inline-flex h-8 items-center rounded-full bg-emerald-100 px-3 text-xs font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                    15% OFF Applied
+                  </span>
+                )}
               </div>
             </div>
 
@@ -138,6 +154,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
               <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">
                 {formatPrice(calculatedTotal)}
               </p>
+              {isBulkDiscountActive && savingsAmount > 0 && (
+                <p className="mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  You save {formatPrice(savingsAmount)}
+                </p>
+              )}
             </div>
           </div>
 

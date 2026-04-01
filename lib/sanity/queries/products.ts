@@ -155,6 +155,8 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   name,
   "slug": slug.current,
   description,
+  imageUrl,
+  imageUrls,
   quantity,
   molecularWeight,
   purity,

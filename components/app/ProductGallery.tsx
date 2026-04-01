@@ -3,21 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import type { PRODUCT_BY_SLUG_QUERYResult } from "@/sanity.types";
-
-type ProductImages = NonNullable<
-  NonNullable<PRODUCT_BY_SLUG_QUERYResult>["images"]
->;
 
 interface ProductGalleryProps {
-  images: ProductImages | null;
+  imageUrls: string[];
   productName: string | null;
 }
 
-export function ProductGallery({ images, productName }: ProductGalleryProps) {
+export function ProductGallery({ imageUrls, productName }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  if (!images || images.length === 0) {
+  if (!imageUrls || imageUrls.length === 0) {
     return (
       <div className="flex aspect-square items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
         <span className="text-zinc-400">No images available</span>
@@ -25,15 +20,15 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     );
   }
 
-  const selectedImage = images[selectedIndex];
+  const selectedImageUrl = imageUrls[selectedIndex];
 
   return (
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
-        {selectedImage?.asset?.url ? (
+        {selectedImageUrl ? (
           <Image
-            src={selectedImage.asset.url}
+            src={selectedImageUrl}
             alt={productName ?? "Product image"}
             fill
             className="object-contain"
@@ -48,11 +43,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       </div>
 
       {/* Thumbnail Grid */}
-      {images.length > 1 && (
+      {imageUrls.length > 0 && (
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6">
-          {images.map((image, index) => (
+          {imageUrls.map((url, index) => (
             <button
-              key={image._key}
+              key={`${url}-${index}`}
               type="button"
               onClick={() => setSelectedIndex(index)}
               aria-label={`View image ${index + 1}`}
@@ -64,9 +59,9 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                   : "hover:opacity-75",
               )}
             >
-              {image.asset?.url ? (
+              {url ? (
                 <Image
-                  src={image.asset.url}
+                  src={url}
                   alt={`${productName} thumbnail ${index + 1}`}
                   fill
                   className="object-cover"
