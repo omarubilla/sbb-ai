@@ -1,16 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
-import { AddToCartButton } from "@/components/app/AddToCartButton";
+import { ChevronDown, Minus, Plus, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 import { AskAISimilarButton } from "@/components/app/AskAISimilarButton";
 import { StockBadge } from "@/components/app/StockBadge";
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
+import { useCartActions } from "@/lib/store/cart-store-provider";
+import { splitProductDescription } from "@/lib/utils/product-description";
 import type { PRODUCT_BY_SLUG_QUERYResult } from "@/sanity.types";
 
 interface ProductInfoProps {
@@ -19,6 +23,9 @@ interface ProductInfoProps {
 
 export function ProductInfo({ product }: ProductInfoProps) {
   const formatPrice = useFormattedPrice();
+  const { addItem } = useCartActions();
+  const stock = product.stock ?? 0;
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
   const imageUrl = product.images?.[0]?.asset?.url;
   const certificateUrl = product.certificateOfAnalysisUrl?.trim();
   const quantity = product.quantity ?? "—";
@@ -26,6 +33,36 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const purity = product.purity ?? "—";
   const storageBuffer = product.storageBuffer ?? "—";
   const storage = product.storage ?? "—";
+  const { meta: descriptionMeta, summary: descriptionSummary } =
+    splitProductDescription(product.description, product.quantity);
+  const unitPrice = product.price ?? 0;
+  const calculatedTotal = unitPrice * selectedQuantity;
+
+  const handleDecreaseQuantity = () => {
+    setSelectedQuantity((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleIncreaseQuantity = () => {
+    setSelectedQuantity((prev) => Math.min(stock, prev + 1));
+  };
+
+  const handleAddSelectedToCart = () => {
+    if (stock <= 0) {
+      return;
+    }
+
+    addItem(
+      {
+        productId: product._id,
+        name: product.name ?? "Unknown Product",
+        price: unitPrice,
+        image: imageUrl ?? undefined,
+      },
+      selectedQuantity,
+    );
+
+    toast.success(`Added ${selectedQuantity} x ${product.name ?? "product"}`);
+  };
 
   return (
     <div className="flex flex-col">
@@ -50,22 +87,74 @@ export function ProductInfo({ product }: ProductInfoProps) {
       </p>
 
       {/* Description */}
-      {product.description && (
-        <p className="mt-4 text-zinc-600 dark:text-zinc-400">
-          {product.description}
-        </p>
-      )}
+      <div className="mt-4 space-y-2">
+        {descriptionMeta && (
+          <p className="font-medium text-zinc-700 dark:text-zinc-300">
+            {descriptionMeta}
+          </p>
+        )}
+        <p className="text-zinc-600 dark:text-zinc-400">{descriptionSummary}</p>
+      </div>
 
       {/* Stock & Add to Cart */}
       <div className="mt-6 flex flex-col gap-3">
-        <StockBadge productId={product._id} stock={product.stock ?? 0} />
-        <AddToCartButton
-          productId={product._id}
-          name={product.name ?? "Unknown Product"}
-          price={product.price ?? 0}
-          image={imageUrl ?? undefined}
-          stock={product.stock ?? 0}
-        />
+        <StockBadge productId={product._id} stock={stock} />
+
+        <div className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-800">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                Quantity
+              </p>
+              <div className="mt-1 flex h-11 w-36 items-center rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-full w-11 rounded-r-none"
+                  onClick={handleDecreaseQuantity}
+                  disabled={selectedQuantity <= 1 || stock <= 0}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="flex-1 text-center text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
+                  {selectedQuantity}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-full w-11 rounded-l-none"
+                  onClick={handleIncreaseQuantity}
+                  disabled={selectedQuantity >= stock || stock <= 0}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                Total
+              </p>
+              <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">
+                {formatPrice(calculatedTotal)}
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-3 text-sm font-semibold text-teal-600 dark:text-teal-400">
+            Free Same-day Shipping on Domestic Orders over $750
+          </p>
+
+          <Button
+            onClick={handleAddSelectedToCart}
+            className="mt-3 h-11 w-full"
+            disabled={stock <= 0}
+          >
+            <ShoppingBag className="mr-2 h-4 w-4" />
+            {stock <= 0 ? "Out of Stock" : `Add ${selectedQuantity} to Cart`}
+          </Button>
+        </div>
+
         <AskAISimilarButton productName={product.name ?? "this product"} />
       </div>
 

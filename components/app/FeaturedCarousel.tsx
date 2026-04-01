@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
+import { splitProductDescription } from "@/lib/utils/product-description";
 import type { FEATURED_PRODUCTS_QUERYResult } from "@/sanity.types";
 
 type FeaturedProduct = FEATURED_PRODUCTS_QUERYResult[number];
@@ -167,6 +168,8 @@ interface FeaturedSlideProps {
 }
 
 function FeaturedSlide({ product, formatPrice }: FeaturedSlideProps) {
+  const { meta, summary } = splitProductDescription(product.description);
+
   return (
     <div className="flex h-full min-h-[340px] w-full flex-col justify-center px-6 py-8 md:min-h-[390px] md:px-10 lg:min-h-[430px] lg:px-12">
       <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
@@ -186,10 +189,17 @@ function FeaturedSlide({ product, formatPrice }: FeaturedSlideProps) {
           {product.name}
         </h2>
 
-        {product.description && (
-          <p className="mt-4 line-clamp-3 text-sm text-zinc-300 sm:text-base lg:text-lg">
-            {product.description}
-          </p>
+        {(meta || summary) && (
+          <div className="mt-4 space-y-1">
+            {meta && (
+              <p className="line-clamp-1 text-sm font-medium text-zinc-200">
+                {meta}
+              </p>
+            )}
+            <p className="line-clamp-2 text-sm text-zinc-300 sm:text-base lg:text-lg">
+              {summary}
+            </p>
+          </div>
         )}
 
         <p className="mt-6 text-3xl font-bold text-white lg:text-4xl">
