@@ -5,6 +5,7 @@ import { AddToCartButton } from "@/components/app/AddToCartButton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import { splitProductDescription } from "@/lib/utils/product-description";
+import { normalizeSlug } from "@/lib/utils";
 import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
 
 type Product = FILTER_PRODUCTS_BY_NAME_QUERYResult[number];
@@ -45,7 +46,7 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
             className="grid gap-6 border-b border-zinc-200 pb-12 last:border-b-0 dark:border-zinc-800 sm:gap-8 lg:grid-cols-[minmax(260px,340px)_1fr] xl:grid-cols-[minmax(320px,380px)_1fr]"
           >
             <Link
-              href={`/products/${product.slug}`}
+              href={`/products/${normalizeSlug(product.slug)}`}
               className="group block overflow-hidden rounded-sm bg-white dark:bg-zinc-950"
             >
               <div className="relative aspect-[4/5] w-full bg-zinc-100 dark:bg-zinc-900">
@@ -80,7 +81,7 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
 
             <div className="flex flex-col justify-center gap-4 lg:gap-5">
               <div className="space-y-3">
-                <Link href={`/products/${product.slug}`} className="block">
+                <Link href={`/products/${normalizeSlug(product.slug)}`} className="block">
                   <h2 className="text-2xl font-semibold tracking-tight text-zinc-950 transition-colors hover:text-sky-700 dark:text-zinc-100 dark:hover:text-sky-300 sm:text-3xl">
                     {product.name}
                   </h2>

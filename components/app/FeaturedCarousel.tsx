@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Autoplay from "embla-carousel-autoplay";
+import { normalizeSlug } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 import {
   Carousel,
@@ -212,7 +213,7 @@ function FeaturedSlide({ product, formatPrice }: FeaturedSlideProps) {
             size="lg"
             className="bg-white text-zinc-900 hover:bg-zinc-100"
           >
-            <Link href={`/products/${product.slug}`}>
+            <Link href={`/products/${normalizeSlug(product.slug)}`}>
               Shop Now
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

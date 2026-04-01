@@ -21,6 +21,11 @@ interface ProductPageProps {
 
 type Product = NonNullable<PRODUCT_BY_SLUG_QUERYResult>;
 type ProductWithExternalImageUrls = Product & {
+  image?: {
+    asset?: {
+      url?: string | null;
+    } | null;
+  } | null;
   imageUrl?: string | null;
   imageUrls?: string[] | null;
 };
@@ -54,19 +59,31 @@ function getProductDescription(product: Product) {
 }
 
 function getProductImageUrls(product: ProductWithExternalImageUrls) {
+  const primaryUploadedImageUrl = product.image?.asset?.url?.trim();
+
   const uploadedImageUrls =
     product.images
       ?.flatMap((image) => (image.asset?.url ? [image.asset.url] : [])) ?? [];
 
-  const externalImageUrls = (product.imageUrls ?? []).filter(Boolean);
-  const legacyImageUrl = product.imageUrl ? [product.imageUrl] : [];
+  const externalImageUrls = (product.imageUrls ?? [])
+    .map((url) => url?.trim())
+    .filter((url): url is string => Boolean(url));
 
-  // Keep order stable while removing duplicates.
-  return [...new Set([...uploadedImageUrls, ...externalImageUrls, ...legacyImageUrl])];
+  const legacyImageUrl = product.imageUrl?.trim();
+
+  // Preserve explicit order from Studio so each configured URL can render a thumbnail.
+  return [
+    ...(primaryUploadedImageUrl ? [primaryUploadedImageUrl] : []),
+    ...uploadedImageUrls,
+    ...(legacyImageUrl ? [legacyImageUrl] : []),
+    ...externalImageUrls,
+  ];
 }
 
+import { normalizeSlug } from "@/lib/utils";
+
 function getProductUrl(slug: string) {
-  return buildAbsoluteUrl(`/products/${slug}`);
+  return buildAbsoluteUrl(`/products/${normalizeSlug(slug)}`);
 }
 
 export async function generateMetadata({
@@ -96,7 +113,7 @@ export async function generateMetadata({
     description,
     robots: getRobotsValue(shouldIndex),
     alternates: {
-      canonical: `/products/${product.slug ?? slug}`,
+      canonical: `/products/${normalizeSlug(product.slug ?? slug)}`,
     },
     openGraph: {
       type: "website",
@@ -128,6 +145,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const productName = product.name ?? "Product";
   const description = getProductDescription(product);
+  const normalizedSlug = normalizeSlug(product.slug ?? slug);
   const productUrl = getProductUrl(product.slug ?? slug);
   const imageUrls = getProductImageUrls(product as ProductWithExternalImageUrls);
   const shouldIndex =

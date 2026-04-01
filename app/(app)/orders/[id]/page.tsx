@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { sanityFetch } from "@/sanity/lib/live";
 import { ORDER_BY_ID_QUERY } from "@/lib/sanity/queries/orders";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { formatPrice, formatDate, normalizeSlug } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Order Details | South Bay Bio",
@@ -100,7 +100,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                   <div className="flex flex-1 flex-col justify-between">
                     <div>
                       <Link
-                        href={`/products/${item.product?.slug}`}
+                        href={`/products/${normalizeSlug(item.product?.slug)}`}
                         className="font-medium text-zinc-900 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-300"
                       >
                         {item.product?.name ?? "Unknown Product"}

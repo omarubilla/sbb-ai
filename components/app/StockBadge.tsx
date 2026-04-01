@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { useCartItem } from "@/lib/store/cart-store-provider";
+import { useCartQuantityByProduct } from "@/lib/store/cart-store-provider";
 import { cn } from "@/lib/utils";
 import { isLowStock as checkLowStock } from "@/lib/constants/stock";
 
@@ -13,15 +13,14 @@ interface StockBadgeProps {
 
 export function StockBadge({ productId, stock, className }: StockBadgeProps) {
   // Safely access cart store with fallback for SSR
-  let cartItem;
+  let quantityInCart;
   try {
-    cartItem = useCartItem(productId);
+    quantityInCart = useCartQuantityByProduct(productId);
   } catch (error) {
     // During SSR or outside provider, assume no items in cart
-    cartItem = null;
+    quantityInCart = 0;
   }
 
-  const quantityInCart = cartItem?.quantity ?? 0;
   const isAtMax = quantityInCart >= stock && stock > 0;
   const lowStock = checkLowStock(stock);
 

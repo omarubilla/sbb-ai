@@ -5,6 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Sanity slugs are stored with a leading "/" — strip it for use in URLs. */
+export function normalizeSlug(slug: string | null | undefined): string {
+  return (slug ?? "").replace(/^\/+/, "");
+}
+
 /**
  * Format a price amount with currency symbol
  * @param amount - The price amount (can be null/undefined)

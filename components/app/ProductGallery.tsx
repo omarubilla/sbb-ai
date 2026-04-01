@@ -21,6 +21,8 @@ export function ProductGallery({ imageUrls, productName }: ProductGalleryProps) 
   }
 
   const selectedImageUrl = imageUrls[selectedIndex];
+  const selectedIsExternal =
+    !!selectedImageUrl && !selectedImageUrl.includes("cdn.sanity.io");
 
   return (
     <div className="space-y-4">
@@ -34,6 +36,7 @@ export function ProductGallery({ imageUrls, productName }: ProductGalleryProps) 
             className="object-contain"
             sizes="(max-width: 1024px) 100vw, 50vw"
             priority
+            unoptimized={selectedIsExternal}
           />
         ) : (
           <div className="flex h-full items-center justify-center text-zinc-400">
@@ -66,6 +69,7 @@ export function ProductGallery({ imageUrls, productName }: ProductGalleryProps) 
                   fill
                   className="object-cover"
                   sizes="100px"
+                  unoptimized={!url.includes("cdn.sanity.io")}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-xs text-zinc-400">

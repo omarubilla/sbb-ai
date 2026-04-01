@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { sanityFetch } from "@/sanity/lib/live";
 import { AI_SEARCH_PRODUCTS_QUERY } from "@/lib/sanity/queries/products";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, normalizeSlug } from "@/lib/utils";
 import { getStockStatus, getStockMessage } from "@/lib/constants/stock";
 import { MATERIAL_VALUES, COLOR_VALUES } from "@/lib/constants/filters";
 import type { AI_SEARCH_PRODUCTS_QUERYResult } from "@/sanity.types";
@@ -112,7 +112,7 @@ export const searchProductsTool = tool({
         featured: product.featured ?? false,
         assemblyRequired: product.assemblyRequired ?? false,
         imageUrl: product.image?.asset?.url ?? null,
-        productUrl: product.slug ? `/products/${product.slug}` : null,
+        productUrl: product.slug ? `/products/${normalizeSlug(product.slug)}` : null,
       }));
 
       return {

@@ -23,6 +23,7 @@ import {
   isProteasomeSeoExperiment,
   SITE_NAME,
 } from "@/lib/site";
+import { normalizeSlug } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: SITE_NAME,
@@ -90,6 +91,37 @@ export default async function HomePage({ searchParams }: PageProps) {
       inStock,
     },
   });
+
+  // Guard against duplicate documents with the same logical slug.
+  const dedupedProducts = Array.from(
+    products
+      .slice()
+      .sort((a, b) => {
+        const score = (p: (typeof products)[number]) => {
+          const hasImagesArray = (p.images?.length ?? 0) > 0 ? 2 : 0;
+          return hasImagesArray;
+        };
+
+        return score(b) - score(a);
+      })
+      .reduce(
+        (acc, product) => {
+          const slugKey = normalizeSlug(product.slug);
+          if (!slugKey) {
+            acc.set(product._id, product);
+            return acc;
+          }
+
+          if (!acc.has(slugKey)) {
+            acc.set(slugKey, product);
+          }
+
+          return acc;
+        },
+        new Map<string, (typeof products)[number]>(),
+      )
+      .values(),
+  );
 
   // Fetch categories for filter sidebar
   const { data: categories } = await sanityFetch({
@@ -250,7 +282,7 @@ export default async function HomePage({ searchParams }: PageProps) {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <ProductSection
           categories={categories}
-          products={products}
+          products={dedupedProducts}
           searchQuery={searchQuery}
         />
       </div>

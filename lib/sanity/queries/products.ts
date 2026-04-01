@@ -149,7 +149,7 @@ export const PRODUCTS_BY_CATEGORY_QUERY = defineQuery(`*[
  */
 export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   _type == "product"
-  && slug.current == $slug
+  && (slug.current == $slug || slug.current == "/" + $slug)
 ][0] {
   _id,
   name,
@@ -157,6 +157,13 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
   description,
   imageUrl,
   imageUrls,
+  "image": image{
+    asset->{
+      _id,
+      url
+    },
+    hotspot
+  },
   quantity,
   molecularWeight,
   purity,

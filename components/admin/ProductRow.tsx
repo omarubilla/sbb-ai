@@ -12,7 +12,7 @@ import { CircleAlert, ExternalLink, Star } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, normalizeSlug } from "@/lib/utils";
 import { isLowStock, isOutOfStock } from "@/lib/constants/stock";
 import { StockInput } from "./StockInput";
 import { PriceInput } from "./PriceInput";
@@ -121,7 +121,7 @@ function ProductRowContent(handle: DocumentHandle) {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    window.open(`/products/${data.slug}`, "_blank");
+                    window.open(`/products/${normalizeSlug(data.slug)}`, "_blank");
                   }}
                   className="hidden shrink-0 opacity-0 transition-opacity group-hover:opacity-100 sm:block"
                   aria-label="View product on store"

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { client } from "@/sanity/lib/client";
 import { buildAbsoluteUrl, isProteasomeSeoExperiment } from "@/lib/site";
+import { normalizeSlug } from "@/lib/utils";
 
 type ProductSitemapEntry = {
   slug: string;
@@ -83,7 +84,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: route.priority,
     })),
     ...dedupedProducts.map((product) => ({
-      url: buildAbsoluteUrl(`/products/${product.slug}`),
+      url: buildAbsoluteUrl(`/products/${normalizeSlug(product.slug)}`),  
       lastModified: new Date(product.updatedAt),
       changeFrequency: "weekly" as const,
       priority: 0.9,

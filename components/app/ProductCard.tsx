@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, normalizeSlug } from "@/lib/utils";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import { AddToCartButton } from "@/components/app/AddToCartButton";
 import { StockBadge } from "@/components/app/StockBadge";
@@ -118,7 +118,7 @@ export function ProductCard({ product }: ProductCardProps) {
       )}
 
       <CardContent className="flex grow flex-col justify-between gap-2 p-4">
-        <Link href={`/products/${product.slug}`} className="block">
+        <Link href={`/products/${normalizeSlug(product.slug)}`} className="block">
           <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-zinc-900 transition-colors group-hover:text-zinc-600 dark:text-zinc-100 dark:group-hover:text-zinc-300">
             {product.name}
           </h3>

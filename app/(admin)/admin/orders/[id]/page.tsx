@@ -171,7 +171,7 @@ function OrderDetailContent({ handle }: { handle: DocumentHandle }) {
                         </span>
                         {item.product?.slug && (
                           <Link
-                            href={`/products/${item.product.slug}`}
+                            href={`/products/${item.product.slug.replace(/^\/+/, "")}`}
                             target="_blank"
                             className="shrink-0 text-zinc-400 hover:text-zinc-600"
                           >

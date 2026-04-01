@@ -11,6 +11,7 @@ import {
   CATEGORY_BY_SLUG_QUERY,
 } from "@/lib/sanity/queries/categories";
 import { ProductSection } from "@/components/app/ProductSection";
+import { normalizeSlug } from "@/lib/utils";
 
 export interface CategorySearchParams {
   q?: string;
@@ -90,6 +91,29 @@ export async function CategoryPageTemplate({
     notFound();
   }
 
+  const dedupedProducts = Array.from(
+    products
+      .slice()
+      .sort((a, b) => ((b.images?.length ?? 0) > 0 ? 1 : 0) - ((a.images?.length ?? 0) > 0 ? 1 : 0))
+      .reduce(
+        (acc, product) => {
+          const slugKey = normalizeSlug(product.slug);
+          if (!slugKey) {
+            acc.set(product._id, product);
+            return acc;
+          }
+
+          if (!acc.has(slugKey)) {
+            acc.set(slugKey, product);
+          }
+
+          return acc;
+        },
+        new Map<string, (typeof products)[number]>(),
+      )
+      .values(),
+  );
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
@@ -110,7 +134,7 @@ export async function CategoryPageTemplate({
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <ProductSection
           categories={categories}
-          products={products}
+          products={dedupedProducts}
           searchQuery={searchQuery}
           variant="category-list"
           basePath={`/category/${slug}`}

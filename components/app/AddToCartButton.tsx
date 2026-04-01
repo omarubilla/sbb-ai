@@ -12,6 +12,8 @@ interface AddToCartButtonProps {
   price: number;
   image?: string;
   stock: number;
+  size?: string;
+  catalogNumber?: string;
   className?: string;
 }
 
@@ -21,10 +23,12 @@ export function AddToCartButton({
   price,
   image,
   stock,
+  size,
+  catalogNumber,
   className,
 }: AddToCartButtonProps) {
   const { addItem, updateQuantity } = useCartActions();
-  const cartItem = useCartItem(productId);
+  const cartItem = useCartItem(productId, size);
 
   const quantityInCart = cartItem?.quantity ?? 0;
   const isOutOfStock = stock <= 0;
@@ -32,14 +36,14 @@ export function AddToCartButton({
 
   const handleAdd = () => {
     if (quantityInCart < stock) {
-      addItem({ productId, name, price, image }, 1);
+      addItem({ productId, name, price, image, size, catalogNumber }, 1);
       toast.success(`Added ${name}`);
     }
   };
 
   const handleDecrement = () => {
     if (quantityInCart > 0) {
-      updateQuantity(productId, quantityInCart - 1);
+      updateQuantity(productId, quantityInCart - 1, size);
     }
   };
 

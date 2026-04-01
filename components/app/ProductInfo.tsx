@@ -7,11 +7,6 @@ import { toast } from "sonner";
 import { AskAISimilarButton } from "@/components/app/AskAISimilarButton";
 import { StockBadge } from "@/components/app/StockBadge";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import { useCartActions } from "@/lib/store/cart-store-provider";
 import { splitProductDescription } from "@/lib/utils/product-description";
@@ -29,6 +24,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const { addItem } = useCartActions();
   const stock = product.stock ?? 0;
   const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState<"50 mg" | "100 mg">("50 mg");
+  const [isCoaOpen, setIsCoaOpen] = useState(false);
   const imageUrl = product.images?.[0]?.asset?.url;
   const certificateUrl = product.certificateOfAnalysisUrl?.trim();
   const quantity = product.quantity ?? "—";
@@ -38,6 +35,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const storage = product.storage ?? "—";
   const { meta: descriptionMeta, summary: descriptionSummary } =
     splitProductDescription(product.description, product.quantity);
+  const catalogNumber = descriptionMeta
+    .replace(/^Catalog\s+[Nn]umber:\s*/, "")
+    .trim();
   const unitPrice = product.price ?? 0;
   const isBulkDiscountActive = selectedQuantity >= BULK_MIN_QUANTITY;
   const discountedUnitPrice = isBulkDiscountActive
@@ -45,6 +45,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
     : unitPrice;
   const calculatedTotal = discountedUnitPrice * selectedQuantity;
   const savingsAmount = (unitPrice - discountedUnitPrice) * selectedQuantity;
+  const coaPanelId = `coa-panel-${product._id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
 
   const handleDecreaseQuantity = () => {
     setSelectedQuantity((prev) => Math.max(1, prev - 1));
@@ -65,11 +66,15 @@ export function ProductInfo({ product }: ProductInfoProps) {
         name: product.name ?? "Unknown Product",
         price: discountedUnitPrice,
         image: imageUrl ?? undefined,
+        size: selectedSize,
+        catalogNumber,
       },
       selectedQuantity,
     );
 
-    toast.success(`Added ${selectedQuantity} x ${product.name ?? "product"}`);
+    toast.success(
+      `Added ${selectedQuantity} x ${product.name ?? "product"} (${selectedSize})`,
+    );
   };
 
   return (
@@ -111,40 +116,66 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <div className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-800">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                Quantity
-              </p>
-              <div className="mt-1 flex items-center gap-2">
-                <div className="flex h-11 w-36 items-center rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-full w-11 rounded-r-none"
-                    onClick={handleDecreaseQuantity}
-                    disabled={selectedQuantity <= 1 || stock <= 0}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="flex-1 text-center text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
-                    {selectedQuantity}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-full w-11 rounded-l-none"
-                    onClick={handleIncreaseQuantity}
-                    disabled={selectedQuantity >= stock || stock <= 0}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+              <div className="w-full max-w-[420px]">
+                <div className="grid grid-cols-[9rem_1fr] gap-x-8">
+                  <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                    Quantity
+                  </p>
+                  <p className="text-center text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                    Size
+                  </p>
                 </div>
+                <div className="mt-1 grid grid-cols-[9rem_1fr] items-center gap-x-8">
+                  <div className="flex h-11 w-36 items-center rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-full w-11 rounded-r-none"
+                      onClick={handleDecreaseQuantity}
+                      disabled={selectedQuantity <= 1 || stock <= 0}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="flex-1 text-center text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-100">
+                      {selectedQuantity}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-full w-11 rounded-l-none"
+                      onClick={handleIncreaseQuantity}
+                      disabled={selectedQuantity >= stock || stock <= 0}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
 
-                {isBulkDiscountActive && (
-                  <span className="inline-flex h-8 items-center rounded-full bg-emerald-100 px-3 text-xs font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                    15% OFF Applied
-                  </span>
-                )}
+                  <div className="flex justify-center">
+                    <div className="inline-flex rounded-md border border-zinc-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-900">
+                      {(["50 mg", "100 mg"] as const).map((sizeOption) => (
+                        <button
+                          key={sizeOption}
+                          type="button"
+                          onClick={() => setSelectedSize(sizeOption)}
+                          className={`rounded px-2 py-1 text-xs font-semibold transition-colors ${
+                            selectedSize === sizeOption
+                              ? "bg-teal-600 text-white"
+                              : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                          }`}
+                        >
+                          {sizeOption}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {isBulkDiscountActive && (
+                <span className="mt-2 inline-flex h-8 items-center rounded-full bg-emerald-100 px-3 text-xs font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                  15% OFF Applied
+                </span>
+              )}
             </div>
 
             <div className="text-right">
@@ -172,7 +203,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
             disabled={stock <= 0}
           >
             <ShoppingBag className="mr-2 h-4 w-4" />
-            {stock <= 0 ? "Out of Stock" : `Add ${selectedQuantity} to Cart`}
+            {stock <= 0
+              ? "Out of Stock"
+              : `Add ${selectedQuantity} (${selectedSize}) to Cart`}
           </Button>
         </div>
 
@@ -241,12 +274,26 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </table>
       </div>
 
-      <Collapsible className="mt-6 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
-        <CollapsibleTrigger className="group flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800">
+      <div className="mt-6 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+        <button
+          type="button"
+          aria-expanded={isCoaOpen}
+          aria-controls={coaPanelId}
+          onClick={() => setIsCoaOpen((prev) => !prev)}
+          className="group flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
+        >
           <span>View Certificate of Analysis</span>
-          <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="border-t border-zinc-200 p-4 dark:border-zinc-800">
+          <ChevronDown
+            className={`h-4 w-4 transition-transform duration-200 ${
+              isCoaOpen ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+        {isCoaOpen && (
+          <div
+            id={coaPanelId}
+            className="border-t border-zinc-200 p-4 dark:border-zinc-800"
+          >
           {certificateUrl ? (
             <iframe
               src={certificateUrl}
@@ -258,8 +305,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
               Certificate of Analysis is not available for this product yet.
             </p>
           )}
-        </CollapsibleContent>
-      </Collapsible>
+          </div>
+        )}
+      </div>
 
       {/* Metadata */}
       <div className="mt-6 space-y-2 border-t border-zinc-200 pt-6 dark:border-zinc-800">

@@ -71,18 +71,14 @@ export function ProductSection({
       </div>
 
       {/* Main content area */}
-      <div
-        className={`flex flex-col gap-8 lg:flex-row ${
-          isCategoryList ? "lg:items-start" : "lg:h-[760px]"
-        }`}
-      >
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
         {/* Sidebar Filters - completely hidden when collapsed on desktop */}
         <aside
           className={`shrink-0 transition-all duration-300 ease-in-out ${
             filtersOpen ? "w-full lg:w-72 lg:opacity-100" : "hidden lg:hidden"
           }`}
         >
-          <div className={isCategoryList ? "lg:sticky lg:top-24" : "lg:h-full lg:overflow-y-auto"}>
+          <div className="lg:sticky lg:top-28 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
             <ProductFilters
               categories={categories}
               basePath={basePath}
@@ -93,11 +89,7 @@ export function ProductSection({
         </aside>
 
         {/* Product Grid - expands to full width when filters hidden */}
-        <main
-          className={`flex-1 transition-all duration-300 ${
-            isCategoryList ? "min-w-0" : "lg:h-full lg:overflow-y-auto"
-          }`}
-        >
+        <main className="min-w-0 flex-1 transition-all duration-300">
           {isCategoryList ? (
             <CategoryProductList products={products} />
           ) : (

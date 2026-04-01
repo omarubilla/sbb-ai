@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { client } from "@/sanity/lib/client";
 import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products";
-import type { CartItem } from "@/lib/store/cart-store";
+import { getCartLineId, type CartItem } from "@/lib/store/cart-store";
 
 export interface StockInfo {
   productId: string;
@@ -53,11 +53,12 @@ export function useCartStock(items: CartItem[]): UseCartStockReturn {
 
       for (const item of items) {
         const product = products.find(
-          (p: { _id: string }) => p._id === item.productId
+          (p: { _id: string }) => p._id === item.productId,
         );
         const currentStock = product?.stock ?? 0;
+        const lineId = getCartLineId(item.productId, item.size);
 
-        newStockMap.set(item.productId, {
+        newStockMap.set(lineId, {
           productId: item.productId,
           currentStock,
           isOutOfStock: currentStock === 0,
