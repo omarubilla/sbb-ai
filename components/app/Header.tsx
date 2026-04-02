@@ -16,11 +16,41 @@ interface HeaderProps {
   categories: ALL_CATEGORIES_QUERYResult;
 }
 
+const TOP_NAV_ORDER = [
+  "ub-conjugation",
+  "e3-ligases",
+  "ub-deconjugation",
+  "c-terminal-derivatives",
+  "proteasome",
+  "tr-fret",
+  "chains",
+  "neurodegenerative-diseases",
+] as const;
+
 export function Header({ categories }: HeaderProps) {
   const { openCart } = useCartActions();
   const { openChat } = useChatActions();
   const isChatOpen = useIsChatOpen();
   const totalItems = useTotalItems();
+
+  const orderedCategories = categories
+    .map((category) => ({
+      category,
+      categorySlug: getCategoryPageSlug(category.title, category.slug),
+    }))
+    .filter((item) => Boolean(item.categorySlug))
+    .sort((a, b) => {
+      const aIndex = TOP_NAV_ORDER.indexOf(a.categorySlug as (typeof TOP_NAV_ORDER)[number]);
+      const bIndex = TOP_NAV_ORDER.indexOf(b.categorySlug as (typeof TOP_NAV_ORDER)[number]);
+      const safeAIndex = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex;
+      const safeBIndex = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex;
+
+      if (safeAIndex !== safeBIndex) {
+        return safeAIndex - safeBIndex;
+      }
+
+      return (a.category.title ?? "").localeCompare(b.category.title ?? "");
+    });
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/80">
@@ -109,17 +139,12 @@ export function Header({ categories }: HeaderProps) {
 
       <div className="border-t border-zinc-200 dark:border-zinc-800">
         <nav className="mx-auto flex h-11 max-w-7xl items-center gap-1 px-4 sm:px-6 lg:px-8">
-          {categories.map((category) => {
+          {orderedCategories.map(({ category, categorySlug }) => {
             const subcategories = category.subcategories || [];
-            const categorySlug = getCategoryPageSlug(category.title, category.slug);
             const isProteasome = categorySlug === "proteasome";
             const categoryHref = isProteasome
               ? "/proteasome"
               : `/category/${categorySlug}`;
-
-            if (!categorySlug) {
-              return null;
-            }
 
             if (subcategories.length === 0) {
               return (

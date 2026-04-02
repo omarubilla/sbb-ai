@@ -1,0 +1,482 @@
+[
+  {
+    "productName": "100x TRF-Ubiquitin Mix",
+    "sku": "SBB-TR0051-2K",
+    "lot": "172570051",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_47edc38f148a463ca56e6e8ebb35488d.pdf"
+  },
+  {
+    "productName": "20S Immunoproteasome Kit, human PBMC",
+    "sku": "SBB-KP0037",
+    "lot": "172440038",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_c8dfbf019e494adfab81b361466e849d.pdf"
+  },
+  {
+    "productName": "20S Immunoproteasome, human PBMC",
+    "sku": "SBB-PP0004",
+    "lot": "163060004",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_116bfa033c474c338f54b773aaa43829.pdf"
+  },
+  {
+    "productName": "20S Immunoproteasome, Human Spleen",
+    "sku": "SBB-PP0144",
+    "lot": "242300144",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_12ee01b34b5740309725a3e5102ccd23.pdf"
+  },
+  {
+    "productName": "20S Immunoproteasome, mouse Spleen",
+    "sku": "SBB-PP0083",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_4bb169dcc59244f9bda274071b25cbba.pdf"
+  },
+  {
+    "productName": "20S Immunoproteasome, rat Spleen",
+    "sku": "SBB-PP0046",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_9268774379024621a9ea43f67632f7b6.pdf"
+  },
+  {
+    "productName": "20S Proteasome Kit, human RBC",
+    "sku": "SBB-KP0038",
+    "lot": "172440038",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_9345fea537954518bb0c5ffb51acc119.pdf"
+  },
+  {
+    "productName": "20S Proteasome, human RBC",
+    "sku": "SBB-PP0005",
+    "lot": "163060005",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_9268774379024621a9ea43f67632f7b6.pdf"
+  },
+  {
+    "productName": "20S Proteasome, mouse RBC",
+    "sku": "SBB-PP0047",
+    "lot": "190700047",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_79551e29ea924ea69a243b4d16571070.pdf"
+  },
+  {
+    "productName": "20S Proteasome, rat RBC",
+    "sku": "SBB-PP0086",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_35ba610fa1554dabbc3bc8314241b4d5.pdf"
+  },
+  {
+    "productName": "26S Proteasome (Human HEK293) (untagged)",
+    "sku": "SBB-PP0101-C025",
+    "lot": "232510101",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_92e619de92964f9eb16996fd2f38d3f2.pdf"
+  },
+  {
+    "productName": "Ac-Ala-Asn-Trp-AMC (ANW-AMC)",
+    "sku": "SBB-PS0009",
+    "lot": "163060009",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_5d9cfd33cf6248a1a00bb142c1b05963.pdf"
+  },
+  {
+    "productName": "Ac-Ala-Asn-Trp-AMC (ANW-AMC)",
+    "sku": "SBB-PS0009",
+    "lot": "163060009",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_c552f4ab696a43b9a3668fd2e1d3bba1.pdf"
+  },
+  {
+    "productName": "Ac-Pro-Ala-Leu-AMC (PAL-AMC)",
+    "sku": "SBB-PS0007",
+    "lot": "163060007",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_0665a6119db94cf0bbe342858ca4762f.pdf"
+  },
+  {
+    "productName": "Ac-Trp-Leu-Ala-AMC (WLA-AMC)",
+    "sku": "SBB-PS0008",
+    "lot": "163060008",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_29e4fd7ec7fc40278e77e85e55f779aa.pdf"
+  },
+  {
+    "productName": "Biotin-Parkin (PARK2)",
+    "sku": "SBB-CE0107",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_6933cce35de243beb76e5845cdb62629.pdf"
+  },
+  {
+    "productName": "Cullin4a/Rbx1/DDB1/CRBN – E3 Ligase Complex TR-FRET Kit",
+    "sku": "SBB-KF0120",
+    "lot": "181480120",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_bbf508f40fc74dec8cb301c4c32f4947.pdf"
+  },
+  {
+    "productName": "Cy5-Ubiquitin, human recombinant",
+    "sku": "SBB-TR0015",
+    "lot": "163060015",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_3d6b43b1abc1427c8bdca1821ddf6f55.pdf"
+  },
+  {
+    "productName": "DDB1/Cereblon (CRBN)",
+    "sku": "SBB-SC0116",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_5df502eb49114497811803ee7b5dc303.pdf"
+  },
+  {
+    "productName": "Europium-Cryptate Ubiquitin, human recombinant",
+    "sku": "SBB-TR0014",
+    "lot": "163060014",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_0cd9a098622d46e085f49d09ad0ed27a.pdf"
+  },
+  {
+    "productName": "Europium-Cryptate Ubiquitin, human recombinant",
+    "sku": "SBB-TR0014",
+    "lot": "163060014",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_746f1452e7d14a23890b63d5ebb4527d.pdf"
+  },
+  {
+    "productName": "Fluorescein-Ubiquitin (6-FAM-Ub), human recombinant",
+    "sku": "SBB-TR0016",
+    "lot": "163060016",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_ab73954cf878418aa720813aa6ce85ec.pdf"
+  },
+  {
+    "productName": "HA-Ubiquitin-Propargylamide",
+    "sku": "SBB-PS0124",
+    "lot": "190690124",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_ace8494eeb7340c48aa0e53d7b593abf.pdf"
+  },
+  {
+    "productName": "HA-Ubiquitin-Vinyl Methyl Ester",
+    "sku": "SBB-PS0123",
+    "lot": "190690123",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_1d51380a08534504a5f58db48a3c83b1.pdf"
+  },
+  {
+    "productName": "HA-Ubiquitin-Vinyl Pentyl Sulfone",
+    "sku": "SBB-PS0125",
+    "lot": "190690125",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_7a690726b14340e89f4b5956435b3439.pdf"
+  },
+  {
+    "productName": "HA-Ubiquitin-Vinyl Sulfone",
+    "sku": "SBB-PS0122",
+    "lot": "190690122",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_e73d645bbc714a1f9b6ce7b0ba9dc060.pdf"
+  },
+  {
+    "productName": "His10-SARS-CoV-2 (PLpro)",
+    "sku": "SBB-DE0127",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_0da6486e1d644036a36a0132f5db4de3.pdf"
+  },
+  {
+    "productName": "His10-SARS-CoV-2 Mpro (3CLpro)",
+    "sku": "SBB-DE0129",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_95c1c77cb7294e618de3a0c32a5cd6fe.pdf"
+  },
+  {
+    "productName": "His6-NEDP1, human recombinant",
+    "sku": "SBB-DE0025",
+    "lot": "163060025",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_307a13389f6f424e8557348c45f33820.pdf"
+  },
+  {
+    "productName": "His6-Poly-Ubiquitinated p53, human recombinant",
+    "sku": "SBB-US0012",
+    "lot": "163060012",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_e8a8d41ba85d414fafef68d2e028f633.pdf"
+  },
+  {
+    "productName": "His6-SARS-CoV (PLpro), SARS Coronavirus recombinant",
+    "sku": "SBB-DE0024",
+    "lot": "163060024",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_ad13b9d3f2b94392bb84a58336c59a75.pdf"
+  },
+  {
+    "productName": "His6-SENP1, human recombinant",
+    "sku": "SBB-DE0026",
+    "lot": "163060022",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_fa255b40420f40ceba4f9918a0213489.pdf"
+  },
+  {
+    "productName": "His6-UBE2K, human recombinant",
+    "sku": "SBB-CE0022",
+    "lot": "163060022",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_49b64efe5eb14522921f21d9e35fc286.pdf"
+  },
+  {
+    "productName": "His8- Avi-DDB1-biotinylated",
+    "sku": "SBB-SC0140",
+    "lot": "243120140",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_1516621a715140d69cd4673701f7d91c.pdf"
+  },
+  {
+    "productName": "ISG15 Rhodamine 110",
+    "sku": "SBB-PS0002",
+    "lot": "163060002",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_c6d1c3e8bb0746cb86bb9d8e70485910.pdf"
+  },
+  {
+    "productName": "ITCH E3 Ligase TR-FRET Kit",
+    "sku": "SBB-KF0035",
+    "lot": "172440035",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_a4b7246893ec466ca5488278bd2bf49f.pdf"
+  },
+  {
+    "productName": "K11 Di-Ubiquitin",
+    "sku": "SBB-UP0063",
+    "lot": "181940063",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_dcf8ed91f56947ecb490cd52f3c1ee50.pdf"
+  },
+  {
+    "productName": "K11 Tetra-Ubiquitin",
+    "sku": "SBB-UP0064",
+    "lot": "181940064",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_089f888bcf774d6cbdddc6e8582cc1a0.pdf"
+  },
+  {
+    "productName": "K29 Di-Ubiquitin",
+    "sku": "SBB-UP0077",
+    "lot": "181940077",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_d0d479bf8d2b43e9b10b5331c3b45f6a.pdf"
+  },
+  {
+    "productName": "K29 Tetra-Ubiquitin",
+    "sku": "SBB-UP0078",
+    "lot": "181940078",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_3635dac666dc4c3891a8e9629ea0559e.pdf"
+  },
+  {
+    "productName": "K33 Di-Ubiquitin",
+    "sku": "SBB-UP0066",
+    "lot": "181940066",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_fab1bfa5a867455a9665608e59fde4e9.pdf"
+  },
+  {
+    "productName": "K33 Tetra-Ubiquitin",
+    "sku": "SBB-UP0067",
+    "lot": "181940067",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_161dfc9bc1934e83bb2aefaa4becae24.pdf"
+  },
+  {
+    "productName": "K48 Di-Ubiquitin",
+    "sku": "SBB-UP0069",
+    "lot": "181940069",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_3809018219d94a8aa4deb8c361996fdf.pdf"
+  },
+  {
+    "productName": "K48 Penta-Ubiquitin",
+    "sku": "SBB-UP0172",
+    "lot": "242470172",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_92b432205c5541228c1f0ebd3d87db15.pdf"
+  },
+  {
+    "productName": "K48 Tetra-Ubiquitin",
+    "sku": "SBB-UP0070",
+    "lot": "181940070",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_70c1eff8d64e45d9bbaf3daf617b2b7b.pdf"
+  },
+  {
+    "productName": "K48 Tri-Ubiquitin",
+    "sku": "SBB-UP0171",
+    "lot": "243020171",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_bf5e804c27fe452fb8342797a9f12954.pdf"
+  },
+  {
+    "productName": "K6 Di-Ubiquitin",
+    "sku": "SBB-UP0060",
+    "lot": "181940060",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_468c956494fd401380b911c316dab114.pdf"
+  },
+  {
+    "productName": "K6 Tetra-Ubiquitin",
+    "sku": "SBB-UP0061",
+    "lot": "181940064",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_b5e4eb5af9eb4d2399687cba7b17636e.pdf"
+  },
+  {
+    "productName": "K63 Di-Ubiquitin",
+    "sku": "SBB-UP0072",
+    "lot": "181940072",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_6e261ed812624359b9753b1d5a9e0313.pdf"
+  },
+  {
+    "productName": "K63 Tetra-Ubiquitin",
+    "sku": "SBB-UP0073",
+    "lot": "181940073",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_fed674fd033941b49433f85e2e4d82b4.pdf"
+  },
+  {
+    "productName": "M1 Di-Ubiquitin",
+    "sku": "SBB-UP0075",
+    "lot": "181940075",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_00235ae2c0dd4a658d8604238130ec8d.pdf"
+  },
+  {
+    "productName": "M1 Tetra-Ubiquitin",
+    "sku": "SBB-UP0119",
+    "lot": "181940119",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_9c2b6d52f4a24a63b1954bfc19e053d9.pdf"
+  },
+  {
+    "productName": "MDM2 E3 Ligase TR-FRET Kit",
+    "sku": "SBB-KF0030",
+    "lot": "172440030",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_fd7f4d3b3f81469dad0a9254c2251d35.pdf"
+  },
+  {
+    "productName": "NEDD4 E3 Ligase TR-FRET Kit",
+    "sku": "SBB-KF0056",
+    "lot": "173050056",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_16944b738f7e4aa9865fff67c615976f.pdf"
+  },
+  {
+    "productName": "NEDD8 Rhodamine 110",
+    "sku": "SBB-PS0003",
+    "lot": "163060003",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_2fad52142f96444b9670b59ff382e342.pdf"
+  },
+  {
+    "productName": "NEDD8-AMC",
+    "sku": "SBB-PS0044",
+    "lot": "172440044",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_17e1af0b7e164f8386160972fb6b74fd.pdf"
+  },
+  {
+    "productName": "Parkin (PARK2)",
+    "sku": "SBB-CE0055",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_cea19c68946d4369bf5071efd028646a.pdf"
+  },
+  {
+    "productName": "Parkin E3 Ligase TR-FRET Kit",
+    "sku": "SBB-KF0036",
+    "lot": "172440036",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_9b9ce45b8d544bfd8f9fb79434509069.pdf"
+  },
+  {
+    "productName": "Skp1/His6-Skp2",
+    "sku": "SBB-SC0118-50",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_573549c325a042bc9ee66ae69fcbaf6b.pdf"
+  },
+  {
+    "productName": "Skp1/His6-Skp2",
+    "sku": "SBB-SC0118-50",
+    "lot": "",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_7034d66684d8496eb5c2edece7b7cd45.pdf"
+  },
+  {
+    "productName": "Suc-Leu-Leu-Val-Tyr-AMC (LLVY-AMC)",
+    "sku": "SBB-PS0010",
+    "lot": "163060010",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_5ae014cc51bb45c0849b0387ca8c7e9e.pdf"
+  },
+  {
+    "productName": "SUMO1 Rhodamine 110",
+    "sku": "SBB-PS0028",
+    "lot": "163060028",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_62176c500e614412919a3d74ae6bee19.pdf"
+  },
+  {
+    "productName": "SUMO2-Rhodamine 110",
+    "sku": "SBB-PS0029",
+    "lot": "163060029",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_113fced94e4a4048aba61212d735aa1f.pdf"
+  },
+  {
+    "productName": "UBE2D1, human recombinant",
+    "sku": "SBB-CE0021",
+    "lot": "163060021",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_d5bef8218d8149ab875fff0ac8951d2a.pdf"
+  },
+  {
+    "productName": "UBE2D2, human recombinant",
+    "sku": "SBB-CE0027",
+    "lot": "163060027",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_273ee9be110d43f4bb0d2be2a80b5dd6.pdf"
+  },
+  {
+    "productName": "UBE2D3, human recombinant",
+    "sku": "SBB-CE0019",
+    "lot": "163060019",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_f95f332153a54f6f95553e0407b39f98.pdf"
+  },
+  {
+    "productName": "UBE2L3, human recombinant",
+    "sku": "SBB-CE0020",
+    "lot": "163060020",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_696692de36ab40b29698485c198e7021.pdf"
+  },
+  {
+    "productName": "UBE3A-His₈ (E6AP)",
+    "sku": "SBB-CE0090",
+    "lot": "232710090",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_0bc53c8962934b8d86e109b84133a2af.pdf"
+  },
+  {
+    "productName": "Ubiquitin Activating Enzyme (UBA1), human recombinant (His-tagged)",
+    "sku": "SBB-CE0058",
+    "lot": "180770058",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_435fbb34739342f4859b3d349b3aceec.pdf"
+  },
+  {
+    "productName": "Ubiquitin Activating Enzyme (UBA1), human recombinant",
+    "sku": "SBB-CE0011",
+    "lot": "163060011",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_045163be0c414f61845a1dca6199ee82.pdf"
+  },
+  {
+    "productName": "Ubiquitin Rhodamine 110",
+    "sku": "SBB-PS0001",
+    "lot": "163060001",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_733bd431b38842ee98e6746e961356f2.pdf"
+  },
+  {
+    "productName": "Ubiquitin-Aldehyde",
+    "sku": "SBB-PS0031",
+    "lot": "172440031",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_c511cc443d8b4d2aa368986127854e84.pdf"
+  },
+  {
+    "productName": "Ubiquitin-AMC",
+    "sku": "SBB-PS0043",
+    "lot": "172440043",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_52f058fc7fce48cab7c760915869c270.pdf"
+  },
+  {
+    "productName": "Ubiquitin-Propargylamide",
+    "sku": "SBB-PS0034",
+    "lot": "172440034",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_f107fe5717ae411bb8992e8de5de387e.pdf"
+  },
+  {
+    "productName": "Ubiquitin-Vinyl Methyl Ester",
+    "sku": "SBB-PS0033",
+    "lot": "172440033",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_698a946e34ca46f4b7563a8f03eae4bd.pdf"
+  },
+  {
+    "productName": "Ubiquitin-Vinyl Sulfone",
+    "sku": "SBB-PS0032",
+    "lot": "172440032",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_af137d3ad440463d81b8a41578d2e18e.pdf"
+  },
+  {
+    "productName": "Ubiquitin, human recombinant",
+    "sku": "SBB-UP0013",
+    "lot": "163060013",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_0b228567fcfe4f02bed02a58cda836d1.pdf"
+  },
+  {
+    "productName": "UCHL3, human recombinant",
+    "sku": "SBB-DE0023",
+    "lot": "163060023",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_c6a0ba21a33946e0aaa4aecf75963f77.pdf"
+  },
+  {
+    "productName": "XIAP E3 Ligase TR-FRET Kit",
+    "sku": "SBB-KF0057",
+    "lot": "173050057",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_2bd58e6a0bc044439df3c67db30e80a6.pdf"
+  },
+  {
+    "productName": "Z-Leu-Leu-Glu-AMC (Z-LLE-AMC)",
+    "sku": "SBB-PS0006",
+    "lot": "163060006",
+    "coaUrl": "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_db205498f08f406e915cbfce15d3e833.pdf"
+  }
+]
