@@ -11,6 +11,19 @@ function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function splitAtMicrogramBoundary(value: string) {
+  const match = value.match(/^(.*?\b\d+(?:\.\d+)?\s*(?:[μµu]g))\s*(?=[A-Za-z(])/i);
+
+  if (!match) return null;
+
+  const before = match[1].trim();
+  const after = value.slice(match[0].length).trim();
+
+  if (!before || !after) return null;
+
+  return { before, after };
+}
+
 export function splitProductDescription(
   description?: string | null,
   quantity?: string | null,
@@ -24,7 +37,9 @@ export function splitProductDescription(
     };
   }
 
-  const catalogPrefixMatch = normalized.match(/^Catalog\s+[Nn]umber:\s*/);
+  const catalogPrefixMatch = normalized.match(
+    /^Catalog\s*(?:[Nn]umber|#|[Nn]o\.?)\s*:\s*/,
+  );
 
   if (catalogPrefixMatch) {
     const rest = normalized.slice(catalogPrefixMatch[0].length).trim();
@@ -46,12 +61,10 @@ export function splitProductDescription(
       }
     }
 
-    const unitMatch = rest.match(/([μµ]g|ug)/i);
+    const microgramSplit = splitAtMicrogramBoundary(rest);
 
-    if (unitMatch && unitMatch.index !== undefined) {
-      const splitAt = unitMatch.index + unitMatch[0].length;
-      const metaBody = rest.slice(0, splitAt).trim();
-      const summary = rest.slice(splitAt).trim();
+    if (microgramSplit) {
+      const { before: metaBody, after: summary } = microgramSplit;
 
       return {
         meta: `Catalog number: ${metaBody}`,

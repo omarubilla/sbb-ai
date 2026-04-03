@@ -27,6 +27,16 @@ const TOP_NAV_ORDER = [
   "neurodegenerative-diseases",
 ] as const;
 
+const UB_CONJUGATION_DROPDOWN_SUBCATEGORIES = [
+  { _id: "nav-subcategory-e1", name: "E1", slug: "e1s" },
+  { _id: "nav-subcategory-e2", name: "E2", slug: "e2s" },
+  {
+    _id: "nav-subcategory-ubiquitin-ubls",
+    name: "Ubiquitin/UBLs",
+    slug: "ubiquitin-ubls",
+  },
+] as const;
+
 export function Header({ categories }: HeaderProps) {
   const { openCart } = useCartActions();
   const { openChat } = useChatActions();
@@ -140,7 +150,10 @@ export function Header({ categories }: HeaderProps) {
       <div className="border-t border-zinc-200 dark:border-zinc-800">
         <nav className="mx-auto flex h-11 max-w-7xl items-center gap-1 px-4 sm:px-6 lg:px-8">
           {orderedCategories.map(({ category, categorySlug }) => {
-            const subcategories = category.subcategories || [];
+            const subcategories =
+              categorySlug === "ub-conjugation"
+                ? UB_CONJUGATION_DROPDOWN_SUBCATEGORIES
+                : (category.subcategories ?? []);
             const isProteasome = categorySlug === "proteasome";
             const categoryHref = isProteasome
               ? "/proteasome"

@@ -9,6 +9,7 @@ import { StockBadge } from "@/components/app/StockBadge";
 import { Button } from "@/components/ui/button";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import { useCartActions } from "@/lib/store/cart-store-provider";
+import { productHasSizeVariants } from "@/lib/constants/products-with-size-variants";
 import { splitProductDescription } from "@/lib/utils/product-description";
 import type { PRODUCT_BY_SLUG_QUERYResult } from "@/sanity.types";
 
@@ -23,6 +24,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const formatPrice = useFormattedPrice();
   const { addItem } = useCartActions();
   const stock = product.stock ?? 0;
+  const hasSizeVariants = productHasSizeVariants(product.name);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<"50 mg" | "100 mg">("50 mg");
   const [isCoaOpen, setIsCoaOpen] = useState(false);
@@ -66,14 +68,16 @@ export function ProductInfo({ product }: ProductInfoProps) {
         name: product.name ?? "Unknown Product",
         price: discountedUnitPrice,
         image: imageUrl ?? undefined,
-        size: selectedSize,
+        size: hasSizeVariants ? selectedSize : undefined,
         catalogNumber,
       },
       selectedQuantity,
     );
 
     toast.success(
-      `Added ${selectedQuantity} x ${product.name ?? "product"} (${selectedSize})`,
+      hasSizeVariants
+        ? `Added ${selectedQuantity} x ${product.name ?? "product"} (${selectedSize})`
+        : `Added ${selectedQuantity} x ${product.name ?? "product"}`,
     );
   };
 
@@ -117,15 +121,19 @@ export function ProductInfo({ product }: ProductInfoProps) {
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="w-full max-w-[420px]">
-                <div className="grid grid-cols-[9rem_1fr] gap-x-8">
+                <div className={`grid gap-x-8 ${hasSizeVariants ? "grid-cols-[9rem_1fr]" : "grid-cols-[9rem_1fr]"}`}>
                   <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                     Quantity
                   </p>
-                  <p className="text-center text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                    Size
-                  </p>
+                  {hasSizeVariants ? (
+                    <p className="text-center text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                      Size
+                    </p>
+                  ) : (
+                    <span />
+                  )}
                 </div>
-                <div className="mt-1 grid grid-cols-[9rem_1fr] items-center gap-x-8">
+                <div className={`mt-1 grid items-center gap-x-8 ${hasSizeVariants ? "grid-cols-[9rem_1fr]" : "grid-cols-[9rem_1fr]"}`}>
                   <div className="flex h-11 w-36 items-center rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
                     <Button
                       variant="ghost"
@@ -150,24 +158,28 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     </Button>
                   </div>
 
-                  <div className="flex justify-center">
-                    <div className="inline-flex rounded-md border border-zinc-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-900">
-                      {(["50 mg", "100 mg"] as const).map((sizeOption) => (
-                        <button
-                          key={sizeOption}
-                          type="button"
-                          onClick={() => setSelectedSize(sizeOption)}
-                          className={`rounded px-2 py-1 text-xs font-semibold transition-colors ${
-                            selectedSize === sizeOption
-                              ? "bg-teal-600 text-white"
-                              : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                          }`}
-                        >
-                          {sizeOption}
-                        </button>
-                      ))}
+                  {hasSizeVariants ? (
+                    <div className="flex justify-center">
+                      <div className="inline-flex rounded-md border border-zinc-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-900">
+                        {(["50 mg", "100 mg"] as const).map((sizeOption) => (
+                          <button
+                            key={sizeOption}
+                            type="button"
+                            onClick={() => setSelectedSize(sizeOption)}
+                            className={`rounded px-2 py-1 text-xs font-semibold transition-colors ${
+                              selectedSize === sizeOption
+                                ? "bg-teal-600 text-white"
+                                : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                            }`}
+                          >
+                            {sizeOption}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <span />
+                  )}
                 </div>
               </div>
 
@@ -205,7 +217,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
             <ShoppingBag className="mr-2 h-4 w-4" />
             {stock <= 0
               ? "Out of Stock"
-              : `Add ${selectedQuantity} (${selectedSize}) to Cart`}
+              : hasSizeVariants
+                ? `Add ${selectedQuantity} (${selectedSize}) to Cart`
+                : `Add ${selectedQuantity} to Cart`}
           </Button>
         </div>
 

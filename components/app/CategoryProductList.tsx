@@ -31,7 +31,7 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       {products.map((product) => {
         const imageUrl = product.images?.[0]?.asset?.url;
         const stock = product.stock ?? 0;
@@ -43,21 +43,24 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
         return (
           <article
             key={product._id}
-            className="grid gap-6 border-b border-zinc-200 pb-12 last:border-b-0 dark:border-zinc-800 sm:gap-8 lg:grid-cols-[minmax(260px,340px)_1fr] xl:grid-cols-[minmax(320px,380px)_1fr]"
+            className="grid gap-6 border-b border-zinc-200 pb-8 last:border-b-0 dark:border-zinc-800 lg:grid-cols-[minmax(220px,280px)_1fr]"
           >
             <Link
               href={`/products/${normalizeSlug(product.slug)}`}
-              className="group block overflow-hidden rounded-sm bg-white dark:bg-zinc-950"
+              className="group block overflow-hidden rounded-sm bg-zinc-100 dark:bg-zinc-900"
             >
-              <div className="relative aspect-[4/5] w-full bg-zinc-100 dark:bg-zinc-900">
+              <div className="relative aspect-square w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900">
                 {imageUrl ? (
-                  <Image
-                    src={imageUrl}
-                    alt={product.name ?? "Product image"}
-                    fill
-                    className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                    sizes="(max-width: 1024px) 100vw, 380px"
-                  />
+                  <div className="absolute inset-0 flex items-center justify-center p-2">
+                    <Image
+                      src={imageUrl}
+                      alt={product.name ?? "Product image"}
+                      width={1200}
+                      height={1200}
+                      className="h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-[1.02]"
+                      sizes="(max-width: 1024px) 100vw, 280px"
+                    />
+                  </div>
                 ) : (
                   <div className="flex h-full items-center justify-center text-zinc-400">
                     <svg
@@ -79,35 +82,32 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
               </div>
             </Link>
 
-            <div className="flex flex-col justify-center gap-4 lg:gap-5">
-              <div className="space-y-3">
+            <div className="flex flex-col justify-center gap-5 lg:gap-6">
+              <div className="space-y-2">
                 <Link href={`/products/${normalizeSlug(product.slug)}`} className="block">
-                  <h2 className="text-2xl font-semibold tracking-tight text-zinc-950 transition-colors hover:text-sky-700 dark:text-zinc-100 dark:hover:text-sky-300 sm:text-3xl">
+                  <h2 className="text-xl font-semibold tracking-tight text-zinc-950 transition-colors hover:text-sky-700 dark:text-zinc-100 dark:hover:text-sky-300 sm:text-2xl">
                     {product.name}
                   </h2>
                 </Link>
-                <p className="text-3xl font-light tracking-tight text-sky-600 dark:text-sky-400 sm:text-4xl">
+                <p className="text-2xl font-light tracking-tight text-sky-600 dark:text-sky-400 sm:text-3xl">
                   {formatPrice(product.price)}
                 </p>
               </div>
 
-              <div className="max-w-[220px]">
+              <div className="max-w-[190px]">
                 <AddToCartButton
                   productId={product._id}
                   name={product.name ?? "Unknown Product"}
                   price={product.price ?? 0}
                   image={imageUrl ?? undefined}
                   stock={stock}
+                  className="h-9 text-xs"
                 />
               </div>
 
-              {meta && (
-                <p className="text-base leading-7 text-zinc-800 dark:text-zinc-200 sm:text-lg">
-                  {meta}
-                </p>
-              )}
+              {meta && <p className="text-sm leading-7 text-zinc-800 dark:text-zinc-200">{meta}</p>}
 
-              <p className="max-w-3xl text-base leading-8 text-zinc-700 dark:text-zinc-300 sm:text-lg">
+              <p className="max-w-3xl whitespace-pre-line text-sm leading-7 text-zinc-700 dark:text-zinc-300">
                 {summary}
               </p>
             </div>
