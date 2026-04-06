@@ -148,7 +148,7 @@ export function Header({ categories }: HeaderProps) {
       </div>
 
       <div className="border-t border-zinc-200 dark:border-zinc-800">
-        <nav className="mx-auto flex h-11 max-w-7xl items-center gap-1 px-4 sm:px-6 lg:px-8">
+        <nav className="mx-auto flex h-10 max-w-7xl items-center gap-1 overflow-x-auto whitespace-nowrap px-4 sm:px-6 lg:px-8 scrollbar-hide">
           {orderedCategories.map(({ category, categorySlug }) => {
             const subcategories =
               categorySlug === "ub-conjugation"
@@ -165,7 +165,7 @@ export function Header({ categories }: HeaderProps) {
                   key={category._id}
                   variant="ghost"
                   asChild
-                  className="h-8 bg-sky-600 px-3 text-sm text-white hover:bg-sky-700 hover:text-white"
+                  className="h-7 shrink-0 bg-sky-600 px-2.5 text-sm whitespace-nowrap text-white hover:bg-sky-700 hover:text-white"
                 >
                   <Link href={categoryHref}>
                     {category.title}
@@ -175,10 +175,10 @@ export function Header({ categories }: HeaderProps) {
             }
 
             return (
-              <div key={category._id} className="group relative">
+              <div key={category._id} className="group relative shrink-0">
                 <Link
                   href={categoryHref}
-                  className="inline-flex h-8 items-center rounded-md bg-sky-600 px-3 text-sm text-white transition-colors hover:bg-sky-700 hover:text-white"
+                  className="inline-flex h-7 items-center rounded-md bg-sky-600 px-2.5 text-sm whitespace-nowrap text-white transition-colors hover:bg-sky-700 hover:text-white"
                 >
                   {category.title}
                   <ChevronDown className="ml-1 h-4 w-4" />

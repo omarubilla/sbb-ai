@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, Minus, Plus, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
@@ -9,7 +9,10 @@ import { StockBadge } from "@/components/app/StockBadge";
 import { Button } from "@/components/ui/button";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import { useCartActions } from "@/lib/store/cart-store-provider";
-import { productHasSizeVariants } from "@/lib/constants/products-with-size-variants";
+import {
+  getProductSizeVariants,
+  productHasSizeVariants,
+} from "@/lib/constants/products-with-size-variants";
 import { splitProductDescription } from "@/lib/utils/product-description";
 import type { PRODUCT_BY_SLUG_QUERYResult } from "@/sanity.types";
 
@@ -25,8 +28,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const { addItem } = useCartActions();
   const stock = product.stock ?? 0;
   const hasSizeVariants = productHasSizeVariants(product.name);
+  const sizeVariants = getProductSizeVariants(product.name);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState<"50 mg" | "100 mg">("50 mg");
+  const [selectedSize, setSelectedSize] = useState(sizeVariants[0]?.label ?? "");
   const [isCoaOpen, setIsCoaOpen] = useState(false);
   const imageUrl = product.images?.[0]?.asset?.url;
   const certificateUrl = product.certificateOfAnalysisUrl?.trim();
@@ -40,14 +44,24 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const catalogNumber = descriptionMeta
     .replace(/^Catalog\s+[Nn]umber:\s*/, "")
     .trim();
-  const unitPrice = product.price ?? 0;
+  const selectedVariant = sizeVariants.find((variant) => variant.label === selectedSize);
+  const baseUnitPrice = selectedVariant?.price ?? product.price ?? 0;
   const isBulkDiscountActive = selectedQuantity >= BULK_MIN_QUANTITY;
   const discountedUnitPrice = isBulkDiscountActive
-    ? unitPrice * (1 - BULK_DISCOUNT_RATE)
-    : unitPrice;
+    ? baseUnitPrice * (1 - BULK_DISCOUNT_RATE)
+    : baseUnitPrice;
   const calculatedTotal = discountedUnitPrice * selectedQuantity;
-  const savingsAmount = (unitPrice - discountedUnitPrice) * selectedQuantity;
+  const savingsAmount = (baseUnitPrice - discountedUnitPrice) * selectedQuantity;
   const coaPanelId = `coa-panel-${product._id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+
+  useEffect(() => {
+    setSelectedSize(sizeVariants[0]?.label ?? "");
+    setSelectedQuantity(1);
+  }, [product._id, sizeVariants]);
+  const handleSelectSize = (sizeLabel: string) => {
+    setSelectedSize(sizeLabel);
+  };
+
 
   const handleDecreaseQuantity = () => {
     setSelectedQuantity((prev) => Math.max(1, prev - 1));
@@ -100,7 +114,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Price */}
       <p className="mt-4 text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
-        {formatPrice(product.price)}
+        {formatPrice(baseUnitPrice)}
       </p>
 
       {/* Description */}
@@ -161,18 +175,21 @@ export function ProductInfo({ product }: ProductInfoProps) {
                   {hasSizeVariants ? (
                     <div className="flex justify-center">
                       <div className="inline-flex rounded-md border border-zinc-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-900">
-                        {(["50 mg", "100 mg"] as const).map((sizeOption) => (
+                        {sizeVariants.map((sizeOption) => (
                           <button
-                            key={sizeOption}
+                            key={sizeOption.label}
                             type="button"
-                            onClick={() => setSelectedSize(sizeOption)}
+                            onClick={() => handleSelectSize(sizeOption.label)}
                             className={`rounded px-2 py-1 text-xs font-semibold transition-colors ${
-                              selectedSize === sizeOption
+                              selectedSize === sizeOption.label
                                 ? "bg-teal-600 text-white"
                                 : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
                             }`}
                           >
-                            {sizeOption}
+                            {sizeOption.label}
+                            {typeof sizeOption.price === "number" && (
+                              <span className="ml-1 opacity-90">({formatPrice(sizeOption.price)})</span>
+                            )}
                           </button>
                         ))}
                       </div>
