@@ -9,6 +9,7 @@ import { cn, normalizeSlug } from "@/lib/utils";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
 import { AddToCartButton } from "@/components/app/AddToCartButton";
 import { StockBadge } from "@/components/app/StockBadge";
+import { getProductSizeVariants } from "@/lib/constants/products-with-size-variants";
 import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
 
 type Product = FILTER_PRODUCTS_BY_NAME_QUERYResult[number];
@@ -31,6 +32,17 @@ export function ProductCard({ product }: ProductCardProps) {
       : mainImageUrl;
 
   const stock = product.stock ?? 0;
+  const sizeVariants = getProductSizeVariants(product.name);
+  const pricedVariants = sizeVariants.filter(
+    (variant): variant is { label: string; price: number } =>
+      typeof variant.price === "number",
+  );
+  const cheapestVariant = pricedVariants.length > 0
+    ? pricedVariants.reduce((lowest, current) =>
+      current.price < lowest.price ? current : lowest,
+    )
+    : null;
+  const lowestDisplayPrice = cheapestVariant?.price ?? (product.price ?? 0);
   const isOutOfStock = stock <= 0;
   const hasMultipleImages = images.length > 1;
 
@@ -125,7 +137,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
         <div className="flex items-baseline justify-between gap-2">
           <p className="text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
-            {formatPrice(product.price)}
+            {formatPrice(lowestDisplayPrice)}
           </p>
           <StockBadge productId={product._id} stock={stock} />
         </div>
@@ -135,7 +147,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <AddToCartButton
           productId={product._id}
           name={product.name ?? "Unknown Product"}
-          price={product.price ?? 0}
+          price={lowestDisplayPrice}
           image={mainImageUrl ?? undefined}
           stock={stock}
         />

@@ -4,6 +4,7 @@ import { PackageSearch } from "lucide-react";
 import { AddToCartButton } from "@/components/app/AddToCartButton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useFormattedPrice } from "@/lib/hooks/useFormattedPrice";
+import { getProductSizeVariants } from "@/lib/constants/products-with-size-variants";
 import { splitProductDescription } from "@/lib/utils/product-description";
 import { normalizeSlug } from "@/lib/utils";
 import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
@@ -35,10 +36,27 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
       {products.map((product) => {
         const imageUrl = product.images?.[0]?.asset?.url;
         const stock = product.stock ?? 0;
+        const sizeVariants = getProductSizeVariants(product.name);
+        const pricedVariants = sizeVariants.filter(
+          (variant): variant is { label: string; price: number } =>
+            typeof variant.price === "number",
+        );
+        const cheapestVariant = pricedVariants.length > 0
+          ? pricedVariants.reduce((lowest, current) =>
+            current.price < lowest.price ? current : lowest,
+          )
+          : null;
+        const lowestDisplayPrice = cheapestVariant?.price ?? (product.price ?? 0);
         const { meta, summary } = splitProductDescription(
           product.description,
           product.quantity,
         );
+        const displayMeta = meta && cheapestVariant
+          ? meta.replace(
+            /(Catalog\s+[Nn]umber:[^,]*,\s*)(\d+(?:\.\d+)?\s*[μµ]g)/,
+            `$1${cheapestVariant.label}`,
+          )
+          : meta;
 
         return (
           <article
@@ -90,7 +108,7 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
                   </h2>
                 </Link>
                 <p className="text-2xl font-light tracking-tight text-sky-600 dark:text-sky-400 sm:text-3xl">
-                  {formatPrice(product.price)}
+                  {formatPrice(lowestDisplayPrice)}
                 </p>
               </div>
 
@@ -98,14 +116,14 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
                 <AddToCartButton
                   productId={product._id}
                   name={product.name ?? "Unknown Product"}
-                  price={product.price ?? 0}
+                  price={lowestDisplayPrice}
                   image={imageUrl ?? undefined}
                   stock={stock}
                   className="h-9 text-xs"
                 />
               </div>
 
-              {meta && <p className="text-sm leading-7 text-zinc-800 dark:text-zinc-200">{meta}</p>}
+              {displayMeta && <p className="text-sm leading-7 text-zinc-800 dark:text-zinc-200">{displayMeta}</p>}
 
               <p className="max-w-3xl whitespace-pre-line text-sm leading-7 text-zinc-700 dark:text-zinc-300">
                 {summary}

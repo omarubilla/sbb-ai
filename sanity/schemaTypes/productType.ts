@@ -120,6 +120,46 @@ export const productType = defineType({
       ],
     }),
     defineField({
+      name: "sizeVariants",
+      title: "Size Variants",
+      type: "array",
+      group: "details",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "sizeVariant",
+          fields: [
+            defineField({
+              name: "label",
+              type: "string",
+              validation: (rule) => rule.required().error("Size label is required"),
+            }),
+            defineField({
+              name: "price",
+              type: "number",
+              validation: (rule) => [
+                rule.required().error("Variant price is required"),
+                rule.positive().error("Variant price must be positive"),
+              ],
+            }),
+          ],
+          preview: {
+            select: {
+              title: "label",
+              subtitle: "price",
+            },
+            prepare({ title, subtitle }) {
+              return {
+                title,
+                subtitle: `£${subtitle ?? 0}`,
+              };
+            },
+          },
+        }),
+      ],
+      description: "Optional per-size pricing (e.g., 25 ug and 50 ug).",
+    }),
+    defineField({
       name: "category",
       type: "reference",
       to: [{ type: "category" }],

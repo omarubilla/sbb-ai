@@ -28,6 +28,27 @@ export const LEGACY_PRODUCTS_WITH_SIZE_VARIANTS = [
   "Ubiquitin Activating Enzyme (UBA1), human recombinant",
 ] as const;
 
+export const SANITY_PRODUCTS_NEED_TO_UPDATE = {
+  title: "need to update",
+  names: [
+    "His-UBE2S  (Recombinant Human) (His-tagged)",
+    "His-UBE2A  (Recombinant Human) (His-tagged)",
+    "His-UBE2B  (Recombinant Human) (His-tagged)",
+    "His-UBE2C  (Recombinant Human) (His-tagged)",
+    "His-UBE2D4  (Recombinant Human) (His-tagged)",
+    "UBE2N/UBE2V1 Complex (Recombinant Human) (untagged)",
+    "UBE2I (Recombinant Human) (untagged)",
+    "UBE2M (Recombinant Human) (untagged)",
+    "His8- Avi-DDB1-biotinylated",
+    "Skp1/His6-Skp2",
+    "DDB1/Cereblon (CRBN)",
+    "UBE2L3, human recombinant",
+    "UBE2D3, human recombinant",
+    "UBE2D2, human recombinant",
+    "UBE2D1, human recombinant",
+  ],
+} as const;
+
 const PRODUCTS_WITH_SIZE_VARIANTS_CONFIG = [
   {
     names: ["His-UBE2S  (Recombinant Human) (His-tagged)"],

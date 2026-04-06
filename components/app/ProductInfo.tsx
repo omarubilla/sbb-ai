@@ -41,6 +41,12 @@ export function ProductInfo({ product }: ProductInfoProps) {
   const storage = product.storage ?? "—";
   const { meta: descriptionMeta, summary: descriptionSummary } =
     splitProductDescription(product.description, product.quantity);
+  const displayDescriptionMeta = descriptionMeta && hasSizeVariants && selectedSize
+    ? descriptionMeta.replace(
+      /(Catalog\s+[Nn]umber:[^,]*,\s*)(\d+(?:\.\d+)?\s*[μµ]g)/,
+      `$1${selectedSize}`,
+    )
+    : descriptionMeta;
   const catalogNumber = descriptionMeta
     .replace(/^Catalog\s+[Nn]umber:\s*/, "")
     .trim();
@@ -119,9 +125,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Description */}
       <div className="mt-4 space-y-2">
-        {descriptionMeta && (
+        {displayDescriptionMeta && (
           <p className="font-medium text-zinc-700 dark:text-zinc-300">
-            {descriptionMeta}
+            {displayDescriptionMeta}
           </p>
         )}
         <p className="text-zinc-600 dark:text-zinc-400">{descriptionSummary}</p>
@@ -187,9 +193,6 @@ export function ProductInfo({ product }: ProductInfoProps) {
                             }`}
                           >
                             {sizeOption.label}
-                            {typeof sizeOption.price === "number" && (
-                              <span className="ml-1 opacity-90">({formatPrice(sizeOption.price)})</span>
-                            )}
                           </button>
                         ))}
                       </div>

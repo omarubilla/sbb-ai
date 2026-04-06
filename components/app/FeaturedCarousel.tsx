@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Autoplay from "embla-carousel-autoplay";
@@ -22,6 +22,20 @@ import { splitProductDescription } from "@/lib/utils/product-description";
 import type { FEATURED_PRODUCTS_QUERYResult } from "@/sanity.types";
 
 type FeaturedProduct = FEATURED_PRODUCTS_QUERYResult[number];
+
+type FeaturedSlideGroup = {
+  key: string;
+  products: FeaturedProduct[];
+};
+
+const FEATURED_SLIDE_GROUPS = [
+  ["20S Proteasome", "20S Immunoproteasome", "26S Proteasome"],
+  ["Ub-Rhodamine", "ISG15 Rhodamine"],
+  ["Biotin Parkin", "Biotin Ub-PA"],
+  ["Itch TR-FRET Kit"],
+  ["K48 Penta Ubiquitin"],
+  ["Uba1 his-tagged"],
+] as const;
 
 const LEFT_BANNERS = [
   {
@@ -51,16 +65,32 @@ interface FeaturedCarouselProps {
   products: FEATURED_PRODUCTS_QUERYResult;
 }
 
+function normalizeName(value?: string | null) {
+  return (value ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function matchesTarget(productName: string, targetName: string) {
+  const product = normalizeName(productName);
+  const target = normalizeName(targetName);
+
+  return product === target || product.includes(target) || target.includes(product);
+}
+
 export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
   const formatPrice = useFormattedPrice();
+  const autoplay = useRef(
+    Autoplay({
+      delay: 5000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    }),
+  );
 
   useEffect(() => {
     if (!api) return;
 
-    setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap());
 
     api.on("select", () => {
@@ -76,6 +106,47 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
   );
 
   if (products.length === 0) {
+    return null;
+  }
+
+  const usedProductIds = new Set<string>();
+  const groupedSlides: FeaturedSlideGroup[] = FEATURED_SLIDE_GROUPS
+    .map((groupNames) => {
+      const slideProducts: FeaturedProduct[] = [];
+
+      for (const targetName of groupNames) {
+        const matchedProduct = products.find(
+          (product) =>
+            !usedProductIds.has(product._id) &&
+            matchesTarget(product.name ?? "", targetName),
+        );
+
+        if (!matchedProduct) continue;
+        usedProductIds.add(matchedProduct._id);
+        slideProducts.push(matchedProduct);
+      }
+
+      return {
+        key: groupNames.join("|"),
+        products: slideProducts,
+      };
+    })
+    .filter((slide) => slide.products.length > 0);
+
+  const groupedProductIds = new Set(
+    groupedSlides.flatMap((slide) => slide.products.map((product) => product._id)),
+  );
+
+  const remainingSlides: FeaturedSlideGroup[] = products
+    .filter((product) => !groupedProductIds.has(product._id))
+    .map((product) => ({
+      key: product._id,
+      products: [product],
+    }));
+
+  const slides = [...groupedSlides, ...remainingSlides];
+
+  if (slides.length === 0) {
     return null;
   }
 
@@ -118,19 +189,13 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
               loop: true,
               align: "start",
             }}
-            plugins={[
-              Autoplay({
-                delay: 5000,
-                stopOnInteraction: false,
-                stopOnMouseEnter: true,
-              }),
-            ]}
+            plugins={[autoplay.current]}
             className="h-full w-full"
           >
             <CarouselContent className="-ml-0 h-full">
-              {products.map((product) => (
-                <CarouselItem key={product._id} className="pl-0">
-                  <FeaturedSlide product={product} formatPrice={formatPrice} />
+              {slides.map((slide) => (
+                <CarouselItem key={slide.key} className="pl-0">
+                  <FeaturedSlide products={slide.products} formatPrice={formatPrice} />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -139,9 +204,9 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
             <CarouselNext className="right-4 border-zinc-700 bg-zinc-800/80 text-white hover:bg-zinc-700 hover:text-white" />
           </Carousel>
 
-          {count > 1 && (
+          {slides.length > 1 && (
             <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:bottom-6">
-              {Array.from({ length: count }).map((_, index) => (
+              {Array.from({ length: slides.length }).map((_, index) => (
                 <button
                   key={`dot-${index}`}
                   type="button"
@@ -164,61 +229,97 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
 }
 
 interface FeaturedSlideProps {
-  product: FeaturedProduct;
+  products: FeaturedProduct[];
   formatPrice: (amount: number | null | undefined) => string;
 }
 
-function FeaturedSlide({ product, formatPrice }: FeaturedSlideProps) {
-  const { meta, summary } = splitProductDescription(product.description);
+function FeaturedSlide({ products, formatPrice }: FeaturedSlideProps) {
+  if (products.length === 1) {
+    const product = products[0];
+    const { meta, summary } = splitProductDescription(product.description);
+
+    return (
+      <div className="flex h-full min-h-[340px] w-full flex-col justify-center px-6 py-8 md:min-h-[390px] md:px-10 lg:min-h-[430px] lg:px-12">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
+          Featured Products
+        </p>
+
+          {product.category && (
+            <Badge
+              variant="secondary"
+              className="mb-4 w-fit bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+            >
+              {product.category.title}
+            </Badge>
+          )}
+
+          <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
+            {product.name}
+          </h2>
+
+          {(meta || summary) && (
+            <div className="mt-4 space-y-1">
+              {meta && (
+                <p className="line-clamp-1 text-sm font-medium text-zinc-200">
+                  {meta}
+                </p>
+              )}
+              <p className="line-clamp-2 text-sm text-zinc-300 sm:text-base lg:text-lg">
+                {summary}
+              </p>
+            </div>
+          )}
+
+          <p className="mt-6 text-3xl font-bold text-white lg:text-4xl">
+            {formatPrice(product.price)}
+          </p>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button
+              asChild
+              size="lg"
+              className="bg-white text-zinc-900 hover:bg-zinc-100"
+            >
+              <Link href={`/products/${normalizeSlug(product.slug)}`}>
+                Shop Now
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full min-h-[340px] w-full flex-col justify-center px-6 py-8 md:min-h-[390px] md:px-10 lg:min-h-[430px] lg:px-12">
       <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
         Featured Products
       </p>
-
-        {product.category && (
-          <Badge
-            variant="secondary"
-            className="mb-4 w-fit bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+      <div className="space-y-3">
+        {products.map((product) => (
+          <div
+            key={product._id}
+            className="rounded-lg border border-zinc-700/70 bg-zinc-800/60 p-3"
           >
-            {product.category.title}
-          </Badge>
-        )}
-
-        <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
-          {product.name}
-        </h2>
-
-        {(meta || summary) && (
-          <div className="mt-4 space-y-1">
-            {meta && (
-              <p className="line-clamp-1 text-sm font-medium text-zinc-200">
-                {meta}
-              </p>
-            )}
-            <p className="line-clamp-2 text-sm text-zinc-300 sm:text-base lg:text-lg">
-              {summary}
-            </p>
+            <h3 className="text-base font-semibold text-white sm:text-lg">
+              {product.name}
+            </h3>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <p className="text-lg font-bold text-white">{formatPrice(product.price)}</p>
+              <Button
+                asChild
+                size="sm"
+                className="bg-white text-zinc-900 hover:bg-zinc-100"
+              >
+                <Link href={`/products/${normalizeSlug(product.slug)}`}>
+                  Shop
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            </div>
           </div>
-        )}
-
-        <p className="mt-6 text-3xl font-bold text-white lg:text-4xl">
-          {formatPrice(product.price)}
-        </p>
-
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button
-            asChild
-            size="lg"
-            className="bg-white text-zinc-900 hover:bg-zinc-100"
-          >
-            <Link href={`/products/${normalizeSlug(product.slug)}`}>
-              Shop Now
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+        ))}
+      </div>
         </div>
-    </div>
   );
 }

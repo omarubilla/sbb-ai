@@ -91,9 +91,9 @@ export const ALL_PRODUCTS_QUERY = defineQuery(`*[
  */
 export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[
   _type == "product"
-  && featured == true
   && stock > 0
-] | order(name asc) [0...6] {
+  && featured == true
+] | order(name asc) [0...60] {
   _id,
   name,
   "slug": slug.current,
