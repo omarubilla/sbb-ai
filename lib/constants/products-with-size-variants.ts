@@ -182,7 +182,13 @@ const PRODUCTS_WITH_SIZE_VARIANTS_CONFIG = [
 ] as const;
 
 function normalizeProductName(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort()
+    .join("");
 }
 
 const PRODUCT_SIZE_VARIANTS_BY_NAME = new Map<string, readonly ProductSizeVariantOption[]>();
