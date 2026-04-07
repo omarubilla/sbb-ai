@@ -148,7 +148,7 @@ export function Header({ categories }: HeaderProps) {
       </div>
 
       <div className="border-t border-zinc-200 dark:border-zinc-800">
-        <nav className="mx-auto flex h-10 max-w-7xl items-center gap-1 overflow-x-auto whitespace-nowrap px-4 sm:px-6 lg:px-8 scrollbar-hide">
+        <nav className="mx-auto flex h-10 max-w-7xl items-center gap-1 overflow-x-auto whitespace-nowrap px-4 sm:px-6 lg:px-8 md:overflow-visible scrollbar-hide">
           {orderedCategories.map(({ category, categorySlug }) => {
             const subcategories =
               categorySlug === "ub-conjugation"
@@ -183,7 +183,7 @@ export function Header({ categories }: HeaderProps) {
                   {category.title}
                   <ChevronDown className="ml-1 h-4 w-4" />
                 </Link>
-                <div className="bg-popover text-popover-foreground absolute left-0 top-full z-50 hidden min-w-56 overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md group-hover:block">
+                <div className="bg-popover text-popover-foreground absolute left-0 top-full z-50 hidden min-w-56 overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md group-hover:block group-focus-within:block">
                   {subcategories.map((subcategory) => (
                     <Link
                       key={subcategory._id}
