@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, Package, ShoppingBag, Sparkles, User } from "lucide-react";
+import { ChevronDown, Package, ShoppingBag, Sparkles, Truck, User } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
@@ -193,6 +193,20 @@ export function Header({ categories }: HeaderProps) {
             );
           })}
         </nav>
+      </div>
+
+      {/* Shipping Banner */}
+      <div className="bg-teal-50 dark:bg-teal-950/30 border-t border-teal-200 dark:border-teal-900">
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-4 text-sm font-medium text-teal-900 dark:text-teal-200">
+            <div className="flex items-center gap-2">
+              <Truck className="h-4 w-4 shrink-0" />
+              <span>Free Same-day Shipping on Domestic Orders over $750</span>
+            </div>
+            <span className="text-teal-400 dark:text-teal-600">•</span>
+            <span>Direct Shipping to Europe and Asia on orders over $1,000, 50% off overseas shipments</span>
+          </div>
+        </div>
       </div>
     </header>
   );

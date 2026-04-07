@@ -16,6 +16,8 @@ const PRODUCT_IMAGE_URL =
 const PRODUCT_COA_URL =
   "https://8c0a19bf-a2d2-40b6-a0ea-bfe93aeb6d48.usrfiles.com/ugd/8c0a19_0b228567fcfe4f02bed02a58cda836d1.pdf";
 
+const PRODUCT_STOCK = 100;
+
 async function main() {
   const write = process.argv.includes("--write");
 
@@ -61,7 +63,7 @@ async function main() {
     price: 98,
     category: { _type: "reference" as const, _ref: category._id },
     subcategory: { _type: "reference" as const, _ref: subcategory._id },
-    stock: 0,
+    stock: PRODUCT_STOCK,
     featured: false,
     assemblyRequired: false,
   };
@@ -92,6 +94,7 @@ async function main() {
           quantity: payload.quantity,
           molecularWeight: payload.molecularWeight,
           price: payload.price,
+          stock: payload.stock,
           category: payload.category,
           subcategory: payload.subcategory,
         })

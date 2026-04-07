@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, useEffect } from "react";
 import { X } from "lucide-react";
@@ -15,11 +16,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { COLORS, MATERIALS, SORT_OPTIONS } from "@/lib/constants/filters";
+import { CHAINS_SUBCATEGORIES } from "@/lib/constants/chains-subcategories";
 import { UB_CONJUGATION_SUBCATEGORIES } from "@/lib/constants/ub-conjugation-subcategories";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 
+interface CategoryProduct {
+  name: string | null;
+  slug: string | null;
+  subcategorySlug?: string | null;
+}
+
 interface ProductFiltersProps {
   categories: ALL_CATEGORIES_QUERYResult;
+  categoryProducts?: CategoryProduct[];
   basePath?: string;
   hideCategorySelect?: boolean;
   lockedCategorySlug?: string;
@@ -27,6 +36,7 @@ interface ProductFiltersProps {
 
 export function ProductFilters({
   categories,
+  categoryProducts,
   basePath = "/",
   hideCategorySelect = false,
   lockedCategorySlug,
@@ -288,7 +298,9 @@ export function ProductFilters({
             const categorySubcategories =
               category.slug === "ub-conjugation"
                 ? UB_CONJUGATION_SUBCATEGORIES
-                : (category.subcategories ?? []);
+                : category.slug === "chains"
+                  ? CHAINS_SUBCATEGORIES
+                  : (category.subcategories ?? []);
 
             return (
               <div key={category._id} className="space-y-1.5">
@@ -309,25 +321,57 @@ export function ProductFilters({
                     {categorySubcategories.map((subcategory) => {
                       const subcategoryIsActive =
                         currentSubcategory === subcategory.slug;
+                      const subcategoryProducts = categoryProducts
+                        ? categoryProducts
+                            .filter(
+                              (p) => p.subcategorySlug === subcategory.slug,
+                            )
+                            .filter((p) => {
+                              // Remove proteasome products from ub-deconjugation's ubiquitinated-substrates
+                              if (
+                                lockedCategorySlug === "ub-deconjugation" &&
+                                subcategory.slug === "ubiquitinated-substrates" &&
+                                p.name?.toLowerCase().includes("proteasome")
+                              ) {
+                                return false;
+                              }
+                              return true;
+                            })
+                        : [];
 
                       return (
-                        <button
-                          key={subcategory._id}
-                          type="button"
-                          onClick={() =>
-                            handleSubcategoryFilter(
-                              category.slug,
-                              subcategory.slug,
-                            )
-                          }
-                          className={`w-full rounded-md px-2 py-1 text-left text-sm transition-colors ${
-                            subcategoryIsActive
-                              ? "bg-teal-100 text-teal-900 dark:bg-teal-900/40 dark:text-teal-100"
-                              : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-                          }`}
-                        >
-                          {subcategory.name}
-                        </button>
+                        <div key={subcategory._id} className="space-y-0.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleSubcategoryFilter(
+                                category.slug,
+                                subcategory.slug,
+                              )
+                            }
+                            className={`w-full rounded-md px-2 py-1 text-left text-sm transition-colors ${
+                              subcategoryIsActive
+                                ? "bg-teal-100 text-teal-900 dark:bg-teal-900/40 dark:text-teal-100"
+                                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                            }`}
+                          >
+                            {subcategory.name}
+                          </button>
+
+                          {subcategoryProducts.length > 0 && (
+                            <div className="space-y-0.5 pl-3">
+                              {subcategoryProducts.map((product) => (
+                                <Link
+                                  key={product.slug ?? product.name}
+                                  href={`/products/${product.slug ?? ""}`}
+                                  className="block w-full truncate rounded-md px-2 py-1 text-xs text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                                >
+                                  {product.name}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       );
                     })}
                   </div>

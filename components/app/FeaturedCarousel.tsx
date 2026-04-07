@@ -76,6 +76,32 @@ function matchesTarget(productName: string, targetName: string) {
   return product === target || product.includes(target) || target.includes(product);
 }
 
+function dedupeFeaturedProducts(products: FEATURED_PRODUCTS_QUERYResult) {
+  const byKey = new Map<string, FeaturedProduct>();
+
+  for (const product of products) {
+    const slugKey = (product.slug ?? "").trim().replace(/^\/+/, "").toLowerCase();
+    const nameKey = normalizeName(product.name);
+    const key = slugKey ? `slug:${slugKey}` : `name:${nameKey}`;
+
+    const existing = byKey.get(key);
+    if (!existing) {
+      byKey.set(key, product);
+      continue;
+    }
+
+    const existingSlugStartsWithSlash = (existing.slug ?? "").trim().startsWith("/");
+    const currentSlugStartsWithSlash = (product.slug ?? "").trim().startsWith("/");
+
+    // Prefer canonical slugs without leading slash when duplicate products exist.
+    if (existingSlugStartsWithSlash && !currentSlugStartsWithSlash) {
+      byKey.set(key, product);
+    }
+  }
+
+  return [...byKey.values()];
+}
+
 export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -109,13 +135,15 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
     return null;
   }
 
+  const dedupedProducts = dedupeFeaturedProducts(products);
+
   const usedProductIds = new Set<string>();
   const groupedSlides: FeaturedSlideGroup[] = FEATURED_SLIDE_GROUPS
     .map((groupNames) => {
       const slideProducts: FeaturedProduct[] = [];
 
       for (const targetName of groupNames) {
-        const matchedProduct = products.find(
+        const matchedProduct = dedupedProducts.find(
           (product) =>
             !usedProductIds.has(product._id) &&
             matchesTarget(product.name ?? "", targetName),
@@ -137,7 +165,7 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
     groupedSlides.flatMap((slide) => slide.products.map((product) => product._id)),
   );
 
-  const remainingSlides: FeaturedSlideGroup[] = products
+  const remainingSlides: FeaturedSlideGroup[] = dedupedProducts
     .filter((product) => !groupedProductIds.has(product._id))
     .map((product) => ({
       key: product._id,

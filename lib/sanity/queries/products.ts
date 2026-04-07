@@ -46,6 +46,10 @@ const FILTERED_PRODUCT_PROJECTION = `{
     title,
     "slug": slug.current
   },
+  subcategory->{
+    _id,
+    "slug": slug.current
+  },
   material,
   color,
   stock

@@ -5,6 +5,7 @@ import { CurrencyProvider } from "@/lib/context/CurrencyContext";
 import { SanityLive } from "@/sanity/lib/live";
 import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/app/Header";
+
 import { CartSheet } from "@/components/app/CartSheet";
 import { ChatSheet } from "@/components/app/ChatSheet";
 import { AppShell } from "@/components/app/AppShell";

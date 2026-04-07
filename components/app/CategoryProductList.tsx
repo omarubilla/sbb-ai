@@ -111,34 +111,36 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
               </div>
             </Link>
 
-            <div className="flex flex-col justify-center gap-5 lg:gap-6">
+            <div className="flex flex-col justify-center gap-3 lg:gap-4">
               <div className="space-y-2">
                 <Link href={`/products/${normalizeSlug(product.slug)}`} className="block">
-                  <h2 className="text-xl font-semibold tracking-tight text-zinc-950 transition-colors hover:text-sky-700 dark:text-zinc-100 dark:hover:text-sky-300 sm:text-2xl">
+                  <h2 className="text-lg font-semibold tracking-tight text-zinc-950 transition-colors hover:text-sky-700 dark:text-zinc-100 dark:hover:text-sky-300 sm:text-xl">
                     {product.name}
                   </h2>
                 </Link>
-                <p className="text-2xl font-light tracking-tight text-sky-600 dark:text-sky-400 sm:text-3xl">
+                <p className="text-xl font-light tracking-tight text-sky-600 dark:text-sky-400 sm:text-2xl">
                   {formatPrice(lowestDisplayPrice)}
                 </p>
               </div>
 
               <div className="max-w-[190px]">
-                <AddToCartButton
-                  productId={product._id}
-                  name={product.name ?? "Unknown Product"}
-                  price={lowestDisplayPrice}
-                  image={imageUrl ?? undefined}
-                  stock={stock}
-                  className="h-9 text-xs"
-                />
+                  <AddToCartButton
+                    productId={product._id}
+                    name={product.name ?? "Unknown Product"}
+                    price={lowestDisplayPrice}
+                    image={imageUrl ?? undefined}
+                    stock={stock}
+                    className="h-8 text-xs"
+                  />
               </div>
 
-              {displayMeta && <p className="text-sm leading-7 text-zinc-800 dark:text-zinc-200">{displayMeta}</p>}
+              <div className="space-y-1">
+                {displayMeta && <p className="text-sm font-semibold leading-5 text-zinc-800 dark:text-zinc-200">{displayMeta}</p>}
 
-              <p className="max-w-3xl whitespace-pre-line text-sm leading-7 text-zinc-700 dark:text-zinc-300">
-                {summary}
-              </p>
+                <p className="max-w-3xl whitespace-pre-line text-sm leading-5 text-zinc-700 dark:text-zinc-300">
+                  {summary}
+                </p>
+              </div>
             </div>
           </article>
         );

@@ -93,10 +93,10 @@ export default async function HomePage({ searchParams }: PageProps) {
   });
 
   // Guard against duplicate documents with the same logical slug.
-  const dedupedProducts = Array.from(
+  const dedupedProducts: (typeof products)[number][] = Array.from(
     products
       .slice()
-      .sort((a, b) => {
+      .sort((a: (typeof products)[number], b: (typeof products)[number]) => {
         const score = (p: (typeof products)[number]) => {
           const hasImagesArray = (p.images?.length ?? 0) > 0 ? 2 : 0;
           return hasImagesArray;
@@ -105,7 +105,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         return score(b) - score(a);
       })
       .reduce(
-        (acc, product) => {
+        (acc: Map<string, (typeof products)[number]>, product: (typeof products)[number]) => {
           const slugKey = normalizeSlug(product.slug);
           if (!slugKey) {
             acc.set(product._id, product);
@@ -118,7 +118,7 @@ export default async function HomePage({ searchParams }: PageProps) {
 
           return acc;
         },
-        new Map<string, (typeof products)[number]>(),
+        new Map<string, (typeof products)[number]>() as Map<string, (typeof products)[number]>,
       )
       .values(),
   );
@@ -197,7 +197,7 @@ export default async function HomePage({ searchParams }: PageProps) {
                     250k+
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 sm:text-lg">
-                    Customers
+                    Orders
                   </p>
                 </div>
               </div>
@@ -212,7 +212,7 @@ export default async function HomePage({ searchParams }: PageProps) {
                       Direct Shipping to Europe
                     </h3>
                     <p className="mt-2 text-base leading-6 text-zinc-600 dark:text-zinc-300">
-                      For oders over $1,000, 50% off overseas shipments.
+                      For orders over $1,000, 50% off overseas shipments.
                     </p>
                   </div>
                 </article>
