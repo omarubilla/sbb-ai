@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 import {
   getProductSizeVariants,
   productsWithSizeVariants,
-} from "../lib/constants/products-with-size-variants.ts";
+} from "../lib/constants/products-with-size-variants";
 
 dotenv.config({ path: ".env.local" });
 
