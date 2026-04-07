@@ -20,10 +20,10 @@ export const LEGACY_PRODUCTS_WITH_SIZE_VARIANTS = [
   "DDB1/Cereblon (CRBN)",
   "DDB1/Cereblon (CRBN) Protein",
   "His6-UBE2K, human recombinant",
-  "UBE2L3, human recombinant",
-  "UBE2D3, human recombinant",
-  "UBE2D2, human recombinant",
-  "UBE2D1, human recombinant",
+  "UBE2L3 (Recombinant Human)",
+  "UBE2D3 (Recombinant Human)",
+  "UBE2D2 (Recombinant Human)",
+  "UBE2D1 (Recombinant Human)",
   "Ubiquitin Activating Enzyme (UBA1), human recombinant (His-tagged)",
   "Ubiquitin Activating Enzyme (UBA1), human recombinant",
 ] as const;
@@ -42,10 +42,10 @@ export const SANITY_PRODUCTS_NEED_TO_UPDATE = {
     "His8- Avi-DDB1-biotinylated",
     "Skp1/His6-Skp2",
     "DDB1/Cereblon (CRBN)",
-    "UBE2L3, human recombinant",
-    "UBE2D3, human recombinant",
-    "UBE2D2, human recombinant",
-    "UBE2D1, human recombinant",
+    "UBE2L3 (Recombinant Human)",
+    "UBE2D3 (Recombinant Human)",
+    "UBE2D2 (Recombinant Human)",
+    "UBE2D1 (Recombinant Human)",
   ],
 } as const;
 
@@ -138,28 +138,28 @@ const PRODUCTS_WITH_SIZE_VARIANTS_CONFIG = [
     ],
   },
   {
-    names: ["UBE2L3, human recombinant"],
+    names: ["UBE2L3 (Recombinant Human)", "UBE2L3, human recombinant"],
     options: [
       { label: "50 µg", price: 121 },
       { label: "100 µg", price: 235 },
     ],
   },
   {
-    names: ["UBE2D3, human recombinant"],
+    names: ["UBE2D3 (Recombinant Human)", "UBE2D3, human recombinant"],
     options: [
       { label: "50 µg", price: 121 },
       { label: "100 µg", price: 235 },
     ],
   },
   {
-    names: ["UBE2D2, human recombinant"],
+    names: ["UBE2D2 (Recombinant Human)", "UBE2D2, human recombinant"],
     options: [
       { label: "50 µg", price: 121 },
       { label: "100 µg", price: 235 },
     ],
   },
   {
-    names: ["UBE2D1, human recombinant"],
+    names: ["UBE2D1 (Recombinant Human)", "UBE2D1, human recombinant"],
     options: [
       { label: "50 µg", price: 121 },
       { label: "100 µg", price: 235 },

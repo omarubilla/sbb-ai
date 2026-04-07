@@ -10,6 +10,11 @@ import { normalizeSlug } from "@/lib/utils";
 import type { FILTER_PRODUCTS_BY_NAME_QUERYResult } from "@/sanity.types";
 
 type Product = FILTER_PRODUCTS_BY_NAME_QUERYResult[number];
+type ProductWithLegacyImageFields = Product & {
+  image?: { asset?: { url?: string | null } | null } | null;
+  imageUrl?: string | null;
+  imageUrls?: Array<string | null> | null;
+};
 
 interface CategoryProductListProps {
   products: FILTER_PRODUCTS_BY_NAME_QUERYResult;
@@ -34,7 +39,13 @@ export function CategoryProductList({ products }: CategoryProductListProps) {
   return (
     <div className="space-y-8">
       {products.map((product) => {
-        const imageUrl = product.images?.[0]?.asset?.url;
+        const productWithFallback = product as ProductWithLegacyImageFields;
+        const imageUrl =
+          productWithFallback.images?.[0]?.asset?.url ??
+          productWithFallback.image?.asset?.url ??
+          productWithFallback.imageUrl ??
+          productWithFallback.imageUrls?.[0] ??
+          undefined;
         const stock = product.stock ?? 0;
         const sizeVariants = getProductSizeVariants(product.name);
         const pricedVariants = sizeVariants.filter(

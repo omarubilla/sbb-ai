@@ -25,7 +25,12 @@ export function ProductCard({ product }: ProductCardProps) {
   const formatPrice = useFormattedPrice();
 
   const images = product.images ?? [];
-  const mainImageUrl = images[0]?.asset?.url;
+  const fallbackImageUrl =
+    product.image?.asset?.url ??
+    product.imageUrl ??
+    product.imageUrls?.[0] ??
+    null;
+  const mainImageUrl = images[0]?.asset?.url ?? fallbackImageUrl;
   const displayedImageUrl =
     hoveredImageIndex !== null
       ? images[hoveredImageIndex]?.asset?.url

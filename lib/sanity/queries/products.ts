@@ -26,6 +26,14 @@ const FILTERED_PRODUCT_PROJECTION = `{
   description,
   quantity,
   price,
+  imageUrl,
+  imageUrls,
+  "image": image{
+    asset->{
+      _id,
+      url
+    }
+  },
   "images": images[0...4]{
     _key,
     asset->{

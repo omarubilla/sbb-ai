@@ -10,6 +10,7 @@ import { useChatActions, useIsChatOpen } from "@/lib/store/chat-store-provider";
 import { CurrencyConverter } from "@/components/app/CurrencyConverter";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 import { getCategoryPageSlug } from "@/lib/constants/category-pages";
+import { UB_CONJUGATION_SUBCATEGORIES } from "@/lib/constants/ub-conjugation-subcategories";
 import sbbLogo from "@/app/SBB_Logo_full.png";
 
 interface HeaderProps {
@@ -25,16 +26,6 @@ const TOP_NAV_ORDER = [
   "tr-fret",
   "chains",
   "neurodegenerative-diseases",
-] as const;
-
-const UB_CONJUGATION_DROPDOWN_SUBCATEGORIES = [
-  { _id: "nav-subcategory-e1", name: "E1", slug: "e1s" },
-  { _id: "nav-subcategory-e2", name: "E2", slug: "e2s" },
-  {
-    _id: "nav-subcategory-ubiquitin-ubls",
-    name: "Ubiquitin/UBLs",
-    slug: "ubiquitin-ubls",
-  },
 ] as const;
 
 export function Header({ categories }: HeaderProps) {
@@ -152,7 +143,7 @@ export function Header({ categories }: HeaderProps) {
           {orderedCategories.map(({ category, categorySlug }) => {
             const subcategories =
               categorySlug === "ub-conjugation"
-                ? UB_CONJUGATION_DROPDOWN_SUBCATEGORIES
+                ? UB_CONJUGATION_SUBCATEGORIES
                 : (category.subcategories ?? []);
             const isProteasome = categorySlug === "proteasome";
             const categoryHref = isProteasome

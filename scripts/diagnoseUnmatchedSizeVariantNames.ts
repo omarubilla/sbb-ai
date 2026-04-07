@@ -15,10 +15,10 @@ const unmatchedNames = [
   "His8- Avi-DDB1-biotinylated",
   "Skp1/His6-Skp2",
   "DDB1/Cereblon (CRBN)",
-  "UBE2L3, human recombinant",
-  "UBE2D3, human recombinant",
-  "UBE2D2, human recombinant",
-  "UBE2D1, human recombinant",
+  "UBE2L3 (Recombinant Human)",
+  "UBE2D3 (Recombinant Human)",
+  "UBE2D2 (Recombinant Human)",
+  "UBE2D1 (Recombinant Human)",
 ];
 
 function normalize(value: string) {

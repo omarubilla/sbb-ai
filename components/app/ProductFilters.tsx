@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { COLORS, MATERIALS, SORT_OPTIONS } from "@/lib/constants/filters";
+import { UB_CONJUGATION_SUBCATEGORIES } from "@/lib/constants/ub-conjugation-subcategories";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 
 interface ProductFiltersProps {
@@ -284,6 +285,10 @@ export function ProductFilters({
         <div className="space-y-3">
           {shopByCategories.map((category) => {
             const categoryIsCurrentPage = category.slug === lockedCategorySlug;
+            const categorySubcategories =
+              category.slug === "ub-conjugation"
+                ? UB_CONJUGATION_SUBCATEGORIES
+                : (category.subcategories ?? []);
 
             return (
               <div key={category._id} className="space-y-1.5">
@@ -299,9 +304,9 @@ export function ProductFilters({
                   {category.title}
                 </button>
 
-                {category.subcategories && category.subcategories.length > 0 && (
+                {categorySubcategories.length > 0 && (
                   <div className="space-y-1 pl-3">
-                    {category.subcategories.map((subcategory) => {
+                    {categorySubcategories.map((subcategory) => {
                       const subcategoryIsActive =
                         currentSubcategory === subcategory.slug;
 
