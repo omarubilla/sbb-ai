@@ -91,12 +91,19 @@ export async function CategoryPageTemplate({
     notFound();
   }
 
-  const dedupedProducts = Array.from(
+  const dedupedProducts: (typeof products)[number][] = Array.from(
     products
       .slice()
-      .sort((a, b) => ((b.images?.length ?? 0) > 0 ? 1 : 0) - ((a.images?.length ?? 0) > 0 ? 1 : 0))
+      .sort(
+        (a: (typeof products)[number], b: (typeof products)[number]) =>
+          ((b.images?.length ?? 0) > 0 ? 1 : 0) -
+          ((a.images?.length ?? 0) > 0 ? 1 : 0),
+      )
       .reduce(
-        (acc, product) => {
+        (
+          acc: Map<string, (typeof products)[number]>,
+          product: (typeof products)[number],
+        ) => {
           const slugKey = normalizeSlug(product.slug);
           if (!slugKey) {
             acc.set(product._id, product);
