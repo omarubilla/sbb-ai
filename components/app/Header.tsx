@@ -11,6 +11,7 @@ import { CurrencyConverter } from "@/components/app/CurrencyConverter";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 import { getCategoryPageSlug } from "@/lib/constants/category-pages";
 import { CHAINS_SUBCATEGORIES } from "@/lib/constants/chains-subcategories";
+import { sortProteasomeSubcategories } from "@/lib/constants/proteasome-subcategories";
 import { UB_CONJUGATION_SUBCATEGORIES } from "@/lib/constants/ub-conjugation-subcategories";
 import sbbLogo from "@/app/SBB_Logo_full.png";
 
@@ -167,6 +168,8 @@ export function Header({ categories }: HeaderProps) {
                 ? UB_CONJUGATION_SUBCATEGORIES
                 : normalizedTitle === "chains" || categorySlug === "chains"
                   ? CHAINS_SUBCATEGORIES
+                  : normalizedTitle === "proteasome" || categorySlug === "proteasome"
+                    ? sortProteasomeSubcategories(category.subcategories ?? [])
                 : fallbackSubcategories;
             const isProteasome = categorySlug === "proteasome";
             const categoryHref = isProteasome
@@ -203,7 +206,7 @@ export function Header({ categories }: HeaderProps) {
                       key={subcategory._id}
                       href={
                         isProteasome
-                          ? `/proteasome#${subcategory.slug}`
+                          ? `/proteasome?subcategory=${subcategory.slug}`
                           : `/category/${categorySlug}?category=${categorySlug}&subcategory=${subcategory.slug}`
                       }
                       className="focus:bg-accent focus:text-accent-foreground relative flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none"

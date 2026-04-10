@@ -1,5 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+const GONE_PATHS = new Set(["/tr-gret", "/shop-1", "/shop-2"]);
+
 const isProtectedRoute = createRouteMatcher([
   "/checkout",
   "/orders",
@@ -8,6 +10,16 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  if (GONE_PATHS.has(req.nextUrl.pathname)) {
+    return new Response("Gone", {
+      status: 410,
+      headers: {
+        "X-Robots-Tag": "noindex, nofollow",
+        "Cache-Control": "public, max-age=3600",
+      },
+    });
+  }
+
   if (isProtectedRoute(req)) {
     await auth.protect();
   }

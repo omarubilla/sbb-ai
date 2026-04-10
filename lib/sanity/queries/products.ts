@@ -9,7 +9,60 @@ import { LOW_STOCK_THRESHOLD } from "@/lib/constants/stock";
 const PRODUCT_FILTER_CONDITIONS = `
   _type == "product"
   && ($categorySlug == "" || category->slug.current == $categorySlug)
-  && ($subcategorySlug == "" || subcategory->slug.current == $subcategorySlug)
+  && (
+    $subcategorySlug == ""
+    || subcategory->slug.current == $subcategorySlug
+    || (
+      category->slug.current == "proteasome"
+      && (
+        (
+          $subcategorySlug == "26s-proteasome"
+          && (
+            lower(name) match "*26s proteasome*"
+            || lower(name) match "*26 proteasome*"
+            || slug.current match "26s-proteasome*"
+          )
+        )
+        || (
+          $subcategorySlug == "20s-immunoproteasomes"
+          && lower(name) match "*20s immunoproteasome*"
+          && !(lower(name) match "*kit*")
+        )
+        || (
+          $subcategorySlug == "proteasome-kits"
+          && (
+            lower(name) match "*proteasome kit*"
+            || lower(name) match "*immunoproteasome kit*"
+          )
+        )
+        || (
+          $subcategorySlug == "20s-proteasome"
+          && (
+            (
+              lower(name) match "*20s proteasome*"
+              && !(lower(name) match "*immunoproteasome*")
+            )
+            || lower(name) match "*20s proteasome kit*"
+          )
+        )
+        || (
+          $subcategorySlug == "substrates"
+          && (
+            lower(name) match "*anw-amc*"
+            || lower(name) match "*pal-amc*"
+            || lower(name) match "*wla-amc*"
+            || lower(name) match "*llvy-amc*"
+            || lower(name) match "*z-lle-amc*"
+            || lower(name) match "*ac-ala-asn-trp-amc*"
+            || lower(name) match "*ac-pro-ala-leu-amc*"
+            || lower(name) match "*ac-trp-leu-ala-amc*"
+            || lower(name) match "*suc-leu-leu-val-tyr-amc*"
+            || lower(name) match "*z-leu-leu-glu-amc*"
+          )
+        )
+      )
+    )
+  )
   && ($color == "" || color == $color)
   && ($material == "" || material == $material)
   && ($minPrice == 0 || price >= $minPrice)

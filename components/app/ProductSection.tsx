@@ -83,22 +83,18 @@ export function ProductSection({
           <div className="lg:sticky lg:top-28 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
             <ProductFilters
               categories={categories}
-              categoryProducts={
-                lockedCategorySlug
-                  ? products
-                      .filter((p) => p.name && p.slug)
-                      .map((p) => ({
-                        name: p.name,
-                        slug: p.slug,
-                        subcategorySlug:
-                          (
-                            p as unknown as {
-                              subcategory?: { slug?: string | null } | null;
-                            }
-                          ).subcategory?.slug ?? null,
-                      }))
-                  : undefined
-              }
+              categoryProducts={products
+                .filter((p) => p.name && p.slug)
+                .map((p) => ({
+                  name: p.name,
+                  slug: p.slug,
+                  subcategorySlug:
+                    (
+                      p as unknown as {
+                        subcategory?: { slug?: string | null } | null;
+                      }
+                    ).subcategory?.slug ?? null,
+                }))}
               basePath={basePath}
               hideCategorySelect={Boolean(lockedCategorySlug)}
               lockedCategorySlug={lockedCategorySlug}

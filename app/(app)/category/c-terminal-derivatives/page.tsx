@@ -6,6 +6,12 @@ import {
 import { getRobotsValue } from "@/lib/site";
 
 export const metadata: Metadata = {
+  title: "C-Terminal Derivatives Category | South Bay Bio",
+  description:
+    "Explore C-terminal derivative reagents and related products from South Bay Bio.",
+  alternates: {
+    canonical: "/category/c-terminal-derivatives",
+  },
   robots: getRobotsValue(true),
 };
 

@@ -6,6 +6,12 @@ import {
 import { getRobotsValue } from "@/lib/site";
 
 export const metadata: Metadata = {
+  title: "Ub-Deconjugation Category | South Bay Bio",
+  description:
+    "Browse ubiquitin deconjugation reagents and tools from South Bay Bio for pathway analysis.",
+  alternates: {
+    canonical: "/category/ub-deconjugation",
+  },
   robots: getRobotsValue(true),
 };
 

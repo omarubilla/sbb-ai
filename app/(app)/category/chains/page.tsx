@@ -6,6 +6,12 @@ import {
 import { getRobotsValue } from "@/lib/site";
 
 export const metadata: Metadata = {
+  title: "Chains Category | South Bay Bio",
+  description:
+    "Browse ubiquitin and related chain products for biochemical and proteasome research.",
+  alternates: {
+    canonical: "/category/chains",
+  },
   robots: getRobotsValue(true),
 };
 

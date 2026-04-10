@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { COLORS, MATERIALS, SORT_OPTIONS } from "@/lib/constants/filters";
 import { CHAINS_SUBCATEGORIES } from "@/lib/constants/chains-subcategories";
+import { sortProteasomeSubcategories } from "@/lib/constants/proteasome-subcategories";
 import { UB_CONJUGATION_SUBCATEGORIES } from "@/lib/constants/ub-conjugation-subcategories";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 
@@ -32,6 +33,112 @@ interface ProductFiltersProps {
   basePath?: string;
   hideCategorySelect?: boolean;
   lockedCategorySlug?: string;
+}
+
+const PROTEASOME_PRODUCT_ORDER: Record<string, string[]> = {
+  "substrates": [
+    "Ac-Ala-Asn-Trp-AMC (ANW-AMC)",
+    "Ac-Pro-Ala-Leu-AMC (PAL-AMC)",
+    "Ac-Trp-Leu-Ala-AMC (WLA-AMC)",
+    "Suc-Leu-Leu-Val-Tyr-AMC (LLVY-AMC)",
+    "Z-Leu-Leu-Glu-AMC (Z-LLE-AMC)",
+  ],
+  "20s-proteasome": [
+    "20S Proteasome (Rat RBC)",
+    "20S Proteasome (Mouse RBC)",
+    "20S Proteasome (Human RBC)",
+    "20S Proteasome Kit (Human RBC)",
+  ],
+  "26s-proteasome": ["26S Proteasome (Human HEK293) (untagged)"],
+  "20s-immunoproteasomes": [
+    "20S Immunoproteasome (Human Spleen)",
+    "20S Immunoproteasome (Rat Spleen)",
+    "20S Immunoproteasome (Mouse Spleen)",
+    "20S Immunoproteasome (Human PBMC)",
+  ],
+  "proteasome-kits": [
+    "20S Proteasome Kit (Human RBC)",
+    "20S Immunoproteasome Kit (Human PBMC)",
+  ],
+};
+
+function normalizeLabel(value?: string | null) {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/\(untagged\)/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function getProteasomeOrderIndex(subcategorySlug: string, productName?: string | null) {
+  const orderedNames = PROTEASOME_PRODUCT_ORDER[subcategorySlug] ?? [];
+  const normalizedProductName = normalizeLabel(productName);
+
+  const exactIndex = orderedNames.findIndex(
+    (name) => normalizeLabel(name) === normalizedProductName,
+  );
+
+  if (exactIndex !== -1) {
+    return exactIndex;
+  }
+
+  const fuzzyIndex = orderedNames.findIndex((name) => {
+    const normalizedTarget = normalizeLabel(name);
+    return (
+      normalizedProductName.includes(normalizedTarget) ||
+      normalizedTarget.includes(normalizedProductName)
+    );
+  });
+
+  return fuzzyIndex !== -1 ? fuzzyIndex : Number.MAX_SAFE_INTEGER;
+}
+
+function isProteasomeFallbackMatch(
+  subcategorySlug: string,
+  product: CategoryProduct,
+) {
+  const name = (product.name ?? "").toLowerCase();
+  const slug = (product.slug ?? "").toLowerCase();
+
+  if (subcategorySlug === "26s-proteasome") {
+    return (
+      name.includes("26s proteasome") ||
+      name.includes("26 proteasome") ||
+      slug.includes("26s-proteasome")
+    );
+  }
+
+  if (subcategorySlug === "20s-immunoproteasomes") {
+    return name.includes("20s immunoproteasome") && !name.includes("kit");
+  }
+
+  if (subcategorySlug === "proteasome-kits") {
+    return name.includes("proteasome kit") || name.includes("immunoproteasome kit");
+  }
+
+  if (subcategorySlug === "20s-proteasome") {
+    return (
+      (name.includes("20s proteasome") && !name.includes("immunoproteasome")) ||
+      name.includes("20s proteasome kit")
+    );
+  }
+
+  if (subcategorySlug === "substrates") {
+    return (
+      name.includes("anw-amc") ||
+      name.includes("pal-amc") ||
+      name.includes("wla-amc") ||
+      name.includes("llvy-amc") ||
+      name.includes("z-lle-amc") ||
+      name.includes("ac-ala-asn-trp-amc") ||
+      name.includes("ac-pro-ala-leu-amc") ||
+      name.includes("ac-trp-leu-ala-amc") ||
+      name.includes("suc-leu-leu-val-tyr-amc") ||
+      name.includes("z-leu-leu-glu-amc")
+    );
+  }
+
+  return false;
 }
 
 export function ProductFilters({
@@ -300,6 +407,8 @@ export function ProductFilters({
                 ? UB_CONJUGATION_SUBCATEGORIES
                 : category.slug === "chains"
                   ? CHAINS_SUBCATEGORIES
+                  : category.slug === "proteasome"
+                    ? sortProteasomeSubcategories(category.subcategories ?? [])
                   : (category.subcategories ?? []);
 
             return (
@@ -324,18 +433,33 @@ export function ProductFilters({
                       const subcategoryProducts = categoryProducts
                         ? categoryProducts
                             .filter(
-                              (p) => p.subcategorySlug === subcategory.slug,
+                              (p) =>
+                                p.subcategorySlug === subcategory.slug ||
+                                (lockedCategorySlug === "proteasome" &&
+                                  isProteasomeFallbackMatch(
+                                    subcategory.slug ?? "",
+                                    p,
+                                  )),
                             )
-                            .filter((p) => {
-                              // Remove proteasome products from ub-deconjugation's ubiquitinated-substrates
-                              if (
-                                lockedCategorySlug === "ub-deconjugation" &&
-                                subcategory.slug === "ubiquitinated-substrates" &&
-                                p.name?.toLowerCase().includes("proteasome")
-                              ) {
-                                return false;
+                            .sort((a, b) => {
+                              if (lockedCategorySlug !== "proteasome") {
+                                return (a.name ?? "").localeCompare(b.name ?? "");
                               }
-                              return true;
+
+                              const aIndex = getProteasomeOrderIndex(
+                                subcategory.slug ?? "",
+                                a.name,
+                              );
+                              const bIndex = getProteasomeOrderIndex(
+                                subcategory.slug ?? "",
+                                b.name,
+                              );
+
+                              if (aIndex !== bIndex) {
+                                return aIndex - bIndex;
+                              }
+
+                              return (a.name ?? "").localeCompare(b.name ?? "");
                             })
                         : [];
 

@@ -10,6 +10,8 @@ type ProductSitemapEntry = {
 
 const FULL_STATIC_ROUTES = [
   { path: "/", changeFrequency: "daily" as const, priority: 1 },
+  { path: "/about", changeFrequency: "monthly" as const, priority: 0.6 },
+  { path: "/distributors", changeFrequency: "monthly" as const, priority: 0.6 },
   { path: "/services", changeFrequency: "weekly" as const, priority: 0.8 },
   { path: "/proteasome", changeFrequency: "weekly" as const, priority: 0.8 },
   { path: "/privacy-policy", changeFrequency: "yearly" as const, priority: 0.2 },
