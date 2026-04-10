@@ -14,13 +14,13 @@ type SubcategoryLike = {
 export function sortProteasomeSubcategories<T extends SubcategoryLike>(
   subcategories: readonly T[],
 ): T[] {
-  const order = new Map(
+  const orderBySlug: Record<string, number> = Object.fromEntries(
     PROTEASOME_SUBCATEGORY_ORDER.map((slug, index) => [slug, index]),
   );
 
   return [...subcategories].sort((a, b) => {
-    const aIndex = order.get(a.slug ?? "") ?? Number.MAX_SAFE_INTEGER;
-    const bIndex = order.get(b.slug ?? "") ?? Number.MAX_SAFE_INTEGER;
+    const aIndex = orderBySlug[a.slug ?? ""] ?? Number.MAX_SAFE_INTEGER;
+    const bIndex = orderBySlug[b.slug ?? ""] ?? Number.MAX_SAFE_INTEGER;
 
     if (aIndex !== bIndex) {
       return aIndex - bIndex;
