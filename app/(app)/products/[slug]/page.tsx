@@ -8,6 +8,7 @@ import { ProductInfo } from "@/components/app/ProductInfo";
 import {
   buildAbsoluteUrl,
   getRobotsValue,
+  getSiteUrl,
   isProteasomeSeoExperiment,
   SITE_NAME,
 } from "@/lib/site";
@@ -208,15 +209,53 @@ export default async function ProductPage({ params }: ProductPageProps) {
     additionalProperty,
   };
 
+  const breadcrumbItems: { "@type": string; position: number; name: string; item: string }[] = [
+    { "@type": "ListItem", position: 1, name: "Home", item: getSiteUrl() },
+  ];
+  if (product.category?.title && product.category?.slug) {
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: 2,
+      name: product.category.title,
+      item: buildAbsoluteUrl(`/category/${product.category.slug}`),
+    });
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: 3,
+      name: productName,
+      item: productUrl,
+    });
+  } else {
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: 2,
+      name: productName,
+      item: productUrl,
+    });
+  }
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems,
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {shouldIndex && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c"),
-          }}
-        />
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c"),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c"),
+            }}
+          />
+        </>
       )}
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-2">

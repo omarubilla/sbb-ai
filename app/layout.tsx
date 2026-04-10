@@ -3,6 +3,40 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { DEFAULT_SITE_DESCRIPTION, SITE_NAME, getSiteUrl } from "@/lib/site";
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE_NAME,
+  url: getSiteUrl(),
+  contactPoint: [
+    {
+      "@type": "ContactPoint",
+      email: "support@south-bay-bio.com",
+      contactType: "customer support",
+    },
+    {
+      "@type": "ContactPoint",
+      email: "orders@south-bay-bio.com",
+      contactType: "sales",
+    },
+  ],
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  url: getSiteUrl(),
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${getSiteUrl()}/products?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -50,6 +84,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
         {children}
       </body>
     </html>

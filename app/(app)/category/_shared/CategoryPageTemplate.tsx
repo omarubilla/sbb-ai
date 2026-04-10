@@ -12,6 +12,7 @@ import {
 } from "@/lib/sanity/queries/categories";
 import { ProductSection } from "@/components/app/ProductSection";
 import { normalizeSlug } from "@/lib/utils";
+import { buildAbsoluteUrl, getSiteUrl } from "@/lib/site";
 
 export interface CategorySearchParams {
   q?: string;
@@ -123,6 +124,29 @@ export async function CategoryPageTemplate({
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: getSiteUrl(),
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: category.title,
+                item: buildAbsoluteUrl(`/category/${slug}`),
+              },
+            ],
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
       <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
