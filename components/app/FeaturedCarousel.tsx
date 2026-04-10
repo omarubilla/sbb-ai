@@ -318,6 +318,71 @@ function FeaturedSlide({ products, formatPrice }: FeaturedSlideProps) {
     );
   }
 
+  if (products.length === 3) {
+    const [primary, ...secondary] = products;
+
+    return (
+      <div className="flex h-full min-h-[340px] w-full flex-col justify-center px-6 py-8 md:min-h-[390px] md:px-10 lg:min-h-[430px] lg:px-12">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
+          Featured Products
+        </p>
+        <span className="mb-6 h-2 w-8 rounded-full bg-blue-500/80" />
+
+        <div className="rounded-xl border border-teal-400/30 bg-linear-to-br from-teal-500/10 to-sky-500/10 p-4">
+          <div className="space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-teal-300">
+              Proteasome Collection
+            </p>
+            <h2 className="mt-2 text-xl font-bold tracking-tight text-white sm:text-2xl">
+              {primary.name}
+            </h2>
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="text-2xl font-bold text-white">
+                {formatPrice(primary.price)}
+              </p>
+              <Button
+                asChild
+                size="sm"
+                className="bg-white text-zinc-900 hover:bg-zinc-100"
+              >
+                <Link href={`/products/${normalizeSlug(primary.slug)}`}>
+                  Shop
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {secondary.map((product) => (
+                <div
+                  key={product._id}
+                  className="rounded-xl border border-zinc-700/70 bg-zinc-800/60 p-3"
+                >
+                  <h3 className="line-clamp-2 text-sm font-semibold text-white sm:text-base">
+                    {product.name}
+                  </h3>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <p className="text-base font-bold text-white sm:text-lg">
+                      {formatPrice(product.price)}
+                    </p>
+                    <Button
+                      asChild
+                      size="sm"
+                      className="bg-white text-zinc-900 hover:bg-zinc-100"
+                    >
+                      <Link href={`/products/${normalizeSlug(product.slug)}`}>
+                        Shop
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full min-h-[340px] w-full flex-col justify-center px-6 py-8 md:min-h-[390px] md:px-10 lg:min-h-[430px] lg:px-12">
       <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">

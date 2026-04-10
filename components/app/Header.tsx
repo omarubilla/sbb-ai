@@ -10,6 +10,7 @@ import { useChatActions, useIsChatOpen } from "@/lib/store/chat-store-provider";
 import { CurrencyConverter } from "@/components/app/CurrencyConverter";
 import type { ALL_CATEGORIES_QUERYResult } from "@/sanity.types";
 import { getCategoryPageSlug } from "@/lib/constants/category-pages";
+import { CHAINS_SUBCATEGORIES } from "@/lib/constants/chains-subcategories";
 import { UB_CONJUGATION_SUBCATEGORIES } from "@/lib/constants/ub-conjugation-subcategories";
 import sbbLogo from "@/app/SBB_Logo_full.png";
 
@@ -141,10 +142,16 @@ export function Header({ categories }: HeaderProps) {
       <div className="border-t border-zinc-200 dark:border-zinc-800">
         <nav className="mx-auto flex h-10 max-w-7xl items-center gap-1 overflow-x-auto whitespace-nowrap px-4 sm:px-6 lg:px-8 md:overflow-visible scrollbar-hide">
           {orderedCategories.map(({ category, categorySlug }) => {
+            const normalizedTitle = (category.title ?? "").trim().toLowerCase();
+            const fallbackSubcategories = [...(category.subcategories ?? [])].sort(
+              (a, b) => (a.name ?? "").localeCompare(b.name ?? ""),
+            );
             const subcategories =
-              categorySlug === "ub-conjugation"
+              normalizedTitle === "ub conjugation" || categorySlug === "ub-conjugation"
                 ? UB_CONJUGATION_SUBCATEGORIES
-                : (category.subcategories ?? []);
+                : normalizedTitle === "chains" || categorySlug === "chains"
+                  ? CHAINS_SUBCATEGORIES
+                : fallbackSubcategories;
             const isProteasome = categorySlug === "proteasome";
             const categoryHref = isProteasome
               ? "/proteasome"
@@ -204,7 +211,7 @@ export function Header({ categories }: HeaderProps) {
               <span>Free Same-day Shipping on Domestic Orders over $750</span>
             </div>
             <span className="text-teal-400 dark:text-teal-600">•</span>
-            <span>Direct Shipping to Europe and Asia on orders over $1,000, 50% off overseas shipments</span>
+            <span>Direct Shipping to Europe and Asia, on orders over $1,000- 50% off overseas shipments</span>
           </div>
         </div>
       </div>

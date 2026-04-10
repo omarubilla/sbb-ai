@@ -18,6 +18,7 @@ interface ProductSectionProps {
   variant?: "grid" | "category-list";
   basePath?: string;
   lockedCategorySlug?: string;
+  enableScrollableProductPane?: boolean;
 }
 
 export function ProductSection({
@@ -27,6 +28,7 @@ export function ProductSection({
   variant = "grid",
   basePath = "/",
   lockedCategorySlug,
+  enableScrollableProductPane = false,
 }: ProductSectionProps) {
   const [filtersOpen, setFiltersOpen] = useState(true);
   const isCategoryList = variant === "category-list";
@@ -105,7 +107,13 @@ export function ProductSection({
         </aside>
 
         {/* Product Grid - expands to full width when filters hidden */}
-        <main className="min-w-0 flex-1 transition-all duration-300">
+        <main
+          className={`min-w-0 flex-1 transition-all duration-300 ${
+            enableScrollableProductPane
+              ? "lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
+              : ""
+          }`}
+        >
           {isCategoryList ? (
             <CategoryProductList products={products} />
           ) : (

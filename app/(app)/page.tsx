@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { HandHeart, ShieldCheck, Truck } from "lucide-react";
 import { sanityFetch } from "@/sanity/lib/live";
@@ -256,6 +257,58 @@ export default async function HomePage({ searchParams }: PageProps) {
         </div>
       </section>
 
+      <section className="border-b border-zinc-200 bg-linear-to-br from-white via-rose-50 to-pink-100 dark:border-zinc-800 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600 dark:text-sky-400">
+                Technology
+              </p>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100 sm:text-4xl lg:text-5xl">
+                The platform behind our biochemical development work.
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-300 sm:text-lg">
+                Our technology capabilities sit at the center of how we design,
+                validate, and deliver advanced reagents for protein science,
+                ubiquitin biology, and assay development.
+              </p>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-300 sm:text-lg">
+                This framework is key to how we think about discovery,
+                translational workflows, and high-confidence product design.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/services"
+                  className="inline-flex items-center rounded-full bg-zinc-950 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+                >
+                  Explore Technology Services
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative pt-5">
+              <div className="absolute left-3 top-0 z-10">
+                <p className="inline-flex items-center rounded-full bg-white/85 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-rose-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_10px_rgba(190,24,93,0.12)] dark:bg-zinc-800 dark:text-rose-300 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_10px_rgba(0,0,0,0.35)]">
+                  10 Hallmarks of Cancer
+                </p>
+              </div>
+              <div className="relative aspect-[5/4] w-full rounded-[2rem] bg-linear-to-br from-white/40 via-rose-200/30 to-pink-200/30 p-2 shadow-[inset_8px_8px_18px_rgba(255,255,255,0.75),inset_-10px_-10px_20px_rgba(190,24,93,0.1),14px_14px_28px_rgba(190,24,93,0.14),-10px_-10px_20px_rgba(255,255,255,0.95)] dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-950 dark:shadow-[inset_6px_6px_14px_rgba(255,255,255,0.05),inset_-8px_-8px_16px_rgba(0,0,0,0.35),12px_12px_24px_rgba(0,0,0,0.45),-10px_-10px_20px_rgba(255,255,255,0.02)]">
+                <div className="absolute inset-2 rounded-[1.5rem] bg-linear-to-br from-white/25 via-rose-100/20 to-pink-100/20 dark:from-zinc-800/20 dark:via-zinc-900/20 dark:to-zinc-950/20" />
+                <Image
+                  src="/10HallmarksofC.jpeg"
+                  alt="The 10 Hallmarks of Cancer scientific diagram"
+                  fill
+                  priority
+                  className="object-contain scale-[1.08] drop-shadow-[0_14px_22px_rgba(164,19,60,0.22)] dark:drop-shadow-[0_14px_24px_rgba(0,0,0,0.45)]"
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Page Banner */}
       <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg:zinc-950">
         <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
@@ -284,6 +337,7 @@ export default async function HomePage({ searchParams }: PageProps) {
           categories={categories}
           products={dedupedProducts}
           searchQuery={searchQuery}
+          enableScrollableProductPane
         />
       </div>
 
