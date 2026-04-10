@@ -9,10 +9,18 @@ interface ProductGalleryProps {
   productName: string | null;
 }
 
+function cleanWixImageUrl(url: string): string {
+  if (url.includes("wixstatic.com")) {
+    return url.replace(/\/v1\/(fill|fit)\/.+$/, "");
+  }
+  return url;
+}
+
 export function ProductGallery({ imageUrls, productName }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const cleanedUrls = imageUrls.map(cleanWixImageUrl);
 
-  if (!imageUrls || imageUrls.length === 0) {
+  if (!cleanedUrls || cleanedUrls.length === 0) {
     return (
       <div className="flex aspect-square items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
         <span className="text-zinc-400">No images available</span>
@@ -20,7 +28,7 @@ export function ProductGallery({ imageUrls, productName }: ProductGalleryProps) 
     );
   }
 
-  const selectedImageUrl = imageUrls[selectedIndex];
+  const selectedImageUrl = cleanedUrls[selectedIndex];
   const selectedIsExternal =
     !!selectedImageUrl && !selectedImageUrl.includes("cdn.sanity.io");
 
@@ -46,9 +54,9 @@ export function ProductGallery({ imageUrls, productName }: ProductGalleryProps) 
       </div>
 
       {/* Thumbnail Grid */}
-      {imageUrls.length > 0 && (
+      {cleanedUrls.length > 0 && (
         <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6">
-          {imageUrls.map((url, index) => (
+          {cleanedUrls.map((url, index) => (
             <button
               key={`${url}-${index}`}
               type="button"

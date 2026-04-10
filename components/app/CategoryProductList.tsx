@@ -24,15 +24,30 @@ interface CategoryProductListProps {
   products: FILTER_PRODUCTS_BY_NAME_QUERYResult;
 }
 
+/**
+ * Strip Wix CDN transformation path so Next.js Image gets the full-resolution
+ * source file instead of a tiny, pre-blurred thumbnail.
+ * e.g. /v1/fill/w_97,h_179,...,blur_2,.../<file> → <base url only>
+ */
+function cleanWixImageUrl(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
+  if (url.includes("wixstatic.com")) {
+    return url.replace(/\/v1\/(fill|fit)\/.+$/, "");
+  }
+  return url;
+}
+
 function CategoryProductRow({ product }: { product: Product }) {
   const formatPrice = useFormattedPrice();
   const productWithFallback = product as ProductWithLegacyImageFields;
-  const imageUrl =
+  const rawImageUrl =
     productWithFallback.images?.[0]?.asset?.url ??
     productWithFallback.image?.asset?.url ??
     productWithFallback.imageUrl ??
     productWithFallback.imageUrls?.[0] ??
     undefined;
+  const imageUrl = cleanWixImageUrl(rawImageUrl);
+  const isExternalUrl = !!imageUrl && !imageUrl.includes("cdn.sanity.io");
   const stock = product.stock ?? 0;
   const sizeVariants = getProductSizeVariants(product.name);
   const pricedVariants = sizeVariants.filter(
@@ -75,6 +90,7 @@ function CategoryProductRow({ product }: { product: Product }) {
                 height={1200}
                 className="h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-[1.02]"
                 sizes="(max-width: 1024px) 100vw, 280px"
+                unoptimized={isExternalUrl}
               />
             </div>
           ) : (

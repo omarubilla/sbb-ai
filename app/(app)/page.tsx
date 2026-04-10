@@ -293,14 +293,13 @@ export default async function HomePage({ searchParams }: PageProps) {
                   10 Hallmarks of Cancer
                 </p>
               </div>
-              <div className="relative aspect-[5/4] w-full rounded-[2rem] bg-linear-to-br from-white/40 via-rose-200/30 to-pink-200/30 p-2 shadow-[inset_8px_8px_18px_rgba(255,255,255,0.75),inset_-10px_-10px_20px_rgba(190,24,93,0.1),14px_14px_28px_rgba(190,24,93,0.14),-10px_-10px_20px_rgba(255,255,255,0.95)] dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-950 dark:shadow-[inset_6px_6px_14px_rgba(255,255,255,0.05),inset_-8px_-8px_16px_rgba(0,0,0,0.35),12px_12px_24px_rgba(0,0,0,0.45),-10px_-10px_20px_rgba(255,255,255,0.02)]">
-                <div className="absolute inset-2 rounded-[1.5rem] bg-linear-to-br from-white/25 via-rose-100/20 to-pink-100/20 dark:from-zinc-800/20 dark:via-zinc-900/20 dark:to-zinc-950/20" />
+              <div className="relative aspect-[5/4] w-full overflow-hidden rounded-[2.5rem] shadow-[14px_14px_28px_rgba(190,24,93,0.14),-10px_-10px_20px_rgba(255,255,255,0.95)] dark:shadow-[12px_12px_24px_rgba(0,0,0,0.45),-10px_-10px_20px_rgba(255,255,255,0.02)]">
                 <Image
                   src="/10HallmarksofC.jpeg"
                   alt="The 10 Hallmarks of Cancer scientific diagram"
                   fill
                   priority
-                  className="object-contain scale-[1.08] drop-shadow-[0_14px_22px_rgba(164,19,60,0.22)] dark:drop-shadow-[0_14px_24px_rgba(0,0,0,0.45)]"
+                  className="object-cover drop-shadow-[0_14px_22px_rgba(164,19,60,0.22)] dark:drop-shadow-[0_14px_24px_rgba(0,0,0,0.45)]"
                   sizes="(max-width: 1024px) 100vw, 55vw"
                 />
               </div>
