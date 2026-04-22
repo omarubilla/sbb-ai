@@ -182,8 +182,8 @@ export function FeaturedCarousel({ products }: FeaturedCarouselProps) {
 
   return (
     <div className="w-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
-      <div className="flex min-h-[340px] flex-col md:min-h-[390px] md:flex-row lg:min-h-[430px]">
-        <div className="relative h-56 w-full overflow-hidden md:h-auto md:w-3/5">
+      <div className="flex min-h-[320px] flex-col md:min-h-[360px] md:flex-row lg:min-h-[400px]">
+        <div className="relative h-52 w-full overflow-hidden md:h-auto md:w-3/5">
           <Image
             src={activeBanner.imageSrc}
             alt={activeBanner.title}
@@ -267,7 +267,7 @@ function FeaturedSlide({ products, formatPrice }: FeaturedSlideProps) {
     const { meta, summary } = splitProductDescription(product.description);
 
     return (
-      <div className="flex h-full min-h-[340px] w-full flex-col justify-center px-6 py-8 md:min-h-[390px] md:px-10 lg:min-h-[430px] lg:px-12">
+      <div className="flex h-full min-h-[320px] w-full flex-col justify-center px-6 py-8 md:min-h-[360px] md:px-10 lg:min-h-[400px] lg:px-12">
         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
           Featured Products
         </p>
@@ -322,7 +322,7 @@ function FeaturedSlide({ products, formatPrice }: FeaturedSlideProps) {
     const [primary, ...secondary] = products;
 
     return (
-      <div className="flex h-full min-h-[340px] w-full flex-col justify-center px-6 py-8 md:min-h-[390px] md:px-10 lg:min-h-[430px] lg:px-12">
+      <div className="flex h-full min-h-[320px] w-full flex-col justify-center px-6 py-8 md:min-h-[360px] md:px-10 lg:min-h-[400px] lg:px-12">
         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
           Featured Products
         </p>

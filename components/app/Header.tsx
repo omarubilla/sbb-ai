@@ -157,7 +157,7 @@ export function Header({ categories }: HeaderProps) {
       </div>
 
       <div className="border-t border-zinc-200 dark:border-zinc-800">
-        <nav className="mx-auto flex h-10 max-w-7xl items-center gap-1 overflow-x-auto whitespace-nowrap px-4 sm:px-6 lg:px-8 md:overflow-visible scrollbar-hide">
+        <nav className="mx-auto flex h-12 max-w-7xl items-center gap-1.5 overflow-x-auto whitespace-nowrap px-4 sm:px-6 lg:px-8 md:overflow-visible scrollbar-hide">
           {orderedCategories.map(({ category, categorySlug }) => {
             const normalizedTitle = (category.title ?? "").trim().toLowerCase();
             const fallbackSubcategories = [...(category.subcategories ?? [])].sort(
@@ -182,7 +182,7 @@ export function Header({ categories }: HeaderProps) {
                   key={category._id}
                   variant="ghost"
                   asChild
-                  className="h-7 shrink-0 bg-sky-600 px-2.5 text-sm whitespace-nowrap text-white hover:bg-sky-700 hover:text-white"
+                  className="h-8 shrink-0 bg-sky-600 px-3 text-[0.95rem] whitespace-nowrap text-white hover:bg-sky-700 hover:text-white"
                 >
                   <Link href={categoryHref}>
                     {category.title}
@@ -195,7 +195,7 @@ export function Header({ categories }: HeaderProps) {
               <div key={category._id} className="group relative shrink-0">
                 <Link
                   href={categoryHref}
-                  className="inline-flex h-7 items-center rounded-md bg-sky-600 px-2.5 text-sm whitespace-nowrap text-white transition-colors hover:bg-sky-700 hover:text-white"
+                  className="inline-flex h-8 items-center rounded-md bg-sky-600 px-3 text-[0.95rem] whitespace-nowrap text-white transition-colors hover:bg-sky-700 hover:text-white"
                 >
                   {category.title}
                   <ChevronDown className="ml-1 h-4 w-4" />
