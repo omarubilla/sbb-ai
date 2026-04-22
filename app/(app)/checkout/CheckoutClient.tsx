@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ArrowLeft, ShoppingBag, AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CheckoutButton } from "@/components/app/CheckoutButton";
+import { BankfulCheckoutButton } from "@/components/app/BankfulCheckoutButton";
 import { formatPrice } from "@/lib/utils";
 import {
   useCartItems,
@@ -192,12 +193,25 @@ export function CheckoutClient() {
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6 space-y-3">
               <CheckoutButton disabled={hasStockIssues || isLoading} />
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-zinc-200 dark:border-zinc-700" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-zinc-400 dark:bg-zinc-950 dark:text-zinc-500">
+                    or
+                  </span>
+                </div>
+              </div>
+
+              <BankfulCheckoutButton disabled={hasStockIssues || isLoading} />
             </div>
 
             <p className="mt-4 text-center text-xs text-zinc-500 dark:text-zinc-400">
-              You&apos;ll be redirected to Stripe&apos;s secure checkout
+              You&apos;ll be redirected to a secure checkout page
             </p>
           </div>
         </div>

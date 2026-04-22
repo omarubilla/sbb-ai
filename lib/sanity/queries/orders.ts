@@ -83,3 +83,28 @@ export const ORDER_BY_STRIPE_PAYMENT_ID_QUERY = defineQuery(`*[
   && stripePaymentId == $stripePaymentId
 ][0]{ _id }`);
 
+/**
+ * Check if order exists by Bankful transaction ID
+ * Used for Bankful webhook idempotency check
+ */
+export const ORDER_BY_BANKFUL_TRANSACTION_ID_QUERY = defineQuery(`*[
+  _type == "order"
+  && bankfulTransactionId == $bankfulTransactionId
+][0]{ _id }`);
+
+/**
+ * Find an order by orderNumber — used by Bankful webhook to correlate
+ * xtl_order_id / XTL_ORDER_ID back to the pre-created Sanity order.
+ */
+export const ORDER_BY_ORDER_NUMBER_QUERY = defineQuery(`*[
+  _type == "order"
+  && orderNumber == $orderNumber
+][0]{
+  _id,
+  bankfulTransactionId,
+  "itemData": items[]{
+    "productId": product._ref,
+    quantity
+  }
+}`);
+

@@ -123,6 +123,13 @@ export const orderType = defineType({
       description: "Stripe payment intent ID",
     }),
     defineField({
+      name: "bankfulTransactionId",
+      type: "string",
+      group: "payment",
+      readOnly: true,
+      description: "Bankful transaction ID",
+    }),
+    defineField({
       name: "createdAt",
       type: "datetime",
       group: "details",

@@ -18,6 +18,7 @@ import { FeaturedCarousel } from "@/components/app/FeaturedCarousel";
 import { FeaturedCarouselSkeleton } from "@/components/app/FeaturedCarouselSkeleton";
 import { NewsInlineCarousel } from "@/components/news/NewsInlineCarousel";
 import { newsItems } from "@/data/news";
+import { FAQSection } from "@/components/app/FAQSection";
 import {
   DEFAULT_SITE_DESCRIPTION,
   getRobotsValue,
@@ -256,7 +257,6 @@ export default async function HomePage({ searchParams }: PageProps) {
           </div>
         </div>
       </section>
-
       <section className="border-b border-zinc-200 bg-linear-to-br from-white via-rose-50 to-pink-100 dark:border-zinc-800 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12">
@@ -374,6 +374,8 @@ export default async function HomePage({ searchParams }: PageProps) {
           </div>
         </div>
       </section>
+
+      <FAQSection />
 
     </div>
   );

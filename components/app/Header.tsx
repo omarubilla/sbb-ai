@@ -230,7 +230,7 @@ export function Header({ categories }: HeaderProps) {
               <span>Free Same-day Shipping on Domestic Orders over $750</span>
             </div>
             <span className="text-teal-400 dark:text-teal-600">•</span>
-            <span>Direct Shipping to Europe and Asia, on orders over $1,000- 50% off overseas shipments</span>
+            <span>Direct Shipping to Europe and Asia (orders over $1,000 qualify for 50% reduced shipping)</span>
           </div>
         </div>
       </div>
