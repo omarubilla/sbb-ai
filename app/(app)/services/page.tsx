@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRobotsValue, isProteasomeSeoExperiment } from "@/lib/site";
+import { ServiceContactActions } from "./service-contact-actions";
 
 export const metadata: Metadata = {
   title: "Services | South Bay Bio",
@@ -35,7 +36,7 @@ const KEY_SERVICES = [
   {
     title: "Protein and Antibody Labeling",
     description:
-      "Site-specific and amine-reactive labeling strategies tuned for high signal-to-noise and low assay interference.",
+      "Site-specific and amine-reactive labeling strategies tuned for low signal-to-noise and low assay interference.",
     icon: TestTube2,
   },
   {
@@ -231,17 +232,7 @@ export default function ServicesPage() {
               We will propose a practical experimental plan, recommended workflow, and a scope aligned to your project stage.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild className="bg-gradient-to-r from-sky-400 to-blue-600 text-white hover:from-sky-500 hover:to-blue-700">
-                <Link href="mailto:support@south-bay-bio.com">
-                  Contact Scientific Support
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="border-zinc-300 bg-white hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800">
-                <Link href="tel:+14159353226">Call (415) 935-3226</Link>
-              </Button>
-            </div>
+            <ServiceContactActions />
           </div>
         </div>
       </section>

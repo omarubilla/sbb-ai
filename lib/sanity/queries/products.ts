@@ -65,6 +65,10 @@ const PRODUCT_FILTER_CONDITIONS = `
   )
   && ($color == "" || color == $color)
   && ($material == "" || material == $material)
+  && (
+    $subcategorySlug != "20s-proteasome"
+    || !(category->slug.current == "proteasome" && lower(name) match "*immunoproteasome*")
+  )
   && ($minPrice == 0 || price >= $minPrice)
   && ($maxPrice == 0 || price <= $maxPrice)
   && ($searchQuery == "" || name match $searchQuery + "*" || description match $searchQuery + "*")

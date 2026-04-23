@@ -22,7 +22,7 @@ export function CartSummary({ hasStockIssues = false }: CartSummaryProps) {
   if (totalItems === 0) return null;
 
   return (
-    <div className="border-t border-zinc-200 p-4 dark:border-zinc-800">
+    <div className="sticky bottom-0 z-20 border-t border-zinc-200 bg-white/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
       <div className="flex justify-between text-base font-medium text-zinc-900 dark:text-zinc-100">
         <span>Subtotal</span>
         <span>{formatPrice(totalPrice)}</span>

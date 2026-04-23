@@ -87,7 +87,7 @@ export function CartSheet() {
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && closeCart()}>
-      <SheetContent className="flex w-full flex-col sm:max-w-lg gap-0">
+      <SheetContent className="flex h-dvh max-h-dvh w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
         <SheetHeader className="border-b border-zinc-200 dark:border-zinc-800">
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
@@ -121,7 +121,7 @@ export function CartSheet() {
             )}
 
             {/* Cart Items - Grouped by Product */}
-            <div className="flex-1 overflow-y-auto px-5">
+            <div className="min-h-0 flex-1 overflow-y-auto px-5">
               <div className="space-y-3 py-3">
                 {Array.from(groupedItems.values()).map((group) => {
                   const isExpanded = expandedProducts.has(group.productId);

@@ -1,6 +1,7 @@
 "use server";
 
 import { createHmac } from "crypto";
+import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { client, writeClient } from "@/sanity/lib/client";
 import { PRODUCTS_BY_IDS_QUERY } from "@/lib/sanity/queries/products";
@@ -19,6 +20,21 @@ interface CheckoutResult {
   success: boolean;
   url?: string;
   error?: string;
+}
+
+function isPublicHttpsUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    const host = parsed.hostname.toLowerCase();
+    const isLocalHost =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "0.0.0.0" ||
+      host.endsWith(".local");
+    return parsed.protocol === "https:" && !isLocalHost;
+  } catch {
+    return false;
+  }
 }
 
 // ---------- Helpers ----------
@@ -50,8 +66,17 @@ export async function createBankfulCheckoutSession(
   const bankfulPassword = process.env.BANKFUL_PASSWORD;
 
   if (!bankfulBaseUrl || !bankfulUsername || !bankfulPassword) {
-    console.error("Missing Bankful env vars (BANKFUL_API_BASE_URL / BANKFUL_USERNAME / BANKFUL_PASSWORD)");
-    return { success: false, error: "Payment provider is not configured." };
+    const missing = [
+      !bankfulBaseUrl ? "BANKFUL_API_BASE_URL" : null,
+      !bankfulUsername ? "BANKFUL_USERNAME" : null,
+      !bankfulPassword ? "BANKFUL_PASSWORD" : null,
+    ].filter((value): value is string => Boolean(value));
+
+    console.error("Missing Bankful env vars:", missing.join(", "));
+    return {
+      success: false,
+      error: `Payment provider is not configured (${missing.join(", ")}).`,
+    };
   }
 
   try {
@@ -113,37 +138,52 @@ export async function createBankfulCheckoutSession(
     );
 
     const userEmail = user.emailAddresses[0]?.emailAddress ?? "";
-    const rawBaseUrl =
-      process.env.BANKFUL_CALLBACK_BASE_URL ||
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
-      "http://localhost:3000";
 
-    let baseUrl: string;
-    try {
-      const parsed = new URL(rawBaseUrl);
-      const isLocalHost =
-        parsed.hostname === "localhost" ||
-        parsed.hostname === "127.0.0.1" ||
-        parsed.hostname === "0.0.0.0";
+    let selectedBaseUrl: string | undefined;
 
-      // Bankful cannot call localhost callback/return URLs and expects publicly reachable HTTPS URLs.
-      if (isLocalHost || parsed.protocol !== "https:") {
+    if (process.env.NODE_ENV === "production") {
+      const explicitBaseUrl = process.env.BANKFUL_CALLBACK_BASE_URL;
+      if (!explicitBaseUrl || !isPublicHttpsUrl(explicitBaseUrl)) {
         return {
           success: false,
           error:
-            "Bankful requires a public HTTPS callback URL. Set BANKFUL_CALLBACK_BASE_URL to your deployed app URL.",
+            "Production checkout requires BANKFUL_CALLBACK_BASE_URL to be a valid public HTTPS URL.",
         };
       }
+      selectedBaseUrl = explicitBaseUrl;
+    } else {
+      const reqHeaders = await headers();
+      const forwardedHost = reqHeaders.get("x-forwarded-host");
+      const forwardedProto = reqHeaders.get("x-forwarded-proto") ?? "https";
+      const originHeader = reqHeaders.get("origin");
+      const forwardedOrigin =
+        forwardedHost && forwardedProto
+          ? `${forwardedProto}://${forwardedHost}`
+          : null;
 
-      baseUrl = parsed.origin;
-    } catch {
+      const candidateBaseUrls = [
+        process.env.BANKFUL_CALLBACK_BASE_URL,
+        process.env.NEXT_PUBLIC_BASE_URL,
+        process.env.VERCEL_PROJECT_PRODUCTION_URL
+          ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+          : null,
+        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+        originHeader,
+        forwardedOrigin,
+      ].filter((value): value is string => Boolean(value));
+
+      selectedBaseUrl = candidateBaseUrls.find(isPublicHttpsUrl);
+    }
+
+    if (!selectedBaseUrl) {
       return {
         success: false,
         error:
-          "Invalid Bankful callback URL configuration. Check BANKFUL_CALLBACK_BASE_URL.",
+          "Bankful requires a public HTTPS callback URL. Set BANKFUL_CALLBACK_BASE_URL to your deployed app URL.",
       };
     }
+
+    const baseUrl = new URL(selectedBaseUrl).origin;
 
     // 5. Generate order number (used as xtl_order_id for correlation)
     const orderNumber = `SBB-${Date.now().toString(36).toUpperCase()}-${Math.random()
