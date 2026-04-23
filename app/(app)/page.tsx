@@ -188,7 +188,7 @@ export default async function HomePage({ searchParams }: PageProps) {
                 </div>
                 <div>
                   <p className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100 sm:text-4xl">
-                    100+
+                    130+
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 sm:text-lg">
                     Products
@@ -196,7 +196,7 @@ export default async function HomePage({ searchParams }: PageProps) {
                 </div>
                 <div>
                   <p className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100 sm:text-4xl">
-                    250k+
+                    10k+
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 sm:text-lg">
                     Orders
@@ -251,9 +251,9 @@ export default async function HomePage({ searchParams }: PageProps) {
               </div>
             </div>
 
-            <div className="py-2 sm:py-4">
+            {/* <div className="py-2 sm:py-4">
               <NewsInlineCarousel items={newsItems} />
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
@@ -309,7 +309,7 @@ export default async function HomePage({ searchParams }: PageProps) {
       </section>
 
       {/* Page Banner */}
-      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg:zinc-950">
+      {/* <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg:zinc-950">
         <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             {categorySlug 
@@ -323,22 +323,22 @@ export default async function HomePage({ searchParams }: PageProps) {
         </div>
 
         {/* Category Tiles - Full width */}
-        <div className="mt-6">
+        {/* <div className="mt-6">
           <CategoryTiles
             categories={categories}
             activeCategory={categorySlug || undefined}
           />
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <ProductSection
           categories={categories}
           products={dedupedProducts}
           searchQuery={searchQuery}
           enableScrollableProductPane
         />
-      </div>
+      </div> */}
 
       <section className="border-t border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">

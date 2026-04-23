@@ -12,7 +12,7 @@ export function ServiceContactActions() {
       <Button
         onClick={() =>
           openChatWithMessage(
-            "Hi, I need scientific support for a custom project. Can you help me scope assay format, target, and timeline?",
+            "__SBB_SUPPORT_INTAKE__",
           )
         }
         className="bg-gradient-to-r from-sky-400 to-blue-600 text-white hover:from-sky-500 hover:to-blue-700"
