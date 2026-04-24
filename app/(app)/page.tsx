@@ -135,6 +135,58 @@ export default async function HomePage({ searchParams }: PageProps) {
     query: FEATURED_PRODUCTS_QUERY,
   });
 
+  // Fetch full product list for the New Products spotlight section.
+  const { data: allProductsForSpotlight } = await sanityFetch({
+    query: FILTER_PRODUCTS_BY_NAME_QUERY,
+    params: {
+      searchQuery: "",
+      categorySlug: "",
+      subcategorySlug: "",
+      color: "",
+      material: "",
+      minPrice: 0,
+      maxPrice: 0,
+      inStock: false,
+    },
+  });
+
+  const spotlightProductMatchers = [
+    {
+      label: "26S Proteasome (HEK 293)",
+      matches: (name: string) =>
+        name.includes("26s proteasome") &&
+        (name.includes("hek 293") || name.includes("hek293")),
+    },
+    {
+      label: "DDB1/Cereblon (CRBN)",
+      matches: (name: string) =>
+        name.includes("ddb1") &&
+        (name.includes("cereblon") || name.includes("crbn")),
+    },
+    {
+      label: "Skp1/His6-Skp2",
+      matches: (name: string) => name.includes("skp1") && name.includes("skp2"),
+    },
+    {
+      label: "UBE3A-His8 (E6AP)",
+      matches: (name: string) => name.includes("ube3a") && name.includes("e6ap"),
+    },
+  ] as const;
+
+  const spotlightProducts = spotlightProductMatchers
+    .map((matcher) => {
+      const product = allProductsForSpotlight.find(
+        (candidate: (typeof allProductsForSpotlight)[number]) =>
+          matcher.matches((candidate.name ?? "").toLowerCase()),
+      );
+
+      return {
+        displayLabel: matcher.label,
+        product,
+      };
+    })
+    .filter((item) => Boolean(item.displayLabel));
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {/* Featured Products Carousel */}
@@ -339,6 +391,93 @@ export default async function HomePage({ searchParams }: PageProps) {
           enableScrollableProductPane
         />
       </div> */}
+
+      <section className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
+                New
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100 sm:text-4xl">
+                New Products
+              </h2>
+              <p className="mt-2 text-zinc-600 dark:text-zinc-300">
+                Recently highlighted additions to our recombinant protein catalog.
+              </p>
+            </div>
+
+            <Link
+              href="/shop-all"
+              className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-200 dark:hover:bg-blue-900/40"
+            >
+              Shop All
+            </Link>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {spotlightProducts.map((product) => {
+              const matchedProduct = product.product;
+              const primaryImage =
+                matchedProduct?.images?.[0]?.asset?.url ??
+                matchedProduct?.image?.asset?.url ??
+                null;
+
+              return (
+                <article
+                  key={product.displayLabel}
+                  className="group overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 transition-colors hover:border-blue-300 dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  <Link
+                    href={
+                      matchedProduct
+                        ? `/products/${normalizeSlug(matchedProduct.slug)}`
+                        : "/shop-all"
+                    }
+                  >
+                    <div className="relative aspect-square w-full bg-white dark:bg-zinc-950">
+                      {primaryImage ? (
+                        <Image
+                          src={primaryImage}
+                          alt={matchedProduct?.name ?? product.displayLabel}
+                          fill
+                          className="object-contain p-4"
+                          sizes="(max-width: 1280px) 50vw, 25vw"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-zinc-500 dark:text-zinc-400">
+                          No image available
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="space-y-2 p-4">
+                    <p className="inline-flex w-fit items-center rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">
+                      New Product
+                    </p>
+                    <Link
+                      href={
+                        matchedProduct
+                          ? `/products/${normalizeSlug(matchedProduct.slug)}`
+                          : "/shop-all"
+                      }
+                      className="block text-base font-semibold text-zinc-900 transition-colors group-hover:text-blue-700 dark:text-zinc-100 dark:group-hover:text-blue-300"
+                    >
+                      {product.displayLabel}
+                    </Link>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                      {matchedProduct?.description
+                        ? matchedProduct.description.slice(0, 110)
+                        : "Explore product details, specifications, and availability."}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
       <section className="border-t border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">

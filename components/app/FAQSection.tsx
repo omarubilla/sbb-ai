@@ -97,6 +97,15 @@ function AccordionItem({ item, isOpen, onToggle }: AccordionItemProps) {
 
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [showAll, setShowAll] = useState(false);
+  const visibleItems = showAll ? faqItems : faqItems.slice(0, 4);
+
+  const handleToggleShowAll = () => {
+    if (showAll && openIndex !== null && openIndex >= 4) {
+      setOpenIndex(null);
+    }
+    setShowAll((current) => !current);
+  };
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -110,7 +119,7 @@ export function FAQSection() {
       </div>
 
       <div className="mx-auto max-w-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 rounded-lg overflow-hidden shadow-sm">
-        {faqItems.map((item, index) => (
+        {visibleItems.map((item, index) => (
           <AccordionItem
             key={index}
             item={item}
@@ -121,6 +130,23 @@ export function FAQSection() {
           />
         ))}
       </div>
+
+      {faqItems.length > 4 && (
+        <div className="mt-4 flex justify-center">
+          <button
+            type="button"
+            onClick={handleToggleShowAll}
+            className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900"
+          >
+            {showAll ? "Show fewer questions" : "Show more questions"}
+            <ChevronDown
+              className={`h-4 w-4 text-blue-600 transition-transform dark:text-blue-400 ${
+                showAll ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+        </div>
+      )}
 
       {/* Structured Data (JSON-LD) */}
       <script

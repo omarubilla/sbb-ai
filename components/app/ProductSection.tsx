@@ -14,6 +14,7 @@ import type {
 interface ProductSectionProps {
   categories: ALL_CATEGORIES_QUERYResult;
   products: FILTER_PRODUCTS_BY_NAME_QUERYResult;
+  allFilterProducts?: FILTER_PRODUCTS_BY_NAME_QUERYResult;
   searchQuery: string;
   variant?: "grid" | "category-list";
   basePath?: string;
@@ -24,6 +25,7 @@ interface ProductSectionProps {
 export function ProductSection({
   categories,
   products,
+  allFilterProducts,
   searchQuery,
   variant = "grid",
   basePath = "/",
@@ -32,6 +34,7 @@ export function ProductSection({
 }: ProductSectionProps) {
   const [filtersOpen, setFiltersOpen] = useState(true);
   const isCategoryList = variant === "category-list";
+  const filterProductsSource = allFilterProducts ?? products;
 
   return (
     <div className="flex flex-col gap-6">
@@ -83,7 +86,7 @@ export function ProductSection({
           <div className="lg:sticky lg:top-28 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
             <ProductFilters
               categories={categories}
-              categoryProducts={products
+              categoryProducts={filterProductsSource
                 .filter((p) => p.name && p.slug)
                 .map((p) => ({
                   name: p.name,
