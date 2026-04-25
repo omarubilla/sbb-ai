@@ -33,6 +33,7 @@ interface ProductFiltersProps {
   basePath?: string;
   hideCategorySelect?: boolean;
   lockedCategorySlug?: string;
+  largeTypography?: boolean;
 }
 
 const PROTEASOME_PRODUCT_ORDER: Record<string, string[]> = {
@@ -147,6 +148,7 @@ export function ProductFilters({
   basePath = "/",
   hideCategorySelect = false,
   lockedCategorySlug,
+  largeTypography = false,
 }: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -321,7 +323,7 @@ export function ProductFilters({
   }) => (
     <div className="mb-2 flex items-center justify-between">
       <span
-        className={`block text-sm font-medium ${
+        className={`block ${largeTypography ? "text-base" : "text-sm"} font-medium ${
           isActive
             ? "text-zinc-900 dark:text-zinc-100"
             : "text-zinc-700 dark:text-zinc-300"
@@ -348,7 +350,11 @@ export function ProductFilters({
   );
 
   return (
-    <div className="space-y-6 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+    <div
+      className={`rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 ${
+        largeTypography ? "space-y-7 p-7" : "space-y-6 p-6"
+      }`}
+    >
       {/* Clear Filters - Show at top when active */}
       {hasActiveFilters && (
         <div className="rounded-lg border-2 border-teal-300 bg-teal-50 p-3 dark:border-teal-700 dark:bg-teal-950">
@@ -379,13 +385,13 @@ export function ProductFilters({
             name="search"
             placeholder="Search products..."
             defaultValue={currentSearch}
-            className={`flex-1 ${
+            className={`flex-1 ${largeTypography ? "h-11 text-base" : ""} ${
               isSearchActive
                 ? "border-teal-500 ring-1 ring-teal-500 dark:border-teal-400 dark:ring-teal-400"
                 : ""
             }`}
           />
-          <Button type="submit" size="sm">
+          <Button type="submit" size={largeTypography ? "default" : "sm"}>
             Search
           </Button>
         </form>
@@ -416,7 +422,7 @@ export function ProductFilters({
                 <button
                   type="button"
                   onClick={() => navigateToCategoryPage(category.slug)}
-                  className={`w-full rounded-md px-2 py-1 text-left text-sm font-semibold transition-colors ${
+                  className={`w-full rounded-md px-2 ${largeTypography ? "py-1.5 text-base" : "py-1 text-sm"} text-left font-semibold transition-colors ${
                     categoryIsCurrentPage
                       ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
                       : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
@@ -426,7 +432,7 @@ export function ProductFilters({
                 </button>
 
                 {categorySubcategories.length > 0 && (
-                  <div className="space-y-1 pl-3">
+                  <div className={`pl-3 ${largeTypography ? "space-y-1.5" : "space-y-1"}`}>
                     {categorySubcategories.map((subcategory) => {
                       const subcategoryIsActive =
                         currentSubcategory === subcategory.slug;
@@ -464,7 +470,10 @@ export function ProductFilters({
                         : [];
 
                       return (
-                        <div key={subcategory._id} className="space-y-0.5">
+                        <div
+                          key={subcategory._id}
+                          className={largeTypography ? "space-y-1" : "space-y-0.5"}
+                        >
                           <button
                             type="button"
                             onClick={() =>
@@ -473,7 +482,7 @@ export function ProductFilters({
                                 subcategory.slug,
                               )
                             }
-                            className={`w-full rounded-md px-2 py-1 text-left text-sm transition-colors ${
+                            className={`w-full rounded-md px-2 ${largeTypography ? "py-1.5 text-[15px]" : "py-1 text-sm"} text-left transition-colors ${
                               subcategoryIsActive
                                 ? "bg-teal-100 text-teal-900 dark:bg-teal-900/40 dark:text-teal-100"
                                 : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
@@ -483,12 +492,20 @@ export function ProductFilters({
                           </button>
 
                           {subcategoryProducts.length > 0 && (
-                            <div className="space-y-0.5 pl-3">
+                            <div
+                              className={`pl-3 ${
+                                largeTypography ? "space-y-1" : "space-y-0.5"
+                              }`}
+                            >
                               {subcategoryProducts.map((product) => (
                                 <Link
                                   key={product.slug ?? product.name}
                                   href={`/products/${product.slug ?? ""}`}
-                                  className="block w-full truncate rounded-md px-2 py-1 text-xs text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                                  className={`block w-full rounded-md px-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 ${
+                                    largeTypography
+                                      ? "py-2 text-sm leading-5 whitespace-normal"
+                                      : "truncate py-1 text-xs"
+                                  }`}
                                 >
                                   {product.name}
                                 </Link>
@@ -646,7 +663,7 @@ export function ProductFilters({
             className="h-5 w-5 rounded border-zinc-300 text-amber-500 focus:ring-amber-500 dark:border-zinc-600 dark:bg-zinc-800"
           />
           <span
-            className={`text-sm font-medium ${
+            className={`${largeTypography ? "text-base" : "text-sm"} font-medium ${
               isInStockActive
                 ? "text-zinc-900 dark:text-zinc-100"
                 : "text-zinc-700 dark:text-zinc-300"
@@ -664,7 +681,9 @@ export function ProductFilters({
 
       {/* Sort */}
       <div>
-        <span className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <span
+          className={`mb-2 block ${largeTypography ? "text-base" : "text-sm"} font-medium text-zinc-700 dark:text-zinc-300`}
+        >
           Sort By
         </span>
         {selectsReady ? (

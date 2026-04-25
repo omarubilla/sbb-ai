@@ -111,6 +111,9 @@ export default async function ShopAllPage({ searchParams }: PageProps) {
           allFilterProducts={allProducts}
           searchQuery={searchQuery}
           basePath="/shop-all"
+          constrainFilterSidebar={false}
+          largeFilterSidebar
+          syncProductPaneToSidebar
         />
       </section>
     </div>

@@ -96,6 +96,11 @@ export function ProductCard({ product }: ProductCardProps) {
               Out of Stock
             </Badge>
           )}
+          {product.category?.slug === "e3-ligases" && (
+            <span className="absolute left-3 bottom-3 rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-white shadow-md">
+              New Arrival
+            </span>
+          )}
           {product.category && (
             <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-zinc-700 shadow-sm backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-300">
               {product.category.title}

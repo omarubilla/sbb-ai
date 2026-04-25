@@ -64,33 +64,45 @@ export async function CategoryPageTemplate({
     }
   };
 
-  const [{ data: category }, { data: categories }, { data: products }] =
-    await Promise.all([
-      sanityFetch({
-        query: CATEGORY_BY_SLUG_QUERY,
-        params: { slug },
-      }),
-      sanityFetch({
-        query: ALL_CATEGORIES_QUERY,
-      }),
-      sanityFetch({
-        query: getQuery(),
-        params: {
-          searchQuery,
-          categorySlug: slug,
-          subcategorySlug,
-          color,
-          material,
-          minPrice,
-          maxPrice,
-          inStock,
-        },
-      }),
-    ]);
+  const [{ data: category }, { data: categories }] = await Promise.all([
+    sanityFetch({
+      query: CATEGORY_BY_SLUG_QUERY,
+      params: { slug },
+    }),
+    sanityFetch({
+      query: ALL_CATEGORIES_QUERY,
+    }),
+  ]);
 
   if (!category) {
     notFound();
   }
+
+  // Ignore stale subcategory params when taxonomy slugs change in Sanity.
+  const currentCategory = categories.find((candidate) => candidate.slug === slug);
+  const validSubcategorySlugs = new Set(
+    (currentCategory?.subcategories ?? [])
+      .map((subcategory) => subcategory.slug)
+      .filter((slugValue): slugValue is string => Boolean(slugValue)),
+  );
+  const effectiveSubcategorySlug =
+    subcategorySlug && validSubcategorySlugs.has(subcategorySlug)
+      ? subcategorySlug
+      : "";
+
+  const { data: products } = await sanityFetch({
+    query: getQuery(),
+    params: {
+      searchQuery,
+      categorySlug: slug,
+      subcategorySlug: effectiveSubcategorySlug,
+      color,
+      material,
+      minPrice,
+      maxPrice,
+      inStock,
+    },
+  });
 
   const dedupedProducts: (typeof products)[number][] = Array.from(
     products

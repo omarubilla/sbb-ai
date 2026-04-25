@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PanelLeftClose, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductFilters } from "./ProductFilters";
@@ -20,6 +20,9 @@ interface ProductSectionProps {
   basePath?: string;
   lockedCategorySlug?: string;
   enableScrollableProductPane?: boolean;
+  constrainFilterSidebar?: boolean;
+  largeFilterSidebar?: boolean;
+  syncProductPaneToSidebar?: boolean;
 }
 
 export function ProductSection({
@@ -31,10 +34,39 @@ export function ProductSection({
   basePath = "/",
   lockedCategorySlug,
   enableScrollableProductPane = false,
+  constrainFilterSidebar = true,
+  largeFilterSidebar = false,
+  syncProductPaneToSidebar = false,
 }: ProductSectionProps) {
   const [filtersOpen, setFiltersOpen] = useState(true);
   const isCategoryList = variant === "category-list";
   const filterProductsSource = allFilterProducts ?? products;
+  const sidebarContentRef = useRef<HTMLDivElement | null>(null);
+  const [syncedPaneHeight, setSyncedPaneHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!syncProductPaneToSidebar || !filtersOpen) {
+      setSyncedPaneHeight(null);
+      return;
+    }
+
+    const target = sidebarContentRef.current;
+    if (!target) return;
+
+    const updateHeight = () => {
+      const nextHeight = Math.ceil(target.getBoundingClientRect().height);
+      setSyncedPaneHeight(nextHeight > 0 ? nextHeight : null);
+    };
+
+    updateHeight();
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [syncProductPaneToSidebar, filtersOpen]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -83,7 +115,14 @@ export function ProductSection({
             filtersOpen ? "w-full lg:w-72 lg:opacity-100" : "hidden lg:hidden"
           }`}
         >
-          <div className="lg:sticky lg:top-28 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
+          <div
+            ref={sidebarContentRef}
+            className={
+              constrainFilterSidebar
+                ? "lg:sticky lg:top-28 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
+                : "lg:pr-1"
+            }
+          >
             <ProductFilters
               categories={categories}
               categoryProducts={filterProductsSource
@@ -101,17 +140,30 @@ export function ProductSection({
               basePath={basePath}
               hideCategorySelect={Boolean(lockedCategorySlug)}
               lockedCategorySlug={lockedCategorySlug}
+              largeTypography={largeFilterSidebar}
             />
+
+            {syncProductPaneToSidebar && (
+              <div className="mt-4 border-b border-zinc-300 dark:border-zinc-700" />
+            )}
           </div>
         </aside>
 
         {/* Product Grid - expands to full width when filters hidden */}
         <main
           className={`min-w-0 flex-1 transition-all duration-300 ${
-            enableScrollableProductPane
+            enableScrollableProductPane || syncProductPaneToSidebar
               ? "lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
               : ""
           }`}
+          style={
+            syncProductPaneToSidebar && syncedPaneHeight
+              ? {
+                  maxHeight: `${syncedPaneHeight}px`,
+                  overflowY: "auto",
+                }
+              : undefined
+          }
         >
           {isCategoryList ? (
             <CategoryProductList products={products} />

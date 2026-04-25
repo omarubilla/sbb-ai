@@ -116,6 +116,11 @@ function CategoryProductRow({ product }: { product: Product }) {
 
       <div className="flex flex-col justify-center gap-3 lg:gap-4">
         <div className="space-y-2">
+          {product.category?.slug === "e3-ligases" && (
+            <p className="inline-flex w-fit items-center rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">
+              New Arrival
+            </p>
+          )}
           <Link href={`/products/${normalizeSlug(product.slug)}`} className="block">
             <h2 className="text-lg font-semibold tracking-tight text-zinc-950 transition-colors hover:text-sky-700 dark:text-zinc-100 dark:hover:text-sky-300 sm:text-xl">
               {product.name}
