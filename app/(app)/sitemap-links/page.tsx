@@ -18,16 +18,21 @@ function extractLocTags(xml: string): string[] {
 }
 
 async function fetchSitemapUrls(sitemapUrl: string): Promise<string[]> {
-  const response = await fetch(sitemapUrl, {
-    next: { revalidate: 3600 },
-  });
+  try {
+    const response = await fetch(sitemapUrl, {
+      next: { revalidate: 3600 },
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return [];
+    }
+
+    const xml = await response.text();
+    return extractLocTags(xml);
+  } catch (error) {
+    console.error("Failed to fetch sitemap:", sitemapUrl, error);
     return [];
   }
-
-  const xml = await response.text();
-  return extractLocTags(xml);
 }
 
 export default async function SitemapPage() {
