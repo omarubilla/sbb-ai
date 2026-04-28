@@ -10,7 +10,7 @@ const isProtectedRoute = createRouteMatcher([
   "/checkout/success",
 ]);
 
-const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
+const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)", "/dashboard(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (GONE_PATHS.has(req.nextUrl.pathname)) {
