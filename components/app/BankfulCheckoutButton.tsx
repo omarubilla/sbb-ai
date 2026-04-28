@@ -15,11 +15,13 @@ interface BankfulCheckoutButtonProps {
     institution: string;
     address: string;
   };
+  onBeforeCheckout?: () => Promise<void>;
 }
 
 export function BankfulCheckoutButton({
   disabled,
   customerInfo,
+  onBeforeCheckout,
 }: BankfulCheckoutButtonProps) {
   const router = useRouter();
   const items = useCartItems();
@@ -30,6 +32,14 @@ export function BankfulCheckoutButton({
     setError(null);
 
     startTransition(async () => {
+      if (onBeforeCheckout) {
+        try {
+          await onBeforeCheckout();
+        } catch {
+          // Non-fatal — proceed to checkout even if save fails
+        }
+      }
+
       const result = await createBankfulCheckoutSession({ items, customerInfo });
 
       if (result.success && result.url) {

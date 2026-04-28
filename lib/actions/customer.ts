@@ -148,3 +148,44 @@ export async function getCustomerProfile(): Promise<{
     address: addressParts.join(", "),
   };
 }
+
+/**
+ * Saves the customer's name, company, and shipping address back to their
+ * Sanity record. Called from the checkout form when signed in.
+ */
+export async function saveCustomerProfile(profile: {
+  fullName: string;
+  institution: string;
+  address: string;
+}): Promise<void> {
+  const { userId } = await auth();
+  if (!userId) return;
+
+  // Find the customer record (same lookup as getCustomerProfile)
+  let customer = await client.fetch(CUSTOMER_BY_CLERK_ID_QUERY, {
+    clerkUserId: userId,
+  });
+
+  if (!customer) {
+    const clerkUser = await currentUser();
+    const email =
+      clerkUser?.emailAddresses.find(
+        (e) => e.id === clerkUser.primaryEmailAddressId
+      )?.emailAddress ?? clerkUser?.emailAddresses[0]?.emailAddress;
+    if (email) {
+      customer = await client.fetch(CUSTOMER_BY_EMAIL_QUERY, { email });
+    }
+  }
+
+  if (!customer) return;
+
+  await writeClient
+    .patch(customer._id)
+    .set({
+      name: profile.fullName || undefined,
+      company: profile.institution || undefined,
+      // Store the full address string in streetAddress for easy retrieval
+      streetAddress: profile.address || undefined,
+    })
+    .commit({ visibility: "async" });
+}

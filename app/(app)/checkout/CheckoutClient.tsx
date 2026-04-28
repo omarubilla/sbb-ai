@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, ShoppingBag, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
@@ -15,7 +16,7 @@ import {
   useTotalItems,
 } from "@/lib/store/cart-store-provider";
 import { useCartStock } from "@/lib/hooks/useCartStock";
-import { getCustomerProfile } from "@/lib/actions/customer";
+import { getCustomerProfile, saveCustomerProfile } from "@/lib/actions/customer";
 
 interface CheckoutCustomerInfo {
   fullName: string;
@@ -26,6 +27,7 @@ interface CheckoutCustomerInfo {
 const DEFAULT_CUSTOMER_STORAGE_KEY = "checkout-default-customer";
 
 export function CheckoutClient() {
+  const router = useRouter();
   const items = useCartItems();
   const totalPrice = useTotalPrice();
   const totalItems = useTotalItems();
@@ -36,6 +38,7 @@ export function CheckoutClient() {
     institution: "",
     address: "",
   });
+  const [saveToAccount, setSaveToAccount] = useState(false);
 
   // On mount: if signed in, load from Sanity; otherwise fall back to localStorage
   useEffect(() => {
@@ -158,13 +161,14 @@ export function CheckoutClient() {
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <Link
-          href="/"
+        <button
+          type="button"
+          onClick={() => router.back()}
           className="inline-flex items-center text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Continue Shopping
-        </Link>
+          Back
+        </button>
         <h1 className="mt-4 text-3xl font-bold text-zinc-900 dark:text-zinc-100">
           Checkout
         </h1>
@@ -389,12 +393,31 @@ export function CheckoutClient() {
                 </div>
               </div>
 
+              {/* Save-to-account checkbox — only shown when signed in and form is complete */}
+              {isSignedIn && hasCompleteCustomerInfo && (
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700">
+                  <input
+                    type="checkbox"
+                    checked={saveToAccount}
+                    onChange={(e) => setSaveToAccount(e.target.checked)}
+                    className="h-4 w-4 rounded border-zinc-300 accent-sky-600"
+                  />
+                  <span className="text-zinc-700 dark:text-zinc-300">
+                    Save shipping address to my account
+                  </span>
+                </label>
+              )}
+
               {/* Stripe checkout temporarily disabled; keep Bankful as the only checkout path. */}
               {/* <CheckoutButton disabled={hasStockIssues || isLoading} /> */}
 
               <BankfulCheckoutButton
                 disabled={hasStockIssues || isLoading || !hasCompleteCustomerInfo}
                 customerInfo={customerInfo}
+                onBeforeCheckout={saveToAccount ? async () => {
+                  await saveCustomerProfile(customerInfo);
+                  toast.success("Shipping address saved to your account");
+                } : undefined}
               />
             </div>
 
