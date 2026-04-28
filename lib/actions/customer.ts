@@ -1,7 +1,7 @@
 "use server";
 
 import Stripe from "stripe";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { client, writeClient } from "@/sanity/lib/client";
 import {
   CUSTOMER_BY_EMAIL_QUERY,
