@@ -26,11 +26,11 @@ export default async function InvoicesPage() {
     errorMsg = err.message || "An unknown error occurred fetching invoices.";
   }
 
-  if (errorMsg) {
+  if (errorMsg || !invoices) {
     return (
       <div className="p-8 text-center text-red-500 bg-red-50 dark:bg-red-950 rounded-lg">
         <h2 className="text-xl font-bold">Error loading Invoices</h2>
-        <p className="mt-2 font-mono text-sm">{errorMsg}</p>
+        <p className="mt-2 font-mono text-sm">{errorMsg || "Failed to load data."}</p>
       </div>
     );
   }

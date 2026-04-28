@@ -25,11 +25,11 @@ export default async function PaymentsPage() {
     errorMsg = err.message || "An unknown error occurred fetching payments.";
   }
 
-  if (errorMsg) {
+  if (errorMsg || !payments) {
     return (
       <div className="p-8 text-center text-red-500 bg-red-50 dark:bg-red-950 rounded-lg">
         <h2 className="text-xl font-bold">Error loading Payments</h2>
-        <p className="mt-2 font-mono text-sm">{errorMsg}</p>
+        <p className="mt-2 font-mono text-sm">{errorMsg || "Failed to load data."}</p>
       </div>
     );
   }

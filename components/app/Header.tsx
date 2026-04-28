@@ -82,6 +82,11 @@ export function Header({ categories }: HeaderProps) {
           <Button variant="ghost" asChild className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100">
             <Link href="/distributors">Distributors</Link>
           </Button>
+          <SignedIn>
+            <Button variant="ghost" asChild className="text-sm font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300">
+              <Link href="/dashboard">Manage</Link>
+            </Button>
+          </SignedIn>
         </div>
 
         {/* Actions */}
