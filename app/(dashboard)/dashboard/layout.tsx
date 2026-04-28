@@ -11,7 +11,7 @@ import {
   BarChart3,
   ExternalLink,
 } from "lucide-react";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, ClerkProvider } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -38,8 +38,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      {/* Mobile Header */}
+    <ClerkProvider>
+      <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        {/* Mobile Header */}
       <div className="fixed left-0 right-0 top-0 z-50 flex h-14 items-center justify-between border-b border-zinc-200 bg-white px-4 dark:border-zinc-800 dark:bg-zinc-900 lg:hidden">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600">
@@ -153,5 +154,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="p-4 lg:p-8">{children}</div>
       </main>
     </div>
+    </ClerkProvider>
   );
 }
