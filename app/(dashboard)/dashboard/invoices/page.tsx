@@ -17,7 +17,23 @@ function formatDate(timestamp: number) {
 }
 
 export default async function InvoicesPage() {
-  const invoices = await getStripeInvoices();
+  let invoices = [];
+  let errorMsg = null;
+
+  try {
+    invoices = await getStripeInvoices();
+  } catch (err: any) {
+    errorMsg = err.message || "An unknown error occurred fetching invoices.";
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="p-8 text-center text-red-500 bg-red-50 dark:bg-red-950 rounded-lg">
+        <h2 className="text-xl font-bold">Error loading Invoices</h2>
+        <p className="mt-2 font-mono text-sm">{errorMsg}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8">

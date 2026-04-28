@@ -17,11 +17,28 @@ function formatDate(timestamp: number) {
 }
 
 export default async function AnalyticsPage() {
-  const balance = await getStripeBalance();
-  const transactions = await getStripeBalanceTransactions(20);
+  let balance;
+  let transactions;
+  let errorMsg = null;
 
-  const totalAvailable = balance.available.reduce((sum, b) => sum + b.amount, 0);
-  const totalPending = balance.pending.reduce((sum, b) => sum + b.amount, 0);
+  try {
+    balance = await getStripeBalance();
+    transactions = await getStripeBalanceTransactions(20);
+  } catch (err: any) {
+    errorMsg = err.message || "An unknown error occurred fetching Stripe data.";
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="p-8 text-center text-red-500 bg-red-50 dark:bg-red-950 rounded-lg">
+        <h2 className="text-xl font-bold">Error loading Stripe data</h2>
+        <p className="mt-2 font-mono text-sm">{errorMsg}</p>
+      </div>
+    );
+  }
+
+  const totalAvailable = balance.available.reduce((sum: any, b: any) => sum + b.amount, 0);
+  const totalPending = balance.pending.reduce((sum: any, b: any) => sum + b.amount, 0);
   const primaryCurrency = balance.available[0]?.currency || "usd";
 
   return (

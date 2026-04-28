@@ -16,7 +16,23 @@ function formatDate(timestamp: number) {
 }
 
 export default async function PaymentsPage() {
-  const payments = await getStripePayments();
+  let payments = [];
+  let errorMsg = null;
+
+  try {
+    payments = await getStripePayments();
+  } catch (err: any) {
+    errorMsg = err.message || "An unknown error occurred fetching payments.";
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="p-8 text-center text-red-500 bg-red-50 dark:bg-red-950 rounded-lg">
+        <h2 className="text-xl font-bold">Error loading Payments</h2>
+        <p className="mt-2 font-mono text-sm">{errorMsg}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8">
