@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import { generateText, gateway } from "ai";
 import { client } from "@/sanity/lib/client";
 import {
@@ -65,6 +66,11 @@ interface RevenuePeriod {
 }
 
 export async function GET() {
+  const { userId, sessionClaims } = await auth();
+  if (!userId || sessionClaims?.publicMetadata?.role !== "admin") {
+    return new Response("Forbidden", { status: 403 });
+  }
+
   try {
     // Calculate date ranges
     const now = new Date();

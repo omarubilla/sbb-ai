@@ -11,6 +11,7 @@ import {
   X,
   ExternalLink,
 } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
 import { Providers } from "@/components/providers/Providers";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -149,6 +150,12 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
               >
                 ← Back to Store
               </Link>
+              <div className="flex items-center gap-3 px-3 pt-1">
+                <UserButton afterSignOutUrl="/" />
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Signed in as admin
+                </span>
+              </div>
             </div>
           </div>
         </aside>
