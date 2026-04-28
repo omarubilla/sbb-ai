@@ -10,6 +10,9 @@ import {
   Menu,
   X,
   ExternalLink,
+  CreditCard,
+  Receipt,
+  BarChart3,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { Providers } from "@/components/providers/Providers";
@@ -31,6 +34,21 @@ const navItems = [
     label: "Orders",
     href: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    label: "Payments",
+    href: "/admin/payments",
+    icon: CreditCard,
+  },
+  {
+    label: "Invoices",
+    href: "/admin/invoices",
+    icon: Receipt,
+  },
+  {
+    label: "Analytics",
+    href: "/admin/analytics",
+    icon: BarChart3,
   },
 ];
 

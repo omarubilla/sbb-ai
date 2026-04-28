@@ -7,7 +7,7 @@ import { LOW_STOCK_THRESHOLD } from "@/lib/constants/stock";
 
 /** Common filter conditions for product filtering */
 const PRODUCT_FILTER_CONDITIONS = `
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && ($categorySlug == "" || category->slug.current == $categorySlug)
   && (
     $subcategorySlug == ""
@@ -127,7 +127,7 @@ const RELEVANCE_SCORE = `score(
  * Used on landing page
  */
 export const ALL_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
 ] | order(name asc) {
   _id,
   name,
@@ -159,7 +159,7 @@ export const ALL_PRODUCTS_QUERY = defineQuery(`*[
  * Get featured products for homepage carousel
  */
 export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && stock > 0
   && featured == true
 ] | order(name asc) [0...60] {
@@ -188,7 +188,7 @@ export const FEATURED_PRODUCTS_QUERY = defineQuery(`*[
  * Get products by category slug
  */
 export const PRODUCTS_BY_CATEGORY_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && category->slug.current == $categorySlug
 ] | order(name asc) {
   _id,
@@ -217,7 +217,7 @@ export const PRODUCTS_BY_CATEGORY_QUERY = defineQuery(`*[
  * Used on product detail page
  */
 export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && (slug.current == $slug || slug.current == "/" + $slug)
 ][0] {
   _id,
@@ -272,7 +272,7 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`*[
  * Orders by relevance score descending
  */
 export const SEARCH_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && (
     name match $searchQuery + "*"
     || description match $searchQuery + "*"
@@ -340,7 +340,7 @@ export const FILTER_PRODUCTS_BY_RELEVANCE_QUERY = defineQuery(
  * Get products by IDs (for cart/checkout)
  */
 export const PRODUCTS_BY_IDS_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && _id in $ids
 ] {
   _id,
@@ -362,7 +362,7 @@ export const PRODUCTS_BY_IDS_QUERY = defineQuery(`*[
  * Uses LOW_STOCK_THRESHOLD constant for consistency
  */
 export const LOW_STOCK_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && stock > 0
   && stock <= ${LOW_STOCK_THRESHOLD}
 ] | order(stock asc) {
@@ -382,7 +382,7 @@ export const LOW_STOCK_PRODUCTS_QUERY = defineQuery(`*[
  * Get out of stock products (admin)
  */
 export const OUT_OF_STOCK_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && stock == 0
 ] | order(name asc) {
   _id,
@@ -406,7 +406,7 @@ export const OUT_OF_STOCK_PRODUCTS_QUERY = defineQuery(`*[
  * Full-featured search with all filters and product details
  */
 export const AI_SEARCH_PRODUCTS_QUERY = defineQuery(`*[
-  _type == "product"
+  _type == "product" && !(name match "Bankful Test*")
   && (
     $searchQuery == ""
     || name match $searchQuery + "*"
