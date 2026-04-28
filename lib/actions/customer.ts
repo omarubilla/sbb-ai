@@ -1,8 +1,12 @@
 "use server";
 
 import Stripe from "stripe";
+import { auth } from "@clerk/nextjs/server";
 import { client, writeClient } from "@/sanity/lib/client";
-import { CUSTOMER_BY_EMAIL_QUERY } from "@/lib/sanity/queries/customers";
+import {
+  CUSTOMER_BY_EMAIL_QUERY,
+  CUSTOMER_BY_CLERK_ID_QUERY,
+} from "@/lib/sanity/queries/customers";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("STRIPE_SECRET_KEY is not defined");
@@ -83,5 +87,64 @@ export async function getOrCreateStripeCustomer(
   return {
     stripeCustomerId,
     sanityCustomerId: newSanityCustomer._id,
+  };
+}
+
+/**
+ * Returns the current signed-in user's Sanity customer profile,
+ * or null if not signed in or no record found.
+ * Used to pre-fill the checkout Customer Information form.
+ *
+ * Lookup order:
+ *  1. By clerkUserId (fastest, works for users linked via webhook)
+ *  2. By primary email (fallback for existing users whose record predates the webhook)
+ *     — if found by email, opportunistically stamps clerkUserId on the record
+ */
+export async function getCustomerProfile(): Promise<{
+  fullName: string;
+  institution: string;
+  address: string;
+} | null> {
+  const { userId } = await auth();
+  if (!userId) return null;
+
+  // 1. Try by clerkUserId first
+  let customer = await client.fetch(CUSTOMER_BY_CLERK_ID_QUERY, {
+    clerkUserId: userId,
+  });
+
+  // 2. Fallback: look up by email and link the account
+  if (!customer) {
+    const clerkUser = await currentUser();
+    const email = clerkUser?.emailAddresses.find(
+      (e) => e.id === clerkUser.primaryEmailAddressId
+    )?.emailAddress ?? clerkUser?.emailAddresses[0]?.emailAddress;
+
+    if (email) {
+      customer = await client.fetch(CUSTOMER_BY_EMAIL_QUERY, { email });
+      if (customer) {
+        // Opportunistically stamp clerkUserId so future lookups hit path 1
+        await writeClient
+          .patch(customer._id)
+          .set({ clerkUserId: userId })
+          .commit({ visibility: "async" });
+      }
+    }
+  }
+
+  if (!customer) return null;
+
+  const addressParts = [
+    customer.streetAddress,
+    customer.city,
+    customer.state,
+    customer.zip,
+    customer.country,
+  ].filter(Boolean);
+
+  return {
+    fullName: customer.name ?? "",
+    institution: customer.company ?? "",
+    address: addressParts.join(", "),
   };
 }

@@ -10,9 +10,17 @@ import { createBankfulCheckoutSession } from "@/lib/actions/bankful-checkout";
 
 interface BankfulCheckoutButtonProps {
   disabled?: boolean;
+  customerInfo: {
+    fullName: string;
+    institution: string;
+    address: string;
+  };
 }
 
-export function BankfulCheckoutButton({ disabled }: BankfulCheckoutButtonProps) {
+export function BankfulCheckoutButton({
+  disabled,
+  customerInfo,
+}: BankfulCheckoutButtonProps) {
   const router = useRouter();
   const items = useCartItems();
   const [isPending, startTransition] = useTransition();
@@ -22,7 +30,7 @@ export function BankfulCheckoutButton({ disabled }: BankfulCheckoutButtonProps) 
     setError(null);
 
     startTransition(async () => {
-      const result = await createBankfulCheckoutSession(items);
+      const result = await createBankfulCheckoutSession({ items, customerInfo });
 
       if (result.success && result.url) {
         router.push(result.url);

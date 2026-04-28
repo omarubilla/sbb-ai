@@ -8,6 +8,8 @@ export const customerType = defineType({
   icon: UserIcon,
   groups: [
     { name: "details", title: "Customer Details", default: true },
+    { name: "address", title: "Address" },
+    { name: "billing", title: "Billing" },
     { name: "stripe", title: "Stripe" },
   ],
   fields: [
@@ -24,10 +26,75 @@ export const customerType = defineType({
       description: "Customer's full name",
     }),
     defineField({
+      name: "phone",
+      type: "string",
+      group: "details",
+    }),
+    defineField({
+      name: "company",
+      type: "string",
+      group: "details",
+    }),
+    defineField({
       name: "clerkUserId",
       type: "string",
       group: "details",
       description: "Clerk user ID for authentication",
+    }),
+    defineField({
+      name: "wixCustomerId",
+      type: "string",
+      group: "details",
+      description: "Original Wix customer ID",
+    }),
+    defineField({
+      name: "customerSince",
+      type: "datetime",
+      group: "details",
+      description: "Date customer account was created",
+    }),
+    defineField({
+      name: "streetAddress",
+      type: "string",
+      group: "address",
+      description: "Street address line",
+    }),
+    defineField({
+      name: "city",
+      type: "string",
+      group: "address",
+    }),
+    defineField({
+      name: "state",
+      type: "string",
+      group: "address",
+      description: "State or province",
+    }),
+    defineField({
+      name: "zip",
+      type: "string",
+      group: "address",
+    }),
+    defineField({
+      name: "country",
+      type: "string",
+      group: "address",
+    }),
+    defineField({
+      name: "billingFirstName",
+      type: "string",
+      group: "billing",
+    }),
+    defineField({
+      name: "billingLastName",
+      type: "string",
+      group: "billing",
+    }),
+    defineField({
+      name: "billingAddress",
+      type: "string",
+      group: "billing",
+      description: "Full billing address string",
     }),
     defineField({
       name: "stripeCustomerId",
@@ -35,9 +102,6 @@ export const customerType = defineType({
       group: "stripe",
       readOnly: true,
       description: "Stripe customer ID for payments",
-      validation: (rule) => [
-        rule.required().error("Stripe customer ID is required"),
-      ],
     }),
     defineField({
       name: "createdAt",
@@ -51,14 +115,12 @@ export const customerType = defineType({
     select: {
       email: "email",
       name: "name",
-      stripeCustomerId: "stripeCustomerId",
+      company: "company",
     },
-    prepare({ email, name, stripeCustomerId }) {
+    prepare({ email, name, company }) {
       return {
         title: name ?? email ?? "Unknown Customer",
-        subtitle: stripeCustomerId
-          ? `${email ?? ""} • ${stripeCustomerId}`
-          : (email ?? ""),
+        subtitle: company ? `${company} • ${email ?? ""}` : (email ?? ""),
       };
     },
   },

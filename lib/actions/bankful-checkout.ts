@@ -16,6 +16,12 @@ interface CartItem {
   image?: string;
 }
 
+interface CheckoutCustomerInfo {
+  fullName: string;
+  institution: string;
+  address: string;
+}
+
 interface CheckoutResult {
   success: boolean;
   url?: string;
@@ -59,8 +65,12 @@ function buildBankfulSignature(
 // ---------- Server action ----------
 
 export async function createBankfulCheckoutSession(
-  items: CartItem[]
+  payload: {
+    items: CartItem[];
+    customerInfo: CheckoutCustomerInfo;
+  }
 ): Promise<CheckoutResult> {
+  const { items, customerInfo } = payload;
   const bankfulBaseUrl = process.env.BANKFUL_API_BASE_URL;
   const bankfulUsername = process.env.BANKFUL_USERNAME;
   const bankfulPassword = process.env.BANKFUL_PASSWORD;
@@ -131,6 +141,17 @@ export async function createBankfulCheckoutSession(
       return { success: false, error: validationErrors.join(". ") };
     }
 
+    const fullName = customerInfo.fullName?.trim() ?? "";
+    const institution = customerInfo.institution?.trim() ?? "";
+    const addressLine = customerInfo.address?.trim() ?? "";
+
+    if (!fullName || !institution || !addressLine) {
+      return {
+        success: false,
+        error: "Please complete name, institution/company, and address before checkout.",
+      };
+    }
+
     // 4. Compute total
     const total = validatedItems.reduce(
       (sum, { product, quantity }) => sum + (product.price ?? 0) * quantity,
@@ -197,6 +218,11 @@ export async function createBankfulCheckoutSession(
       orderNumber,
       clerkUserId: userId,
       email: userEmail,
+      address: {
+        name: fullName,
+        line1: addressLine,
+        line2: institution,
+      },
       items: validatedItems.map((item, index) => ({
         _key: `item-${index}`,
         product: { _type: "reference" as const, _ref: item.product._id },
