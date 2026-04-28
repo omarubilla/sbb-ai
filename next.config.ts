@@ -4,7 +4,8 @@ import type { NextConfig } from "next";
 const CLERK_DOMAIN = "https://clerk.south-bay-bio.com";
 
 const sharedCsp = {
-  connectSrc: `connect-src 'self' ${CLERK_DOMAIN} https://*.sanity.io wss://*.sanity.io`,
+  connectSrc: `connect-src 'self' ${CLERK_DOMAIN} https://accounts.south-bay-bio.com https://*.sanity.io wss://*.sanity.io`,
+  workerSrc: "worker-src 'self' blob:",
   frameSrc: `frame-src ${CLERK_DOMAIN} https://challenges.cloudflare.com`,
   imgSrc: "img-src 'self' data: blob: https://img.clerk.com https://cdn.sanity.io https://static.wixstatic.com https://images.unsplash.com https://lh3.googleusercontent.com https://avatars.githubusercontent.com",
   styleSrc: "style-src 'self' 'unsafe-inline'",
