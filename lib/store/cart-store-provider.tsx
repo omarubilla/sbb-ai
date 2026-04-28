@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { useStore } from "zustand";
+import { useAuth } from "@clerk/nextjs";
 import {
   createCartStore,
   type CartStore,
@@ -25,6 +26,26 @@ const CartStoreContext = createContext<CartStoreApi | undefined>(undefined);
 interface CartStoreProviderProps {
   children: ReactNode;
   initialState?: CartState;
+}
+
+/**
+ * Clears the cart when the user signs out.
+ * Must be rendered inside both ClerkProvider and CartStoreProvider.
+ */
+function CartAuthSync() {
+  const { isSignedIn } = useAuth();
+  const { clearCart } = useCartActions();
+  const prevSignedIn = useRef<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    // Only clear when transitioning from signed-in → signed-out
+    if (prevSignedIn.current === true && isSignedIn === false) {
+      clearCart();
+    }
+    prevSignedIn.current = isSignedIn;
+  }, [isSignedIn, clearCart]);
+
+  return null;
 }
 
 /**
@@ -51,6 +72,7 @@ export const CartStoreProvider = ({
 
   return (
     <CartStoreContext.Provider value={storeRef.current}>
+      <CartAuthSync />
       {children}
     </CartStoreContext.Provider>
   );
