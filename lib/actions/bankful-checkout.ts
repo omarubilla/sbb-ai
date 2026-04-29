@@ -26,6 +26,7 @@ interface CheckoutResult {
   success: boolean;
   url?: string;
   error?: string;
+  warning?: string;
 }
 
 function isPublicHttpsUrl(value: string): boolean {
@@ -60,6 +61,64 @@ function buildBankfulSignature(
     .map((k) => `${k}${params[k]}`)
     .join("");
   return createHmac("sha256", signingKey).update(payload).digest("hex");
+}
+
+async function sendPayLinkInvoiceEmail(payload: {
+  to: string;
+  invoiceNumber: string;
+  amount: number;
+  paymentUrl: string;
+}): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const fromEmail =
+    process.env.PAYLINK_EMAIL_FROM ?? process.env.SUPPORT_EMAIL_FROM;
+
+  if (!resendApiKey || !fromEmail) {
+    return {
+      ok: false,
+      reason:
+        "Missing RESEND_API_KEY or sender email (PAYLINK_EMAIL_FROM/SUPPORT_EMAIL_FROM).",
+    };
+  }
+
+  const subject = `Invoice ${payload.invoiceNumber} - South Bay Bio`;
+  const text = [
+    "Hello,",
+    "",
+    "Your invoice is ready.",
+    `Invoice: ${payload.invoiceNumber}`,
+    `Amount due: $${payload.amount.toFixed(2)} USD`,
+    "",
+    `Pay now: ${payload.paymentUrl}`,
+    "",
+    "If you have any questions, reply to this email.",
+    "",
+    "South Bay Bio",
+  ].join("\n");
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: fromEmail,
+      to: [payload.to],
+      subject,
+      text,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return {
+      ok: false,
+      reason: `Resend error (${response.status}): ${errorText}`,
+    };
+  }
+
+  return { ok: true };
 }
 
 // ---------- Server action ----------
@@ -289,3 +348,147 @@ export async function createBankfulCheckoutSession(
   }
 }
 
+export async function createBankfulPayLink(
+  payload: {
+    amount: number;
+    description: string;
+    customerEmail?: string;
+  }
+): Promise<CheckoutResult> {
+  const { amount, description, customerEmail } = payload;
+  const bankfulBaseUrl = process.env.BANKFUL_API_BASE_URL;
+  const bankfulUsername = process.env.BANKFUL_USERNAME;
+  const bankfulPassword = process.env.BANKFUL_PASSWORD;
+
+  if (!bankfulBaseUrl || !bankfulUsername || !bankfulPassword) {
+    return {
+      success: false,
+      error: "Bankful payment provider is not fully configured.",
+    };
+  }
+
+  try {
+    // 1. Verify this action is only used by the single allowed dashboard admin.
+    const { userId } = await auth();
+    const user = await currentUser();
+    const allowedEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const allowedFirstName =
+      process.env.ADMIN_FIRST_NAME?.trim().toLowerCase() ?? "carsten";
+
+    const primaryEmail =
+      user?.emailAddresses.find((address) => address.id === user.primaryEmailAddressId)
+        ?.emailAddress ?? user?.emailAddresses[0]?.emailAddress;
+    const isAuthorized =
+      Boolean(userId) &&
+      Boolean(allowedEmail) &&
+      primaryEmail?.trim().toLowerCase() === allowedEmail &&
+      (user?.firstName?.trim().toLowerCase() ?? "") === allowedFirstName;
+
+    if (!isAuthorized) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    if (amount <= 0) {
+      return { success: false, error: "Amount must be greater than zero." };
+    }
+
+    // Determine callback base URL
+    let selectedBaseUrl = process.env.BANKFUL_CALLBACK_BASE_URL;
+    if (!selectedBaseUrl || !isPublicHttpsUrl(selectedBaseUrl)) {
+      if (process.env.NODE_ENV === "production") {
+        return {
+          success: false,
+          error: "Production requires BANKFUL_CALLBACK_BASE_URL to be a valid public HTTPS URL.",
+        };
+      }
+      // Fallback for local dev: Bankful AWS WAF blocks any request containing "localhost".
+      // We must use a mock production URL to successfully generate a Pay Link locally.
+      selectedBaseUrl = "https://southbaybio.com";
+    }
+
+    const baseUrl = new URL(selectedBaseUrl).origin;
+
+    // Generate correlation ID
+    const orderNumber = `INV-${Date.now().toString(36).toUpperCase()}-${Math.random()
+      .toString(36)
+      .substring(2, 6)
+      .toUpperCase()}`;
+
+    // Build Bankful params
+    const params: Record<string, string> = {
+      req_username: bankfulUsername,
+      req_password: bankfulPassword,
+      transaction_type: "SALE",
+      amount: amount.toFixed(2),
+      request_currency: "USD",
+      xtl_order_id: orderNumber,
+      url_complete: `${baseUrl}/checkout/success/bankful`,
+      url_callback: `${baseUrl}/api/webhooks/bankful`,
+      return_redirect_url: "Y",
+    };
+
+    // Sign request
+    params.signature = buildBankfulSignature(params, bankfulPassword);
+
+    // Hit Bankful API
+    const response = await fetch(
+      `${bankfulBaseUrl}/front-calls/go-in/hosted-page-pay`,
+      {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+          "Accept": "application/json"
+        },
+        body: new URLSearchParams(params).toString(),
+      }
+    );
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("Bankful API error (Pay Link):", response.status, text);
+      return { success: false, error: `Bankful Error (${response.status}): ${text}` };
+    }
+
+    const data = (await response.json()) as { redirect_url?: string };
+
+    if (!data.redirect_url) {
+      return { success: false, error: `Bankful returned success but no redirect_url. Response: ${JSON.stringify(data)}` };
+    }
+
+    // Save to Sanity so the merchant can see it on the dashboard
+    await writeClient.create({
+      _type: "paymentLink",
+      invoiceNumber: description,
+      amount: amount,
+      url: data.redirect_url,
+      status: "active",
+      customerEmail: customerEmail || "",
+      createdAt: new Date().toISOString(),
+    });
+
+    if (customerEmail) {
+      const emailResult = await sendPayLinkInvoiceEmail({
+        to: customerEmail,
+        invoiceNumber: description,
+        amount,
+        paymentUrl: data.redirect_url,
+      });
+
+      if (!emailResult.ok) {
+        console.error("Pay link email send failed:", emailResult.reason);
+        return {
+          success: true,
+          url: data.redirect_url,
+          warning:
+            "Payment link created, but invoice email could not be sent. You can copy and send the link manually.",
+        };
+      }
+    }
+
+    return { success: true, url: data.redirect_url };
+  } catch (error) {
+    console.error("Bankful pay link error:", error);
+    return { success: false, error: "Something went wrong generating the link." };
+  }
+}

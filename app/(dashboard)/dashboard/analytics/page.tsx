@@ -1,6 +1,7 @@
 import { getStripeBalance, getStripeBalanceTransactions } from "@/lib/actions/stripe-admin";
 import Stripe from "stripe";
-import { DollarSign, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
+import { DollarSign, ArrowUpRight, ArrowDownRight, Activity, Wallet } from "lucide-react";
+import { TrafficChart } from "@/components/admin/TrafficChart";
 
 function formatCurrency(amount: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -23,16 +24,21 @@ export default async function AnalyticsPage() {
 
   try {
     balance = await getStripeBalance();
-    transactions = await getStripeBalanceTransactions(20);
+    transactions = await getStripeBalanceTransactions(30);
   } catch (err: any) {
     errorMsg = err.message || "An unknown error occurred fetching Stripe data.";
   }
 
   if (errorMsg || !balance || !transactions) {
     return (
-      <div className="p-8 text-center text-red-500 bg-red-50 dark:bg-red-950 rounded-lg">
-        <h2 className="text-xl font-bold">Error loading Stripe data</h2>
-        <p className="mt-2 font-mono text-sm">{errorMsg || "Failed to load data."}</p>
+      <div className="flex h-[60vh] w-full items-center justify-center">
+        <div className="flex max-w-md flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center shadow-lg backdrop-blur-xl dark:border-red-900/30 dark:bg-red-950/20">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50">
+            <Activity className="h-8 w-8 text-red-600 dark:text-red-400" />
+          </div>
+          <h2 className="text-xl font-bold text-red-900 dark:text-red-100">Connection Error</h2>
+          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errorMsg || "Failed to establish a secure connection to Stripe."}</p>
+        </div>
       </div>
     );
   }
@@ -42,110 +48,53 @@ export default async function AnalyticsPage() {
   const primaryCurrency = balance.available[0]?.currency || "usd";
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-          Analytics
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+          Traffic & Revenue
         </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
-          Financial overview and Stripe balance.
+        <p className="mt-2 text-base text-zinc-500 dark:text-zinc-400">
+          Monitor your real-time financial metrics and payment flow.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {/* Available Balance */}
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/10">
-              <DollarSign className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-            </div>
+      <div className="grid gap-6 sm:grid-cols-2">
+        {/* Available Balance Card */}
+        <div className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/50 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:border-zinc-800/50 dark:bg-zinc-950/50">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-emerald-500/10 blur-2xl transition-all group-hover:bg-emerald-500/20" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Available Balance</p>
-              <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Available to Payout</p>
+              <h3 className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                 {formatCurrency(totalAvailable, primaryCurrency)}
               </h3>
             </div>
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg shadow-emerald-500/30">
+              <Wallet className="h-6 w-6" />
+            </div>
           </div>
         </div>
 
-        {/* Pending Balance */}
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-500/10">
-              <Activity className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-            </div>
+        {/* Pending Balance Card */}
+        <div className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/50 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:border-zinc-800/50 dark:bg-zinc-950/50">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-amber-500/10 blur-2xl transition-all group-hover:bg-amber-500/20" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Pending Balance</p>
-              <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Pending Clearance</p>
+              <h3 className="mt-2 text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                 {formatCurrency(totalPending, primaryCurrency)}
               </h3>
             </div>
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg shadow-amber-500/30">
+              <Activity className="h-6 w-6" />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-8">
-        <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-          Recent Transactions
-        </h2>
-        <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-zinc-600 dark:text-zinc-400">
-              <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase text-zinc-500 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-400">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Type</th>
-                  <th className="px-6 py-4 font-medium">Date</th>
-                  <th className="px-6 py-4 font-medium">Net Amount</th>
-                  <th className="px-6 py-4 font-medium">Fee</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                {transactions.map((tx) => {
-                  const isPositive = tx.net >= 0;
-                  return (
-                    <tr key={tx.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                      <td className="whitespace-nowrap px-6 py-4 font-medium text-zinc-900 dark:text-zinc-100 capitalize">
-                        {tx.type.replace(/_/g, " ")}
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-4">
-                        {formatDate(tx.created)}
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-4 font-medium">
-                        <span className={`flex items-center gap-1 ${isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-                          {isPositive ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                          {formatCurrency(Math.abs(tx.net), tx.currency)}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-4">
-                        {formatCurrency(tx.fee, tx.currency)}
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-4">
-                        <span
-                          className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                            tx.status === "available"
-                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
-                              : "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
-                          }`}
-                        >
-                          {tx.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {transactions.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-zinc-500">
-                      No transactions found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      {/* Main Chart */}
+      <TrafficChart transactions={transactions} primaryCurrency={primaryCurrency} />
+
     </div>
   );
 }
