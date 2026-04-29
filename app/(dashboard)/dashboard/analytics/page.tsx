@@ -2,6 +2,12 @@ import { getStripeBalance, getStripeBalanceTransactions } from "@/lib/actions/st
 import Stripe from "stripe";
 import { DollarSign, ArrowUpRight, ArrowDownRight, Activity, Wallet } from "lucide-react";
 import { TrafficChart } from "@/components/admin/TrafficChart";
+import { SeoControls } from "@/components/admin/SeoControls";
+import { client } from "@/sanity/lib/client";
+
+const SEO_META_QUERY = `{
+  "latestCheckedAt": *[_type == "product" && defined(seoLastCheckedAt)] | order(seoLastCheckedAt desc)[0].seoLastCheckedAt
+}`;
 
 function formatCurrency(amount: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -18,6 +24,14 @@ function formatDate(timestamp: number) {
 }
 
 export default async function AnalyticsPage() {
+  const seoMeta = await client.fetch<{ latestCheckedAt: string | null }>(SEO_META_QUERY);
+  const latestCheckedText = seoMeta.latestCheckedAt
+    ? new Intl.DateTimeFormat("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date(seoMeta.latestCheckedAt))
+    : "Not refreshed yet";
+
   let balance;
   let transactions;
   let errorMsg = null;
@@ -31,13 +45,33 @@ export default async function AnalyticsPage() {
 
   if (errorMsg || !balance || !transactions) {
     return (
-      <div className="flex h-[60vh] w-full items-center justify-center">
-        <div className="flex max-w-md flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center shadow-lg backdrop-blur-xl dark:border-red-900/30 dark:bg-red-950/20">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50">
-            <Activity className="h-8 w-8 text-red-600 dark:text-red-400" />
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+            Traffic & Revenue
+          </h1>
+          <p className="mt-2 text-base text-zinc-500 dark:text-zinc-400">
+            Monitor your real-time financial metrics and payment flow.
+          </p>
+        </div>
+
+        <section className="rounded-2xl border border-zinc-200/50 bg-white/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/50">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              SEO Controls
+            </h2>
           </div>
-          <h2 className="text-xl font-bold text-red-900 dark:text-red-100">Connection Error</h2>
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errorMsg || "Failed to establish a secure connection to Stripe."}</p>
+          <SeoControls initialLastRefresh={latestCheckedText} />
+        </section>
+
+        <div className="flex h-[35vh] w-full items-center justify-center">
+          <div className="flex max-w-md flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center shadow-lg backdrop-blur-xl dark:border-red-900/30 dark:bg-red-950/20">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50">
+              <Activity className="h-8 w-8 text-red-600 dark:text-red-400" />
+            </div>
+            <h2 className="text-xl font-bold text-red-900 dark:text-red-100">Connection Error</h2>
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errorMsg || "Failed to establish a secure connection to Stripe."}</p>
+          </div>
         </div>
       </div>
     );
@@ -57,6 +91,15 @@ export default async function AnalyticsPage() {
           Monitor your real-time financial metrics and payment flow.
         </p>
       </div>
+
+      <section className="rounded-2xl border border-zinc-200/50 bg-white/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/50">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            SEO Controls
+          </h2>
+        </div>
+        <SeoControls initialLastRefresh={latestCheckedText} />
+      </section>
 
       <div className="grid gap-6 sm:grid-cols-2">
         {/* Available Balance Card */}
