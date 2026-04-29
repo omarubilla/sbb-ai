@@ -103,11 +103,18 @@ export function TrafficChart({ transactions, primaryCurrency }: TrafficChartProp
             <Tooltip
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length && !isEmpty) {
+                  const rawValue = payload[0].value;
+                  const numericValue =
+                    typeof rawValue === "number" ? rawValue : Number(rawValue ?? 0);
+                  const displayValue = Number.isFinite(numericValue)
+                    ? numericValue.toFixed(2)
+                    : "0.00";
+
                   return (
                     <div className="rounded-lg border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
                       <p className="mb-1 text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
                       <p className="text-lg font-bold text-sky-600 dark:text-sky-400">
-                        ${payload[0].value?.toFixed(2)}
+                        ${displayValue}
                       </p>
                     </div>
                   );
