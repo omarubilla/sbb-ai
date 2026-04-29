@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { DollarSign, ArrowUpRight, ArrowDownRight, Activity, Wallet } from "lucide-react";
 import { TrafficChart } from "@/components/admin/TrafficChart";
 import { SeoControls } from "@/components/admin/SeoControls";
+import { SiteMetricsCards } from "@/components/admin/SiteMetricsCards";
 import { client } from "@/sanity/lib/client";
 
 const SEO_META_QUERY = `{
@@ -55,6 +56,8 @@ export default async function AnalyticsPage() {
           </p>
         </div>
 
+        <SiteMetricsCards />
+
         <section className="rounded-2xl border border-zinc-200/50 bg-white/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/50">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
@@ -91,6 +94,8 @@ export default async function AnalyticsPage() {
           Monitor your real-time financial metrics and payment flow.
         </p>
       </div>
+
+      <SiteMetricsCards />
 
       <section className="rounded-2xl border border-zinc-200/50 bg-white/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/50">
         <div className="mb-3 flex items-center justify-between">
