@@ -11,6 +11,7 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)", "/dashboard(.*)"]);
+const isSeoRefreshRoute = createRouteMatcher(["/api/admin/seo/refresh"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (GONE_PATHS.has(req.nextUrl.pathname)) {
@@ -21,6 +22,14 @@ export default clerkMiddleware(async (auth, req) => {
         "Cache-Control": "public, max-age=3600",
       },
     });
+  }
+
+  if (isSeoRefreshRoute(req)) {
+    const cronSecret = process.env.CRON_SECRET;
+    const authorization = req.headers.get("authorization");
+    if (cronSecret && authorization === `Bearer ${cronSecret}`) {
+      return;
+    }
   }
 
   if (isAdminRoute(req)) {

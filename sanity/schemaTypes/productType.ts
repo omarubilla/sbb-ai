@@ -10,6 +10,7 @@ export const productType = defineType({
     { name: "details", title: "Details", default: true },
     { name: "media", title: "Media" },
     { name: "inventory", title: "Inventory" },
+    { name: "seo", title: "SEO" },
   ],
   fields: [
     defineField({
@@ -221,6 +222,50 @@ export const productType = defineType({
       group: "inventory",
       initialValue: false,
       description: "Does this product require assembly?",
+    }),
+    defineField({
+      name: "seoRankSouthBayBio",
+      title: "South Bay Bio Google Rank",
+      type: "number",
+      group: "seo",
+      initialValue: 0,
+      validation: (rule) => [
+        rule.min(0).error("Rank must be 0 or greater"),
+        rule.integer().error("Rank must be a whole number"),
+      ],
+      description: "0 means not found in tracked search results.",
+    }),
+    defineField({
+      name: "seoRankUbpBio",
+      title: "UBP Bio Google Rank",
+      type: "number",
+      group: "seo",
+      initialValue: 0,
+      validation: (rule) => [
+        rule.min(0).error("Rank must be 0 or greater"),
+        rule.integer().error("Rank must be a whole number"),
+      ],
+      description: "0 means not found in tracked search results.",
+    }),
+    defineField({
+      name: "seoRankRdSystems",
+      title: "R&D Systems Google Rank",
+      type: "number",
+      group: "seo",
+      initialValue: 0,
+      validation: (rule) => [
+        rule.min(0).error("Rank must be 0 or greater"),
+        rule.integer().error("Rank must be a whole number"),
+      ],
+      description: "0 means not found in tracked search results.",
+    }),
+    defineField({
+      name: "seoLastCheckedAt",
+      title: "SEO Last Checked",
+      type: "datetime",
+      group: "seo",
+      readOnly: true,
+      description: "Last time SEO ranks were refreshed automatically.",
     }),
   ],
   preview: {
