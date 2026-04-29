@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, Package, ShoppingBag, Sparkles, Truck, User } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
 import { useChatActions, useIsChatOpen } from "@/lib/store/chat-store-provider";
@@ -31,6 +32,8 @@ const TOP_NAV_ORDER = [
 ] as const;
 
 export function Header({ categories }: HeaderProps) {
+  const { user } = useUser();
+  const isAdminUser = user?.publicMetadata?.role === "admin";
   const { openCart } = useCartActions();
   const { openChat } = useChatActions();
   const isChatOpen = useIsChatOpen();
@@ -82,9 +85,11 @@ export function Header({ categories }: HeaderProps) {
           <Button variant="ghost" asChild className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100">
             <Link href="/distributors">Distributors</Link>
           </Button>
-          <Button variant="ghost" asChild className="text-sm font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300">
-            <Link href="/dashboard">Manage</Link>
-          </Button>
+          {isAdminUser && (
+            <Button variant="ghost" asChild className="text-sm font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300">
+              <Link href="/dashboard">Manage</Link>
+            </Button>
+          )}
         </div>
 
         {/* Actions */}

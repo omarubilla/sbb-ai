@@ -368,23 +368,11 @@ export async function createBankfulPayLink(
   }
 
   try {
-    // 1. Verify this action is only used by the single allowed dashboard admin.
-    const { userId } = await auth();
-    const user = await currentUser();
-    const allowedEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-    const allowedFirstName =
-      process.env.ADMIN_FIRST_NAME?.trim().toLowerCase() ?? "carsten";
+    // 1. Verify only Clerk admins can generate pay links from dashboard.
+    const { userId, sessionClaims } = await auth();
+    const role = sessionClaims?.publicMetadata?.role;
 
-    const primaryEmail =
-      user?.emailAddresses.find((address) => address.id === user.primaryEmailAddressId)
-        ?.emailAddress ?? user?.emailAddresses[0]?.emailAddress;
-    const isAuthorized =
-      Boolean(userId) &&
-      Boolean(allowedEmail) &&
-      primaryEmail?.trim().toLowerCase() === allowedEmail &&
-      (user?.firstName?.trim().toLowerCase() ?? "") === allowedFirstName;
-
-    if (!isAuthorized) {
+    if (!userId || role !== "admin") {
       return { success: false, error: "Unauthorized" };
     }
 

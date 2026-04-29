@@ -1,7 +1,7 @@
 "use server";
 
 import Stripe from "stripe";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("STRIPE_SECRET_KEY is not defined");
@@ -12,26 +12,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 async function checkAdmin() {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   if (!userId) {
     throw new Error("Unauthorized");
   }
 
-  const user = await currentUser();
-  const allowedEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  const allowedFirstName =
-    process.env.ADMIN_FIRST_NAME?.trim().toLowerCase() ?? "carsten";
-
-  if (!allowedEmail) {
-    throw new Error("Forbidden: ADMIN_EMAIL not configured");
-  }
-
-  const primaryEmail =
-    user?.emailAddresses.find((address) => address.id === user.primaryEmailAddressId)
-      ?.emailAddress ?? user?.emailAddresses[0]?.emailAddress;
-  const firstName = user?.firstName?.trim().toLowerCase() ?? "";
-
-  if (primaryEmail?.trim().toLowerCase() !== allowedEmail || firstName !== allowedFirstName) {
+  const role = sessionClaims?.publicMetadata?.role;
+  if (role !== "admin") {
     throw new Error("Forbidden");
   }
 }
