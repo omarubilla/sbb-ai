@@ -1,0 +1,11 @@
+title = "Repo gitleaks config"
+
+[allowlist]
+description = "Allow obvious placeholders"
+regexes = [
+  '''Your_value_goes_here''',
+  '''example|sample|placeholder'''
+]
+paths = [
+  '''(^|/)\.env\.example$'''
+]

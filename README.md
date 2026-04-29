@@ -102,6 +102,21 @@ And store owners get:
 
 ## 🚀 Before We Dive In - Join the PAPAFAM!
 
+## Security Guardrails
+
+This repo includes a pre-commit secret scan using gitleaks.
+
+1. Install gitleaks:
+```bash
+brew install gitleaks
+```
+2. Enable repo hooks:
+```bash
+./scripts/setup-git-hooks.sh
+```
+
+The pre-commit hook scans staged changes and blocks commits if potential secrets are detected.
+
 **Want to build apps like this from scratch?**
 
 Join thousands of developers learning to build production-ready applications with the latest technologies.
