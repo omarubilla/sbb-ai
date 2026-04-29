@@ -9,9 +9,10 @@ import {
   CreditCard,
   Receipt,
   BarChart3,
+  Search,
   ExternalLink,
 } from "lucide-react";
-import { UserButton, ClerkProvider } from "@clerk/nextjs";
+import { UserButton, ClerkProvider, useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -31,14 +32,29 @@ const navItems = [
     href: "/dashboard/analytics",
     icon: BarChart3,
   },
+  {
+    label: "SEO",
+    href: "/dashboard/seo",
+    icon: Search,
+  },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
     <ClerkProvider>
+      <DashboardShell>{children}</DashboardShell>
+    </ClerkProvider>
+  );
+}
+
+function DashboardShell({ children }: { children: React.ReactNode }) {
+  const { user } = useUser();
+  const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const fallbackName = [user?.firstName, user?.lastName].filter(Boolean).join(" ");
+  const displayName = (user?.fullName ?? fallbackName) || "Dashboard User";
+
+  return (
       <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
         {/* Mobile Header */}
       <div className="fixed left-0 right-0 top-0 z-50 flex h-14 items-center justify-between border-b border-zinc-200 bg-white px-4 dark:border-zinc-800 dark:bg-zinc-900 lg:hidden">
@@ -142,7 +158,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-3 px-3 pt-1">
               <UserButton afterSignOutUrl="/" />
               <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                Dashboard User
+                {displayName}
               </span>
             </div>
           </div>
@@ -154,6 +170,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="p-4 lg:p-8">{children}</div>
       </main>
     </div>
-    </ClerkProvider>
   );
 }
