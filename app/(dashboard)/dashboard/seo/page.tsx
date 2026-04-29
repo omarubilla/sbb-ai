@@ -1,4 +1,5 @@
 import { client } from "@/sanity/lib/client";
+import { SeoControls } from "@/components/admin/SeoControls";
 
 type ProductSeoRow = {
   _id: string;
@@ -49,6 +50,8 @@ export default async function SeoPage() {
           Last auto refresh: {latestCheckedText}
         </p>
       </div>
+
+      <SeoControls initialLastRefresh={latestCheckedText} />
 
       <div className="overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/50">
         <div className="grid grid-cols-12 gap-4 border-b border-zinc-200/50 bg-zinc-50/50 px-6 py-4 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800/50 dark:bg-zinc-900/50 dark:text-zinc-400">
