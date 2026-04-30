@@ -1,9 +1,5 @@
-import { SignIn } from "@clerk/nextjs";
+import { CustomerEmailAuth } from "@/components/app/CustomerEmailAuth";
 
 export default function SignInPage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <SignIn />
-    </div>
-  );
+  return <CustomerEmailAuth />;
 }
