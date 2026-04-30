@@ -36,6 +36,7 @@ export async function POST(req: Request) {
             name: customer.name ?? null,
             isLegacyCustomer: Boolean(customer.isLegacyCustomer),
             welcomeShown: Boolean(customer.welcomeShown),
+            clerkUserId: customer.clerkUserId ?? null,
           }
         : null,
     });

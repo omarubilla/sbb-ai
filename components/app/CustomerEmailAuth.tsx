@@ -18,6 +18,7 @@ type CustomerLookupResult = {
     name: string | null;
     isLegacyCustomer: boolean;
     welcomeShown: boolean;
+    clerkUserId: string | null;
   } | null;
   error?: string;
 };
@@ -33,17 +34,6 @@ function getClerkErrorMessage(error: unknown): string {
       : null;
 
   return message?.longMessage ?? message?.message ?? "Something went wrong. Please try again.";
-}
-
-function isIdentifierNotFoundError(error: unknown): boolean {
-  if (typeof error !== "object" || error === null || !("errors" in error)) {
-    return false;
-  }
-
-  const firstError = (error as { errors?: Array<{ code?: string; message?: string; longMessage?: string }> }).errors?.[0];
-  const combinedMessage = `${firstError?.message ?? ""} ${firstError?.longMessage ?? ""}`.toLowerCase();
-
-  return firstError?.code === "form_identifier_not_found" || combinedMessage.includes("couldn't find your account");
 }
 
 async function lookupCustomer(email: string): Promise<CustomerLookupResult> {
@@ -113,7 +103,13 @@ export function CustomerEmailAuth() {
           : "Checking for an existing account and sending your sign-in code..."
       );
 
-      try {
+      // Route based on whether the customer already has a Clerk account.
+      // clerkUserId present → they've signed in before → use sign-in path.
+      // clerkUserId absent (legacy/new) → first-time Clerk account creation → use sign-up path.
+      const hasClerkAccount = Boolean(lookup.customer?.clerkUserId);
+
+      if (hasClerkAccount || !lookup.found) {
+        // Existing Clerk user (or unknown email — let Clerk decide).
         const signInAttempt = await signIn.create({
           strategy: "email_code",
           identifier: normalizedEmail,
@@ -133,18 +129,15 @@ export function CustomerEmailAuth() {
         });
 
         setAuthMode("sign-in");
-        setStatusMessage(getWelcomeMessage(name, normalizedEmail));
-      } catch (signInError) {
-        if (!lookup.found || !isIdentifierNotFoundError(signInError)) {
-          throw signInError;
-        }
-
+      } else {
+        // Known customer who has never signed into Clerk — create their account now.
         await signUp.create({ emailAddress: normalizedEmail });
         await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
         setAuthMode("sign-up");
-        setStatusMessage(getWelcomeMessage(name, normalizedEmail));
       }
+
+      setStatusMessage(getWelcomeMessage(name, normalizedEmail));
 
       setCode("");
     } catch (submitError) {
