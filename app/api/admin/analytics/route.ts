@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
-const VERCEL_API = "https://vercel.com/api/v1/analytics";
+// Vercel Web Analytics internal API base (powers the Vercel dashboard)
+const VA_BASE = "https://vercel.com/api/web-analytics/v1";
 
 function daysAgoISO(days: number) {
   const d = new Date();
@@ -20,11 +21,14 @@ export async function GET(req: Request) {
 
   const token = process.env.VERCEL_ACCESS_TOKEN;
   const projectId = process.env.VERCEL_PROJECT_ID;
-  const teamId = process.env.VERCEL_TEAM_ID; // optional
+  const teamId = process.env.VERCEL_TEAM_ID; // optional — required for team-owned projects
 
   if (!token || !projectId) {
     return NextResponse.json(
-      { error: "VERCEL_ACCESS_TOKEN and VERCEL_PROJECT_ID are required. Add them in your Vercel project environment variables." },
+      {
+        error: "VERCEL_ACCESS_TOKEN and VERCEL_PROJECT_ID are required.",
+        missingEnv: true,
+      },
       { status: 503 }
     );
   }
@@ -40,29 +44,52 @@ export async function GET(req: Request) {
     from,
     to,
     environment: "production",
+    granularity: range <= 7 ? "day" : range <= 30 ? "day" : "week",
   });
   if (teamId) params.set("teamId", teamId);
 
-  // Fetch page-view summary and top pages in parallel
+  const headers = { Authorization: `Bearer ${token}` };
+
+  // Fetch timeseries summary and top pages in parallel
   const [summaryRes, pagesRes] = await Promise.all([
-    fetch(`${VERCEL_API}?${params}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-    fetch(`${VERCEL_API}/pages?${params}&limit=10`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }),
+    fetch(`${VA_BASE}/timeseries?${params}`, { headers }),
+    fetch(`${VA_BASE}/pages?${params}&limit=10`, { headers }),
   ]);
 
   if (!summaryRes.ok) {
-    const text = await summaryRes.text();
+    const text = await summaryRes.text().catch(() => "");
+    let parsed: { error?: { message?: string } } = {};
+    try { parsed = JSON.parse(text); } catch { /* ignore */ }
+
     return NextResponse.json(
-      { error: `Vercel Analytics API error ${summaryRes.status}: ${text}` },
+      {
+        error: `Vercel Analytics API error ${summaryRes.status}: ${parsed?.error?.message ?? text}`,
+        dashboardUrl: teamId
+          ? `https://vercel.com/teams/${teamId}/${projectId}/analytics`
+          : `https://vercel.com/dashboard`,
+      },
       { status: summaryRes.status }
     );
   }
 
-  const summary = await summaryRes.json();
-  const pages = pagesRes.ok ? await pagesRes.json() : { data: [] };
+  const summaryJson = await summaryRes.json();
+  const pagesJson = pagesRes.ok ? await pagesRes.json() : { data: [] };
 
-  return NextResponse.json({ summary, pages: pages.data ?? [] });
+  // Aggregate totals from timeseries buckets
+  const buckets: Array<{ visitors?: number; pageviews?: number; bounceRate?: number; avgVisitDuration?: number }> =
+    Array.isArray(summaryJson) ? summaryJson : (summaryJson.data ?? []);
+
+  const totalPageviews = buckets.reduce((s, b) => s + (b.pageviews ?? 0), 0);
+  const uniqueVisitors = buckets.reduce((s, b) => s + (b.visitors ?? 0), 0);
+  const avgBounce = buckets.length
+    ? buckets.reduce((s, b) => s + (b.bounceRate ?? 0), 0) / buckets.length
+    : undefined;
+  const avgDuration = buckets.length
+    ? buckets.reduce((s, b) => s + (b.avgVisitDuration ?? 0), 0) / buckets.length
+    : undefined;
+
+  return NextResponse.json({
+    summary: { totalPageviews, uniqueVisitors, bounceRate: avgBounce, avgVisitDuration: avgDuration },
+    pages: pagesJson.data ?? [],
+  });
 }

@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Eye, TrendingDown, BarChart3, RefreshCw, AlertCircle } from "lucide-react";
+import { Users, Eye, TrendingDown, BarChart3, RefreshCw, AlertCircle, ExternalLink } from "lucide-react";
 
 interface AnalyticsSummary {
   totalPageviews?: number;
   uniqueVisitors?: number;
   bounceRate?: number;
   avgVisitDuration?: number;
-  // Vercel may return different shapes — we handle gracefully
   [key: string]: unknown;
 }
 
@@ -21,6 +20,12 @@ interface TopPage {
 interface AnalyticsData {
   summary: AnalyticsSummary;
   pages: TopPage[];
+}
+
+interface ErrorPayload {
+  error?: string;
+  missingEnv?: boolean;
+  dashboardUrl?: string;
 }
 
 function StatCard({
@@ -38,7 +43,7 @@ function StatCard({
 }) {
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-white/50 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:border-zinc-800/50 dark:bg-zinc-950/50">
-      <div className={`absolute -right-4 -top-4 h-24 w-24 rounded-full blur-2xl transition-all ${color}/10 group-hover:${color}/20`} />
+      <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full blur-2xl opacity-10" />
       <div className="relative flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{label}</p>
@@ -61,7 +66,7 @@ function fmt(n?: number) {
 }
 
 function fmtDuration(secs?: number) {
-  if (secs == null) return "—";
+  if (secs == null || secs === 0) return "—";
   const m = Math.floor(secs / 60);
   const s = Math.round(secs % 60);
   return m > 0 ? `${m}m ${s}s` : `${s}s`;
@@ -70,17 +75,27 @@ function fmtDuration(secs?: number) {
 export function SiteMetricsCards() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dashboardUrl, setDashboardUrl] = useState<string | null>(null);
+  const [missingEnv, setMissingEnv] = useState(false);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState(30);
 
   async function load(r: number) {
     setLoading(true);
     setError(null);
+    setDashboardUrl(null);
+    setMissingEnv(false);
     try {
       const res = await fetch(`/api/admin/analytics?range=${r}`);
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Failed to fetch analytics");
-      setData(json);
+      const json: AnalyticsData | ErrorPayload = await res.json();
+      if (!res.ok) {
+        const payload = json as ErrorPayload;
+        setError(payload.error ?? "Failed to fetch analytics");
+        setDashboardUrl(payload.dashboardUrl ?? null);
+        setMissingEnv(payload.missingEnv ?? false);
+        return;
+      }
+      setData(json as AnalyticsData);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
@@ -90,6 +105,7 @@ export function SiteMetricsCards() {
 
   useEffect(() => {
     load(range);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
 
   const ranges = [7, 30, 90];
@@ -130,14 +146,27 @@ export function SiteMetricsCards() {
       {error ? (
         <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-sm dark:border-amber-800/40 dark:bg-amber-950/20">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-          <div>
+          <div className="flex-1">
             <p className="font-medium text-amber-800 dark:text-amber-300">Analytics not connected</p>
             <p className="mt-1 text-amber-700 dark:text-amber-400">{error}</p>
-            {error.includes("VERCEL_ACCESS_TOKEN") && (
+            {missingEnv && (
               <p className="mt-2 text-xs text-amber-600 dark:text-amber-500">
-                Add <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">VERCEL_ACCESS_TOKEN</code> and{" "}
-                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">VERCEL_PROJECT_ID</code> in your Vercel project settings → Environment Variables.
+                Add{" "}
+                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">VERCEL_ACCESS_TOKEN</code> and{" "}
+                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/50">VERCEL_PROJECT_ID</code> in your
+                Vercel project settings → Environment Variables.
               </p>
+            )}
+            {dashboardUrl && (
+              <a
+                href={dashboardUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:hover:bg-amber-900/60"
+              >
+                <ExternalLink className="h-3 w-3" />
+                View in Vercel Dashboard
+              </a>
             )}
           </div>
         </div>
@@ -172,7 +201,11 @@ export function SiteMetricsCards() {
             />
             <StatCard
               label="Bounce Rate"
-              value={data.summary.bounceRate != null ? `${Math.round((data.summary.bounceRate as number) * 100)}%` : "—"}
+              value={
+                data.summary.bounceRate != null
+                  ? `${Math.round((data.summary.bounceRate as number) * 100)}%`
+                  : "—"
+              }
               icon={TrendingDown}
               color="from-rose-400 to-rose-600"
             />
