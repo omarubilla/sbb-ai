@@ -15,8 +15,11 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { createClerkClient } from "@clerk/nextjs/server";
 import { writeClient, client } from "@/sanity/lib/client";
 import { CUSTOMER_BY_EMAIL_QUERY } from "@/lib/sanity/queries/customers";
+
+const clerkAdmin = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
 interface ClerkEmailAddress {
   id: string;
@@ -95,6 +98,19 @@ export async function POST(req: Request) {
       }
       await patch.commit();
       console.log(`[clerk-webhook] Linked clerkUserId to existing customer ${existing._id}`);
+
+      // If this is a legacy (imported) customer who hasn't been welcomed yet,
+      // flag their Clerk account so the app redirects them to the welcome page.
+      if (existing.isLegacyCustomer && !existing.welcomeShown) {
+        try {
+          await clerkAdmin.users.updateUserMetadata(clerkUserId, {
+            publicMetadata: { needsWelcome: true },
+          });
+          console.log(`[clerk-webhook] Set needsWelcome on ${clerkUserId}`);
+        } catch (metaErr) {
+          console.error("[clerk-webhook] Failed to set needsWelcome metadata:", metaErr);
+        }
+      }
     } else {
       // No matching customer — create a new one
       await writeClient.create({

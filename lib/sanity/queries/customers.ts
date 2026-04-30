@@ -16,6 +16,8 @@ export const CUSTOMER_BY_EMAIL_QUERY = defineQuery(`*[
   state,
   zip,
   country,
+  isLegacyCustomer,
+  welcomeShown,
   createdAt
 }`);
 

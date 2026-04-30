@@ -71,6 +71,13 @@ const nextConfig: NextConfig = {
         destination: "/proteasome?subcategory=26s-proteasome",
         permanent: true,
       },
+
+      // Redirect old /product-page/:slug URLs (indexed by Google) → canonical /products/:slug
+      {
+        source: "/product-page/:slug*",
+        destination: "/products/:slug*",
+        permanent: true,
+      },
     ];
   },
   turbopack: {

@@ -104,6 +104,20 @@ export const customerType = defineType({
       description: "Stripe customer ID for payments",
     }),
     defineField({
+      name: "isLegacyCustomer",
+      type: "boolean",
+      group: "details",
+      description: "Imported from Wix / pre-migration contact list",
+      initialValue: false,
+    }),
+    defineField({
+      name: "welcomeShown",
+      type: "boolean",
+      group: "details",
+      description: "Whether the legacy welcome/reset-password prompt has been shown",
+      initialValue: false,
+    }),
+    defineField({
       name: "createdAt",
       type: "datetime",
       group: "details",

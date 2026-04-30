@@ -12,6 +12,8 @@ const isProtectedRoute = createRouteMatcher([
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)", "/dashboard(.*)"]);
 const isSeoRefreshRoute = createRouteMatcher(["/api/admin/seo/refresh"]);
+const isWelcomeBackRoute = createRouteMatcher(["/welcome-back"]);
+const isApiRoute = createRouteMatcher(["/api(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (GONE_PATHS.has(req.nextUrl.pathname)) {
@@ -42,6 +44,16 @@ export default clerkMiddleware(async (auth, req) => {
     const role = sessionClaims?.publicMetadata?.role;
     if (role !== "admin") {
       return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
+  // Redirect legacy customers to the welcome/reset-password page on first login.
+  // Skip the welcome page itself and all API routes to avoid infinite loops.
+  if (!isWelcomeBackRoute(req) && !isApiRoute(req)) {
+    const { userId, sessionClaims } = await auth();
+    const meta = sessionClaims?.publicMetadata as Record<string, unknown> | undefined;
+    if (userId && meta?.needsWelcome === true) {
+      return NextResponse.redirect(new URL("/welcome-back", req.url));
     }
   }
 
