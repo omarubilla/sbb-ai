@@ -40,6 +40,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       exists: Boolean(user),
       clerkUserId: user?.id ?? null,
+      hasPassword: user?.publicMetadata?.hasPassword === true,
     });
   } catch (error) {
     console.error("[clerk-account-status] Failed to check account:", error);

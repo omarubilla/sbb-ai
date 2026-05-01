@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
-type AuthMode = "sign-in" | "sign-up" | null;
+type AuthMode = "sign-in" | "sign-up" | "password" | null;
 
 type CustomerLookupResult = {
   found: boolean;
@@ -26,6 +26,7 @@ type CustomerLookupResult = {
 type ClerkAccountStatusResult = {
   exists: boolean;
   clerkUserId: string | null;
+  hasPassword: boolean;
   error?: string;
 };
 
@@ -75,9 +76,7 @@ function isAlreadyVerifiedError(error: unknown): boolean {
 async function lookupCustomer(email: string): Promise<CustomerLookupResult> {
   const response = await fetch("/api/auth/customer-lookup", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
 
@@ -92,9 +91,7 @@ async function lookupCustomer(email: string): Promise<CustomerLookupResult> {
 async function lookupClerkAccountStatus(email: string): Promise<ClerkAccountStatusResult> {
   const response = await fetch("/api/auth/clerk-account-status", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
 
@@ -110,6 +107,13 @@ function getWelcomeMessage(name: string | null, email: string): string {
   return name ? `Welcome back, ${name}. We sent a code to ${email}.` : `Welcome back. We sent a code to ${email}.`;
 }
 
+// After first-time sign-in (no password set yet), redirect to welcome-back to set one
+function buildPostAuthRedirect(originalRedirectUrl: string, hasPassword: boolean): string {
+  if (hasPassword) return originalRedirectUrl;
+  const dest = encodeURIComponent(originalRedirectUrl);
+  return `/welcome-back?redirect_url=${dest}`;
+}
+
 export function CustomerEmailAuth() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect_url") ?? "/";
@@ -118,11 +122,14 @@ export function CustomerEmailAuth() {
 
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
   const [authMode, setAuthMode] = useState<AuthMode>(null);
   const [customerName, setCustomerName] = useState<string | null>(null);
   const [submittedEmail, setSubmittedEmail] = useState("");
+  const [customerHasPassword, setCustomerHasPassword] = useState(false);
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
+  const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
@@ -149,10 +156,23 @@ export function CustomerEmailAuth() {
       setCustomerName(name);
       setSubmittedEmail(normalizedEmail);
 
-      // Unknown email — block here, never touch Clerk
       if (!lookup.found) {
         setError("We don't have a customer account for that email. Please contact us at info@south-bay-bio.com.");
         setStatusMessage(null);
+        setIsSubmittingEmail(false);
+        return;
+      }
+
+      const clerkStatus = await lookupClerkAccountStatus(normalizedEmail);
+      const hasClerkAccount = clerkStatus.exists;
+      const hasPassword = clerkStatus.hasPassword;
+
+      setCustomerHasPassword(hasPassword);
+
+      // Returning customer with a password set — ask for it directly
+      if (hasClerkAccount && hasPassword) {
+        setStatusMessage(null);
+        setAuthMode("password");
         setIsSubmittingEmail(false);
         return;
       }
@@ -163,15 +183,9 @@ export function CustomerEmailAuth() {
           : "Welcome back. Sending your sign-in code..."
       );
 
-      // Determine account status directly from Clerk to avoid stale Sanity clerkUserId mismatches.
-      const clerkStatus = await lookupClerkAccountStatus(normalizedEmail);
-      const hasClerkAccount = clerkStatus.exists;
-
       if (hasClerkAccount) {
         try {
-          const signInAttempt = await signIn.create({
-            identifier: normalizedEmail,
-          });
+          const signInAttempt = await signIn.create({ identifier: normalizedEmail });
 
           const emailFactor = signInAttempt.supportedFirstFactors?.find(
             (factor) => factor.strategy === "email_code" && "emailAddressId" in factor
@@ -188,7 +202,6 @@ export function CustomerEmailAuth() {
 
           setAuthMode("sign-in");
         } catch (signInError) {
-          // Stale clerkUserId in Sanity (Clerk account deleted/recreated) — fall back to sign-up
           const errCode = getClerkErrorCode(signInError);
           if (errCode === "form_identifier_not_found") {
             const nameParts = name ? name.trim().split(/\s+/) : [];
@@ -204,7 +217,6 @@ export function CustomerEmailAuth() {
           }
         }
       } else {
-        // Known customer who has never signed into Clerk — create their account now.
         try {
           const nameParts = name ? name.trim().split(/\s+/) : [];
           await signUp.create({
@@ -215,13 +227,9 @@ export function CustomerEmailAuth() {
           await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
           setAuthMode("sign-up");
         } catch (signUpCreateError) {
-          // Clerk account may already exist even if Sanity clerkUserId is empty.
-          // Fall back to sign-in in that case.
           const errCode = getClerkErrorCode(signUpCreateError);
           if (errCode === "form_identifier_exists") {
-            const signInAttempt = await signIn.create({
-              identifier: normalizedEmail,
-            });
+            const signInAttempt = await signIn.create({ identifier: normalizedEmail });
 
             const emailFactor = signInAttempt.supportedFirstFactors?.find(
               (factor) => factor.strategy === "email_code" && "emailAddressId" in factor
@@ -244,7 +252,6 @@ export function CustomerEmailAuth() {
       }
 
       setStatusMessage(getWelcomeMessage(name, normalizedEmail));
-
       setCode("");
     } catch (submitError) {
       const errCode = getClerkErrorCode(submitError);
@@ -255,13 +262,43 @@ export function CustomerEmailAuth() {
         return;
       }
 
-      setError(
-        submitError instanceof Error ? submitError.message : getClerkErrorMessage(submitError)
-      );
+      setError(submitError instanceof Error ? submitError.message : getClerkErrorMessage(submitError));
       setStatusMessage(null);
       setAuthMode(null);
     } finally {
       setIsSubmittingEmail(false);
+    }
+  }
+
+  async function handlePasswordSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!password.trim()) {
+      setError("Enter your password to continue.");
+      return;
+    }
+
+    setIsSubmittingPassword(true);
+    setError(null);
+
+    try {
+      const result = await signIn?.create({
+        identifier: submittedEmail,
+        password: password.trim(),
+      });
+
+      if (result?.status !== "complete") {
+        throw new Error(
+          result?.status
+            ? `Sign-in requires an additional step (${result.status}). Please contact support.`
+            : "Sign-in could not be completed. Please try again."
+        );
+      }
+
+      await setActiveSignIn?.({ session: result.createdSessionId, redirectUrl });
+    } catch (passwordError) {
+      setError(passwordError instanceof Error ? passwordError.message : getClerkErrorMessage(passwordError));
+    } finally {
+      setIsSubmittingPassword(false);
     }
   }
 
@@ -276,6 +313,9 @@ export function CustomerEmailAuth() {
     setError(null);
 
     try {
+      // After email-code auth, redirect to welcome-back to set a password (first time only)
+      const postAuthRedirect = buildPostAuthRedirect(redirectUrl, customerHasPassword);
+
       if (authMode === "sign-in") {
         const result = await signIn?.attemptFirstFactor({
           strategy: "email_code",
@@ -290,16 +330,11 @@ export function CustomerEmailAuth() {
           );
         }
 
-        await setActiveSignIn?.({
-          session: result.createdSessionId,
-          redirectUrl,
-        });
+        await setActiveSignIn?.({ session: result.createdSessionId, redirectUrl: postAuthRedirect });
         return;
       }
 
-      const result = await signUp?.attemptEmailAddressVerification({
-        code: code.trim(),
-      });
+      const result = await signUp?.attemptEmailAddressVerification({ code: code.trim() });
 
       if (result?.status === "missing_requirements") {
         const missing = signUp?.missingFields ?? [];
@@ -316,15 +351,21 @@ export function CustomerEmailAuth() {
           updatePayload.username = `${base}_${Math.random().toString(36).slice(2, 6)}`;
         }
 
+        if (missing.includes("password")) {
+          const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+          updatePayload.password = Array.from({ length: 32 }, () =>
+            chars[Math.floor(Math.random() * chars.length)]
+          ).join("");
+        }
+
         if (Object.keys(updatePayload).length > 0) {
           const updated = await signUp?.update(updatePayload);
           if (updated?.status === "complete" && updated.createdSessionId) {
-            await setActiveSignUp?.({ session: updated.createdSessionId, redirectUrl });
+            await setActiveSignUp?.({ session: updated.createdSessionId, redirectUrl: postAuthRedirect });
             return;
           }
         }
 
-        // Surface exactly what Clerk says is missing for easier debugging
         throw new Error(
           missing.length > 0
             ? `Sign-up incomplete — missing fields: ${missing.join(", ")}. Please contact us at info@south-bay-bio.com.`
@@ -340,18 +381,12 @@ export function CustomerEmailAuth() {
         );
       }
 
-      await setActiveSignUp?.({
-        session: result.createdSessionId,
-        redirectUrl,
-      });
+      await setActiveSignUp?.({ session: result.createdSessionId, redirectUrl: postAuthRedirect });
     } catch (verifyError) {
       if (authMode === "sign-up" && isAlreadyVerifiedError(verifyError)) {
         const completedSessionId = signUp?.createdSessionId;
         if (completedSessionId) {
-          await setActiveSignUp?.({
-            session: completedSessionId,
-            redirectUrl,
-          });
+          await setActiveSignUp?.({ session: completedSessionId, redirectUrl });
           return;
         }
       }
@@ -359,17 +394,12 @@ export function CustomerEmailAuth() {
       if (authMode === "sign-in" && isAlreadyVerifiedError(verifyError)) {
         const completedSessionId = signIn?.createdSessionId;
         if (completedSessionId) {
-          await setActiveSignIn?.({
-            session: completedSessionId,
-            redirectUrl,
-          });
+          await setActiveSignIn?.({ session: completedSessionId, redirectUrl });
           return;
         }
       }
 
-      setError(
-        verifyError instanceof Error ? verifyError.message : getClerkErrorMessage(verifyError)
-      );
+      setError(verifyError instanceof Error ? verifyError.message : getClerkErrorMessage(verifyError));
     } finally {
       setIsSubmittingCode(false);
     }
@@ -378,10 +408,37 @@ export function CustomerEmailAuth() {
   function resetFlow() {
     setAuthMode(null);
     setCode("");
+    setPassword("");
     setCustomerName(null);
     setSubmittedEmail("");
+    setCustomerHasPassword(false);
     setStatusMessage(null);
     setError(null);
+  }
+
+  async function sendCodeInstead() {
+    if (!signIn || !submittedEmail) return;
+    setError(null);
+    setIsSubmittingEmail(true);
+    try {
+      const signInAttempt = await signIn.create({ identifier: submittedEmail });
+      const emailFactor = signInAttempt.supportedFirstFactors?.find(
+        (factor) => factor.strategy === "email_code" && "emailAddressId" in factor
+      );
+      if (!emailFactor || !("emailAddressId" in emailFactor)) {
+        throw new Error("Email code sign-in is not available for this account.");
+      }
+      await signIn.prepareFirstFactor({
+        strategy: "email_code",
+        emailAddressId: emailFactor.emailAddressId,
+      });
+      setAuthMode("sign-in");
+      setStatusMessage(`We sent a code to ${submittedEmail}.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : getClerkErrorMessage(err));
+    } finally {
+      setIsSubmittingEmail(false);
+    }
   }
 
   if (!isLoaded) {
@@ -405,13 +462,15 @@ export function CustomerEmailAuth() {
           <h1 className="mt-3 text-3xl font-semibold text-zinc-950 dark:text-zinc-50">
             Customer Sign In
           </h1>
-          <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Enter your email. We&apos;ll check your customer record, welcome you by name when we can,
-            and send a secure Clerk code to finish sign-in.
-          </p>
+          {authMode !== "password" && (
+            <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              Enter your email. We&apos;ll check your customer record and send a secure code to finish sign-in.
+            </p>
+          )}
         </div>
 
-        {!authMode ? (
+        {/* Step 1: Email entry */}
+        {!authMode && (
           <form className="space-y-4" onSubmit={handleEmailSubmit}>
             <div className="space-y-2">
               <label className="text-sm font-medium text-zinc-800 dark:text-zinc-200" htmlFor="email">
@@ -445,12 +504,72 @@ export function CustomerEmailAuth() {
 
             <Button className="h-11 w-full" disabled={isSubmittingEmail} type="submit">
               {isSubmittingEmail ? <Spinner className="size-4" /> : null}
-              <span>{isSubmittingEmail ? "Checking and sending code..." : "Continue with email"}</span>
+              <span>{isSubmittingEmail ? "Checking..." : "Continue with email"}</span>
             </Button>
 
             <div className="mt-2" id="clerk-captcha" />
           </form>
-        ) : (
+        )}
+
+        {/* Step 2a: Password sign-in (returning customer with password set) */}
+        {authMode === "password" && (
+          <form className="space-y-4" onSubmit={handlePasswordSubmit}>
+            <div className="rounded-2xl bg-zinc-100 px-4 py-3 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+              <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                {customerName ? `Welcome back, ${customerName}` : "Welcome back"}
+              </p>
+              <p className="mt-1 text-zinc-500 dark:text-zinc-400">{submittedEmail}</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-zinc-800 dark:text-zinc-200" htmlFor="password">
+                Password
+              </label>
+              <Input
+                id="password"
+                autoComplete="current-password"
+                className="h-11"
+                disabled={isSubmittingPassword}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter your password"
+                type="password"
+                value={password}
+              />
+            </div>
+
+            {error ? (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300">
+                {error}
+              </div>
+            ) : null}
+
+            <Button className="h-11 w-full" disabled={isSubmittingPassword} type="submit">
+              {isSubmittingPassword ? <Spinner className="size-4" /> : null}
+              <span>{isSubmittingPassword ? "Signing in..." : "Sign in"}</span>
+            </Button>
+
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={sendCodeInstead}
+                disabled={isSubmittingEmail || isSubmittingPassword}
+                className="text-center text-sm text-zinc-500 underline underline-offset-2 hover:text-zinc-800 dark:hover:text-zinc-200 disabled:opacity-50"
+              >
+                {isSubmittingEmail ? "Sending code..." : "Forgot password? Send me a code instead"}
+              </button>
+              <button
+                type="button"
+                onClick={resetFlow}
+                className="text-center text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              >
+                Use a different email
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Step 2b: Email code verification (first-time or no password) */}
+        {(authMode === "sign-in" || authMode === "sign-up") && (
           <form className="space-y-4" onSubmit={handleCodeSubmit}>
             <div className="rounded-2xl bg-zinc-100 px-4 py-3 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
               <p className="font-medium text-zinc-900 dark:text-zinc-50">
@@ -493,7 +612,10 @@ export function CustomerEmailAuth() {
         )}
 
         <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
-          Need a new customer account? <Link className="font-medium text-zinc-950 underline dark:text-zinc-50" href="/sign-up">Use the same email flow here.</Link>
+          Need a new customer account?{" "}
+          <Link className="font-medium text-zinc-950 underline dark:text-zinc-50" href="/sign-up">
+            Use the same email flow here.
+          </Link>
         </p>
       </div>
     </div>

@@ -8,6 +8,25 @@ import { redirect } from "next/navigation";
 
 const clerkAdmin = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
+export async function markPasswordSet(nextUrl: string = "/") {
+  const { userId } = await auth();
+  if (!userId) redirect("/sign-in");
+
+  const customer = await client.fetch(CUSTOMER_BY_CLERK_ID_QUERY, { clerkUserId: userId });
+  if (customer) {
+    await writeClient
+      .patch(customer._id)
+      .set({ welcomeShown: true })
+      .commit({ visibility: "async" });
+  }
+
+  await clerkAdmin.users.updateUserMetadata(userId, {
+    publicMetadata: { hasPassword: true, needsWelcome: false },
+  });
+
+  redirect(nextUrl);
+}
+
 export async function dismissWelcome() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
