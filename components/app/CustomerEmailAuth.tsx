@@ -23,6 +23,12 @@ type CustomerLookupResult = {
   error?: string;
 };
 
+type ClerkAccountStatusResult = {
+  exists: boolean;
+  clerkUserId: string | null;
+  error?: string;
+};
+
 function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
 }
@@ -67,6 +73,23 @@ async function lookupCustomer(email: string): Promise<CustomerLookupResult> {
   const result = (await response.json()) as CustomerLookupResult;
   if (!response.ok) {
     throw new Error(result.error ?? "Unable to look up customer");
+  }
+
+  return result;
+}
+
+async function lookupClerkAccountStatus(email: string): Promise<ClerkAccountStatusResult> {
+  const response = await fetch("/api/auth/clerk-account-status", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  const result = (await response.json()) as ClerkAccountStatusResult;
+  if (!response.ok) {
+    throw new Error(result.error ?? "Unable to look up Clerk account");
   }
 
   return result;
@@ -129,10 +152,9 @@ export function CustomerEmailAuth() {
           : "Welcome back. Sending your sign-in code..."
       );
 
-      // Route based on whether the customer already has a Clerk account.
-      // clerkUserId present → they've signed in before → use sign-in path.
-      // clerkUserId absent → first-time Clerk account creation → use sign-up path.
-      const hasClerkAccount = Boolean(lookup.customer?.clerkUserId);
+      // Determine account status directly from Clerk to avoid stale Sanity clerkUserId mismatches.
+      const clerkStatus = await lookupClerkAccountStatus(normalizedEmail);
+      const hasClerkAccount = clerkStatus.exists;
 
       if (hasClerkAccount) {
         try {
@@ -156,7 +178,7 @@ export function CustomerEmailAuth() {
           setAuthMode("sign-in");
         } catch (signInError) {
           // Stale clerkUserId in Sanity (Clerk account deleted/recreated) — fall back to sign-up
-          const errCode = (signInError as { errors?: Array<{ code?: string }> })?.errors?.[0]?.code;
+          const errCode = getClerkErrorCode(signInError);
           if (errCode === "form_identifier_not_found") {
             await signUp.create({ emailAddress: normalizedEmail });
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
@@ -204,6 +226,14 @@ export function CustomerEmailAuth() {
 
       setCode("");
     } catch (submitError) {
+      const errCode = getClerkErrorCode(submitError);
+      if (errCode === "captcha_missing_token" || errCode === "captcha_invalid" || errCode === "captcha_not_enabled") {
+        setError("Security check is still initializing. Please wait 2-3 seconds and try Continue again.");
+        setStatusMessage(null);
+        setAuthMode(null);
+        return;
+      }
+
       setError(
         submitError instanceof Error ? submitError.message : getClerkErrorMessage(submitError)
       );
