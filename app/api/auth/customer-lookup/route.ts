@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { CUSTOMER_BY_EMAIL_QUERY } from "@/lib/sanity/queries/customers";
-import { client } from "@/sanity/lib/client";
+import { writeClient } from "@/sanity/lib/client";
 
 function normalizeEmail(value: unknown): string {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const customer = await client.fetch(CUSTOMER_BY_EMAIL_QUERY, { email });
+    const customer = await writeClient.fetch(CUSTOMER_BY_EMAIL_QUERY, { email });
 
     return NextResponse.json({
       found: Boolean(customer),
