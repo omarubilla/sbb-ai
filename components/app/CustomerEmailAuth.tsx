@@ -95,45 +95,62 @@ export function CustomerEmailAuth() {
 
       setCustomerName(name);
       setSubmittedEmail(normalizedEmail);
+
+      // Unknown email — block here, never touch Clerk
+      if (!lookup.found) {
+        setError("We don't have a customer account for that email. Please contact us at info@south-bay-bio.com.");
+        setStatusMessage(null);
+        setIsSubmittingEmail(false);
+        return;
+      }
+
       setStatusMessage(
-        lookup.found
-          ? name
-            ? `Welcome back, ${name}. Sending your sign-in code...`
-            : "Welcome back. Sending your sign-in code..."
-          : "Checking for an existing account and sending your sign-in code..."
+        name
+          ? `Welcome back, ${name}. Sending your sign-in code...`
+          : "Welcome back. Sending your sign-in code..."
       );
 
       // Route based on whether the customer already has a Clerk account.
       // clerkUserId present → they've signed in before → use sign-in path.
-      // clerkUserId absent (legacy/new) → first-time Clerk account creation → use sign-up path.
+      // clerkUserId absent → first-time Clerk account creation → use sign-up path.
       const hasClerkAccount = Boolean(lookup.customer?.clerkUserId);
 
-      if (hasClerkAccount || !lookup.found) {
-        // Existing Clerk user (or unknown email — let Clerk decide).
-        const signInAttempt = await signIn.create({
-          strategy: "email_code",
-          identifier: normalizedEmail,
-        });
+      if (hasClerkAccount) {
+        try {
+          const signInAttempt = await signIn.create({
+            strategy: "email_code",
+            identifier: normalizedEmail,
+          });
 
-        const emailFactor = signInAttempt.supportedFirstFactors?.find(
-          (factor) => factor.strategy === "email_code" && "emailAddressId" in factor
-        );
+          const emailFactor = signInAttempt.supportedFirstFactors?.find(
+            (factor) => factor.strategy === "email_code" && "emailAddressId" in factor
+          );
 
-        if (!emailFactor || !("emailAddressId" in emailFactor)) {
-          throw new Error("Email code sign-in is not available for this account.");
+          if (!emailFactor || !("emailAddressId" in emailFactor)) {
+            throw new Error("Email code sign-in is not available for this account.");
+          }
+
+          await signIn.prepareFirstFactor({
+            strategy: "email_code",
+            emailAddressId: emailFactor.emailAddressId,
+          });
+
+          setAuthMode("sign-in");
+        } catch (signInError) {
+          // Stale clerkUserId in Sanity (Clerk account deleted/recreated) — fall back to sign-up
+          const errCode = (signInError as { errors?: Array<{ code?: string }> })?.errors?.[0]?.code;
+          if (errCode === "form_identifier_not_found") {
+            await signUp.create({ emailAddress: normalizedEmail });
+            await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+            setAuthMode("sign-up");
+          } else {
+            throw signInError;
+          }
         }
-
-        await signIn.prepareFirstFactor({
-          strategy: "email_code",
-          emailAddressId: emailFactor.emailAddressId,
-        });
-
-        setAuthMode("sign-in");
       } else {
         // Known customer who has never signed into Clerk — create their account now.
         await signUp.create({ emailAddress: normalizedEmail });
         await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
         setAuthMode("sign-up");
       }
 
