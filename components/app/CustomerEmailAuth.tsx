@@ -191,7 +191,12 @@ export function CustomerEmailAuth() {
           // Stale clerkUserId in Sanity (Clerk account deleted/recreated) — fall back to sign-up
           const errCode = getClerkErrorCode(signInError);
           if (errCode === "form_identifier_not_found") {
-            await signUp.create({ emailAddress: normalizedEmail });
+            const nameParts = name ? name.trim().split(/\s+/) : [];
+            await signUp.create({
+              emailAddress: normalizedEmail,
+              ...(nameParts[0] && { firstName: nameParts[0] }),
+              ...(nameParts.length > 1 && { lastName: nameParts.slice(1).join(" ") }),
+            });
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
             setAuthMode("sign-up");
           } else {
@@ -201,7 +206,12 @@ export function CustomerEmailAuth() {
       } else {
         // Known customer who has never signed into Clerk — create their account now.
         try {
-          await signUp.create({ emailAddress: normalizedEmail });
+          const nameParts = name ? name.trim().split(/\s+/) : [];
+          await signUp.create({
+            emailAddress: normalizedEmail,
+            ...(nameParts[0] && { firstName: nameParts[0] }),
+            ...(nameParts.length > 1 && { lastName: nameParts.slice(1).join(" ") }),
+          });
           await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
           setAuthMode("sign-up");
         } catch (signUpCreateError) {
@@ -291,10 +301,41 @@ export function CustomerEmailAuth() {
         code: code.trim(),
       });
 
+      if (result?.status === "missing_requirements") {
+        const missing = signUp?.missingFields ?? [];
+        const updatePayload: Record<string, string> = {};
+
+        if (missing.includes("first_name") || missing.includes("last_name")) {
+          const nameParts = customerName ? customerName.trim().split(/\s+/) : [];
+          if (nameParts[0]) updatePayload.firstName = nameParts[0];
+          if (nameParts.length > 1) updatePayload.lastName = nameParts.slice(1).join(" ");
+        }
+
+        if (missing.includes("username")) {
+          const base = submittedEmail.split("@")[0].replace(/[^a-z0-9]/gi, "_").toLowerCase();
+          updatePayload.username = `${base}_${Math.random().toString(36).slice(2, 6)}`;
+        }
+
+        if (Object.keys(updatePayload).length > 0) {
+          const updated = await signUp?.update(updatePayload);
+          if (updated?.status === "complete" && updated.createdSessionId) {
+            await setActiveSignUp?.({ session: updated.createdSessionId, redirectUrl });
+            return;
+          }
+        }
+
+        // Surface exactly what Clerk says is missing for easier debugging
+        throw new Error(
+          missing.length > 0
+            ? `Sign-up incomplete — missing fields: ${missing.join(", ")}. Please contact us at info@south-bay-bio.com.`
+            : "Sign-up could not be completed. Please contact us at info@south-bay-bio.com."
+        );
+      }
+
       if (result?.status !== "complete") {
         throw new Error(
           result?.status
-            ? `Sign-up requires an additional step (${result.status}). Please contact support.`
+            ? `Sign-up could not be completed (${result.status}). Please contact support.`
             : "Sign-up could not be completed. Please request a new code and try again."
         );
       }
