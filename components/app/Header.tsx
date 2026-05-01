@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, Package, ShoppingBag, Sparkles, Truck, User } from "lucide-react";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useCartActions, useTotalItems } from "@/lib/store/cart-store-provider";
@@ -154,12 +154,12 @@ export function Header({ categories }: HeaderProps) {
             </UserButton>
           </SignedIn>
           <SignedOut>
-            <SignInButton mode="modal">
-              <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/sign-in">
                 <User className="h-5 w-5" />
                 <span className="sr-only">Sign in</span>
-              </Button>
-            </SignInButton>
+              </Link>
+            </Button>
           </SignedOut>
         </div>
       </div>
