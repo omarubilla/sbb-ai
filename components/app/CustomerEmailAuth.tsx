@@ -34,12 +34,23 @@ function normalizeEmail(value: string): string {
 }
 
 function getClerkErrorMessage(error: unknown): string {
-  const message =
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  const firstError =
     typeof error === "object" && error !== null && "errors" in error
-      ? (error as { errors?: Array<{ longMessage?: string; message?: string }> }).errors?.[0]
+      ? (error as { errors?: Array<{ code?: string; longMessage?: string; message?: string }> }).errors?.[0]
       : null;
 
-  return message?.longMessage ?? message?.message ?? "Something went wrong. Please try again.";
+  if (firstError?.longMessage) return firstError.longMessage;
+  if (firstError?.message) return firstError.message;
+
+  if (firstError?.code) {
+    return `Authentication failed (${firstError.code}). Please try again.`;
+  }
+
+  return "Authentication failed. Please refresh and try again.";
 }
 
 function getClerkErrorCode(error: unknown): string | null {
@@ -307,7 +318,9 @@ export function CustomerEmailAuth() {
         }
       }
 
-      setError(getClerkErrorMessage(verifyError));
+      setError(
+        verifyError instanceof Error ? verifyError.message : getClerkErrorMessage(verifyError)
+      );
     } finally {
       setIsSubmittingCode(false);
     }
