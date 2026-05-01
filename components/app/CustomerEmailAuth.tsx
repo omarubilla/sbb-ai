@@ -272,8 +272,12 @@ export function CustomerEmailAuth() {
           code: code.trim(),
         });
 
-        if (!result?.createdSessionId) {
-          throw new Error("Verification succeeded but no session was returned. Please request a new code and try again.");
+        if (result?.status !== "complete") {
+          throw new Error(
+            result?.status
+              ? `Sign-in requires an additional step (${result.status}). Please contact support.`
+              : "Sign-in could not be completed. Please request a new code and try again."
+          );
         }
 
         await setActiveSignIn?.({
@@ -287,8 +291,12 @@ export function CustomerEmailAuth() {
         code: code.trim(),
       });
 
-      if (!result?.createdSessionId) {
-        throw new Error("Verification succeeded but no session was returned. Please request a new code and try again.");
+      if (result?.status !== "complete") {
+        throw new Error(
+          result?.status
+            ? `Sign-up requires an additional step (${result.status}). Please contact support.`
+            : "Sign-up could not be completed. Please request a new code and try again."
+        );
       }
 
       await setActiveSignUp?.({
