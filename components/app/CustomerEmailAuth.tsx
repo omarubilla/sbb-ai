@@ -36,6 +36,25 @@ function getClerkErrorMessage(error: unknown): string {
   return message?.longMessage ?? message?.message ?? "Something went wrong. Please try again.";
 }
 
+function getClerkErrorCode(error: unknown): string | null {
+  if (typeof error !== "object" || error === null || !("errors" in error)) {
+    return null;
+  }
+
+  const firstError = (error as { errors?: Array<{ code?: string }> }).errors?.[0];
+  return firstError?.code ?? null;
+}
+
+function isAlreadyVerifiedError(error: unknown): boolean {
+  const code = getClerkErrorCode(error);
+  if (code === "verification_already_verified" || code === "form_code_already_verified") {
+    return true;
+  }
+
+  const message = getClerkErrorMessage(error).toLowerCase();
+  return message.includes("already been verified");
+}
+
 async function lookupCustomer(email: string): Promise<CustomerLookupResult> {
   const response = await fetch("/api/auth/customer-lookup", {
     method: "POST",
@@ -149,9 +168,38 @@ export function CustomerEmailAuth() {
         }
       } else {
         // Known customer who has never signed into Clerk — create their account now.
-        await signUp.create({ emailAddress: normalizedEmail });
-        await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-        setAuthMode("sign-up");
+        try {
+          await signUp.create({ emailAddress: normalizedEmail });
+          await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+          setAuthMode("sign-up");
+        } catch (signUpCreateError) {
+          // Clerk account may already exist even if Sanity clerkUserId is empty.
+          // Fall back to sign-in in that case.
+          const errCode = getClerkErrorCode(signUpCreateError);
+          if (errCode === "form_identifier_exists") {
+            const signInAttempt = await signIn.create({
+              strategy: "email_code",
+              identifier: normalizedEmail,
+            });
+
+            const emailFactor = signInAttempt.supportedFirstFactors?.find(
+              (factor) => factor.strategy === "email_code" && "emailAddressId" in factor
+            );
+
+            if (!emailFactor || !("emailAddressId" in emailFactor)) {
+              throw new Error("Email code sign-in is not available for this account.");
+            }
+
+            await signIn.prepareFirstFactor({
+              strategy: "email_code",
+              emailAddressId: emailFactor.emailAddressId,
+            });
+
+            setAuthMode("sign-in");
+          } else {
+            throw signUpCreateError;
+          }
+        }
       }
 
       setStatusMessage(getWelcomeMessage(name, normalizedEmail));
@@ -209,6 +257,28 @@ export function CustomerEmailAuth() {
         redirectUrl,
       });
     } catch (verifyError) {
+      if (authMode === "sign-up" && isAlreadyVerifiedError(verifyError)) {
+        const completedSessionId = signUp?.createdSessionId;
+        if (completedSessionId) {
+          await setActiveSignUp?.({
+            session: completedSessionId,
+            redirectUrl,
+          });
+          return;
+        }
+      }
+
+      if (authMode === "sign-in" && isAlreadyVerifiedError(verifyError)) {
+        const completedSessionId = signIn?.createdSessionId;
+        if (completedSessionId) {
+          await setActiveSignIn?.({
+            session: completedSessionId,
+            redirectUrl,
+          });
+          return;
+        }
+      }
+
       setError(getClerkErrorMessage(verifyError));
     } finally {
       setIsSubmittingCode(false);
