@@ -137,7 +137,6 @@ export function CustomerEmailAuth() {
       if (hasClerkAccount) {
         try {
           const signInAttempt = await signIn.create({
-            strategy: "email_code",
             identifier: normalizedEmail,
           });
 
@@ -178,7 +177,6 @@ export function CustomerEmailAuth() {
           const errCode = getClerkErrorCode(signUpCreateError);
           if (errCode === "form_identifier_exists") {
             const signInAttempt = await signIn.create({
-              strategy: "email_code",
               identifier: normalizedEmail,
             });
 
@@ -357,6 +355,8 @@ export function CustomerEmailAuth() {
               {isSubmittingEmail ? <Spinner className="size-4" /> : null}
               <span>{isSubmittingEmail ? "Checking and sending code..." : "Continue with email"}</span>
             </Button>
+
+            <div className="mt-2" id="clerk-captcha" />
           </form>
         ) : (
           <form className="space-y-4" onSubmit={handleCodeSubmit}>
