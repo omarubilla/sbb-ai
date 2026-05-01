@@ -272,12 +272,13 @@ export function CustomerEmailAuth() {
           code: code.trim(),
         });
 
-        if (!result?.createdSessionId) {
-          throw new Error("We could not complete sign-in with that code.");
+        const sessionId = result?.createdSessionId ?? signIn?.createdSessionId;
+        if (!sessionId) {
+          throw new Error("Verification succeeded but no session was returned. Please request a new code and try again.");
         }
 
         await setActiveSignIn?.({
-          session: result.createdSessionId,
+          session: sessionId,
           redirectUrl,
         });
         return;
@@ -287,12 +288,13 @@ export function CustomerEmailAuth() {
         code: code.trim(),
       });
 
-      if (!result?.createdSessionId) {
-        throw new Error("We could not complete sign-in with that code.");
+      const sessionId = result?.createdSessionId ?? signUp?.createdSessionId;
+      if (!sessionId) {
+        throw new Error("Verification succeeded but no session was returned. Please request a new code and try again.");
       }
 
       await setActiveSignUp?.({
-        session: result.createdSessionId,
+        session: sessionId,
         redirectUrl,
       });
     } catch (verifyError) {
