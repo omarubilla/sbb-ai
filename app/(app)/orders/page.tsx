@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { Package, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -9,6 +9,7 @@ import { ORDERS_BY_USER_QUERY } from "@/lib/sanity/queries/orders";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
 import { formatPrice, formatDate, formatOrderNumber } from "@/lib/utils";
 import { StackedProductImages } from "@/components/app/StackedProductImages";
+import type { ORDERS_BY_USER_QUERYResult } from "@/sanity.types";
 
 export const metadata: Metadata = {
   title: "Your Orders | South Bay Bio",
@@ -21,11 +22,16 @@ export const metadata: Metadata = {
 
 export default async function OrdersPage() {
   const { userId } = await auth();
+  const clerkUser = await currentUser();
+  const primaryEmail =
+    clerkUser?.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
+      ?.emailAddress ?? clerkUser?.emailAddresses[0]?.emailAddress;
 
-  const { data: orders } = await sanityFetch({
+  const { data: ordersData } = await sanityFetch({
     query: ORDERS_BY_USER_QUERY,
-    params: { clerkUserId: userId ?? "" },
+    params: { clerkUserId: userId ?? "", email: primaryEmail ?? null },
   });
+  const orders: ORDERS_BY_USER_QUERYResult = ordersData ?? [];
 
   if (orders.length === 0) {
     return (

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { ArrowLeft, CreditCard, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { sanityFetch } from "@/sanity/lib/live";
@@ -26,14 +26,22 @@ interface OrderPageProps {
 export default async function OrderDetailPage({ params }: OrderPageProps) {
   const { id } = await params;
   const { userId } = await auth();
+  const clerkUser = await currentUser();
+  const primaryEmail =
+    clerkUser?.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
+      ?.emailAddress?.toLowerCase() ?? clerkUser?.emailAddresses[0]?.emailAddress?.toLowerCase();
 
   const { data: order } = await sanityFetch({
     query: ORDER_BY_ID_QUERY,
     params: { id },
   });
 
-  // Verify order exists and belongs to current user
-  if (!order || order.clerkUserId !== userId) {
+  // Verify order exists and belongs to current user.
+  const orderEmail = order?.email?.toLowerCase();
+  const ownsByClerkId = Boolean(userId && order?.clerkUserId === userId);
+  const ownsByEmail = Boolean(!order?.clerkUserId && primaryEmail && orderEmail === primaryEmail);
+
+  if (!order || (!ownsByClerkId && !ownsByEmail)) {
     notFound();
   }
 

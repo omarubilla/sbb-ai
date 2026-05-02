@@ -1,12 +1,19 @@
 import { defineQuery } from "next-sanity";
 
 /**
- * Get orders by Clerk user ID
- * Used on orders list page
+ * Get orders by Clerk user ID with email fallback for legacy records.
+ * Used on orders list page.
  */
 export const ORDERS_BY_USER_QUERY = defineQuery(`*[
   _type == "order"
-  && clerkUserId == $clerkUserId
+  && (
+    clerkUserId == $clerkUserId
+    || (
+      !defined(clerkUserId)
+      && defined($email)
+      && lower(email) == lower($email)
+    )
+  )
 ] | order(createdAt desc) {
   _id,
   orderNumber,
