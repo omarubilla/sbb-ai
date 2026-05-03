@@ -9,8 +9,7 @@ export const ORDERS_BY_USER_QUERY = defineQuery(`*[
   && (
     clerkUserId == $clerkUserId
     || (
-      !defined(clerkUserId)
-      && defined($email)
+      defined($email)
       && lower(email) == lower($email)
     )
   )

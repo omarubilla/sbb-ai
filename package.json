@@ -14,6 +14,8 @@
     "import:customers": "node scripts/importCustomerAccounts.mjs --apply",
     "import:merged:dry": "node scripts/importMergedCustomers.mjs",
     "import:merged": "node scripts/importMergedCustomers.mjs --apply",
+    "import:wix-orders:dry": "node scripts/importWixOrders.mjs --input=./data/wix-orders.json",
+    "import:wix-orders": "node scripts/importWixOrders.mjs --input=./data/wix-orders.json --apply",
     "sync:sbb-specs": "node scrape-south-bay-bio-specs.mjs",
     "sync:coa:dry": "pnpm ts-node scripts/syncCoaToSanity.ts --dry-run",
     "sync:coa": "pnpm ts-node scripts/syncCoaToSanity.ts",
