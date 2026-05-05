@@ -126,11 +126,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
       {/* Description */}
       <div className="mt-4 space-y-2">
         {displayDescriptionMeta && (
-          <p className="font-medium text-zinc-700 dark:text-zinc-300">
+          <p className="font-semibold text-zinc-700 dark:text-zinc-300">
             {displayDescriptionMeta}
           </p>
         )}
-        <p className="text-zinc-600 dark:text-zinc-400">{descriptionSummary}</p>
+        <p className="whitespace-pre-line text-zinc-600 dark:text-zinc-400">{descriptionSummary}</p>
       </div>
 
       {/* Stock & Add to Cart */}

@@ -1,8 +1,13 @@
 function normalizeDescription(description?: string | null) {
   return (
     description
-      ?.replace(/\s+/g, " ")
-      .replace(/\u00b5/g, "\u03bc")
+      ?.replace(/\u00b5/g, "\u03bc")
+      // Normalize line endings
+      .replace(/\r\n?/g, "\n")
+      // Collapse horizontal whitespace (not newlines) to single space
+      .replace(/[^\S\n]+/g, " ")
+      // Collapse 3+ consecutive newlines down to 2
+      .replace(/\n{3,}/g, "\n\n")
       .trim() ?? ""
   );
 }
@@ -38,11 +43,21 @@ export function splitProductDescription(
   }
 
   const catalogPrefixMatch = normalized.match(
-    /^Catalog\s*(?:[Nn]umber|#|[Nn]o\.?)\s*:\s*/,
+    /^Catalog\s*(?:[Nn]umber|#|[Nn]o\.?)\s*:?[\s\u00a0]*/,
   );
 
   if (catalogPrefixMatch) {
     const rest = normalized.slice(catalogPrefixMatch[0].length).trim();
+
+    // Split at the first newline boundary (explicit paragraph break in the data)
+    const newlineSplit = rest.match(/^([^\n]+)\n+([\s\S]+)$/);
+    if (newlineSplit) {
+      return {
+        meta: `Catalog number: ${newlineSplit[1].trim()}`,
+        summary: newlineSplit[2].trim() || "Product details coming soon.",
+      };
+    }
+
     const normalizedQuantity = normalizeDescription(quantity);
 
     if (normalizedQuantity) {
